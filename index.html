@@ -1,809 +1,862 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard PROA Integrado - Hospital General Riobamba IESS</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-    <style>
-        :root{--primary:#1a237e;--primary-light:#3949ab;--accent:#00bcd4;--accent2:#26a69a;--danger:#e53935;--danger-light:#ffcdd2;--warning:#ff9800;--warning-light:#fff3e0;--success:#43a047;--success-light:#e8f5e9;--bg:#f0f2f5;--card:#fff;--text:#212121;--text-sec:#616161;--border:#e0e0e0;--shadow:0 2px 12px rgba(0,0,0,.08);--purple:#7b1fa2;--indigo:#283593}
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-        .header{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;position:sticky;top:0;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,.15)}
-        .header-top{display:flex;align-items:center;justify-content:space-between;padding:10px 24px}
-        .header-logo{display:flex;align-items:center;gap:14px}
-        .header-logo .icon{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
-        .header-logo h1{font-size:18px;font-weight:700}
-        .header-logo .subtitle{font-size:11px;opacity:.85}
-        .header-meta{text-align:right;font-size:11px;opacity:.85}
-        .header-meta .date{font-size:13px;font-weight:600;opacity:1}
-        .nav-tabs{display:flex;padding:0 16px;gap:1px;background:rgba(0,0,0,.1);overflow-x:auto;-webkit-overflow-scrolling:touch}
-        .nav-tab{padding:8px 13px;color:rgba(255,255,255,.7);cursor:pointer;font-size:11px;font-weight:500;border-bottom:3px solid transparent;transition:all .3s;white-space:nowrap}
-        .nav-tab:hover{color:#fff;background:rgba(255,255,255,.05)}
-        .nav-tab.active{color:#fff;border-bottom-color:var(--accent);background:rgba(255,255,255,.1)}
-        .alert-banner{background:linear-gradient(90deg,#b71c1c,#c62828);color:#fff;padding:6px 24px;font-size:11px;display:flex;align-items:center;gap:8px}
-        .alert-banner .badge{background:#fff;color:#b71c1c;padding:2px 8px;border-radius:4px;font-weight:700;font-size:9px}
-        .main-content{max-width:1680px;margin:0 auto;padding:14px 20px}
-        .tab-content{display:none}.tab-content.active{display:block}
-        select,button{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:#fff;cursor:pointer}
-        .btn-export{background:var(--accent2);color:#fff;border-color:var(--accent2);font-weight:600}
-        .controls-bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-        .control-group{display:flex;align-items:center;gap:5px}
-        .control-group label{font-size:10px;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.5px}
-
-        /* KPI */
-        .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
-        .kpi-card{background:var(--card);border-radius:10px;padding:14px;box-shadow:var(--shadow);border-left:4px solid var(--accent)}
-        .kpi-card.danger{border-left-color:var(--danger)}.kpi-card.warning{border-left-color:var(--warning)}.kpi-card.success{border-left-color:var(--success)}.kpi-card.purple{border-left-color:var(--purple)}
-        .kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-sec);font-weight:600;margin-bottom:5px}
-        .kpi-value{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px}
-        .kpi-trend{font-size:10px;color:var(--text-sec)}.kpi-trend.up{color:var(--danger)}.kpi-trend.down{color:var(--success)}
-
-        /* Charts */
-        .chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px}
-        .chart-grid.triple{grid-template-columns:repeat(3,1fr)}
-        .chart-card{background:var(--card);border-radius:10px;padding:14px;box-shadow:var(--shadow)}
-        .chart-card.full-width{grid-column:1/-1}
-        .chart-card h3{font-size:12px;font-weight:700;margin-bottom:2px}
-        .chart-card .chart-subtitle{font-size:9px;color:var(--text-sec);margin-bottom:10px}
-        .chart-container{position:relative;height:260px}.chart-container.tall{height:330px}.chart-container.short{height:190px}.chart-container.xtall{height:400px}
-
-        /* Alerts */
-        .alerts-panel{background:var(--card);border-radius:10px;padding:14px;box-shadow:var(--shadow);margin-bottom:18px}
-        .alerts-panel h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-        .alert-item{padding:10px 12px;border-radius:7px;margin-bottom:5px;display:flex;align-items:flex-start;gap:8px;font-size:11px;line-height:1.5}
-        .alert-item.critical{background:#fce4ec;border-left:4px solid var(--danger)}
-        .alert-item.warning{background:var(--warning-light);border-left:4px solid var(--warning)}
-        .alert-item.info{background:#e3f2fd;border-left:4px solid #1976d2}
-        .alert-item.success{background:var(--success-light);border-left:4px solid var(--success)}
-        .alert-icon{font-size:14px;flex-shrink:0}.alert-content{flex:1}
-        .alert-content strong{display:block;margin-bottom:1px;font-size:11px}
-        .alert-content .alert-detail{color:var(--text-sec);font-size:10px}
-        .alert-tag{font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700;text-transform:uppercase;white-space:nowrap}
-        .alert-tag.critical{background:var(--danger);color:#fff}.alert-tag.warning{background:var(--warning);color:#fff}
-
-        /* Reco */
-        .reco-panel{background:var(--card);border-radius:10px;padding:14px;box-shadow:var(--shadow);margin-bottom:18px}
-        .reco-panel h3{font-size:14px;font-weight:700;margin-bottom:10px;color:var(--primary)}
-        .reco-item{padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
-        .reco-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-        .reco-header h4{font-size:12px;font-weight:600}
-        .reco-priority{font-size:8px;padding:2px 8px;border-radius:20px;font-weight:700;text-transform:uppercase}
-        .reco-priority.high{background:#ffcdd2;color:#b71c1c}.reco-priority.medium{background:#fff3e0;color:#e65100}.reco-priority.low{background:#e8f5e9;color:#2e7d32}
-        .reco-body{font-size:11px;color:var(--text-sec);line-height:1.6}
-        .reco-body ul{margin-top:3px;padding-left:14px}.reco-body li{margin-bottom:2px}
-        .reco-meta{margin-top:5px;font-size:9px;color:#9e9e9e;display:flex;gap:12px}
-
-        /* Tables */
-        .data-table-wrapper{overflow-x:auto;background:var(--card);border-radius:10px;box-shadow:var(--shadow);margin-bottom:18px;padding-bottom:4px}
-        .data-table-wrapper h3{padding:12px 14px 6px;font-size:13px;font-weight:700}
-        .data-table-wrapper .table-note{padding:2px 14px 8px;font-size:9px;color:var(--text-sec);font-style:italic}
-        table.data-table{width:100%;border-collapse:collapse;font-size:10px}
-        table.data-table thead{background:var(--primary);color:#fff}
-        table.data-table th{padding:7px 8px;text-align:center;font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
-        table.data-table th:first-child{text-align:left;min-width:200px}
-        table.data-table td{padding:5px 8px;text-align:center;border-bottom:1px solid #f5f5f5}
-        table.data-table td:first-child{text-align:left;font-weight:500;white-space:nowrap}
-        table.data-table tbody tr:hover{background:#f5f8ff}
-        table.data-table .highlight{background:#fff9c4;font-weight:700}
-        table.data-table .danger-cell{background:#ffebee;color:var(--danger);font-weight:700}
-        table.data-table .total-row{background:#e8eaf6;font-weight:800}
-        table.data-table .year-sep{background:var(--indigo) !important;color:#fff !important}
-
-        /* Heatmap */
-        .heatmap-table{width:100%;border-collapse:collapse;font-size:10px}
-        .heatmap-table th{padding:5px;font-size:9px;text-transform:uppercase;font-weight:600;color:var(--text-sec)}
-        .heatmap-table td{padding:5px 7px;text-align:center;font-weight:600;font-size:10px;border:2px solid #fff;border-radius:3px}
-        .heatmap-table td:first-child{text-align:left;font-weight:500;background:transparent!important;color:var(--text);min-width:160px}
-
-        /* Stat boxes */
-        .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
-        .stat-box{background:var(--card);border-radius:8px;padding:12px;box-shadow:var(--shadow);text-align:center}
-        .stat-box .stat-value{font-size:22px;font-weight:800;color:var(--primary)}
-        .stat-box .stat-label{font-size:9px;text-transform:uppercase;color:var(--text-sec);margin-top:3px;letter-spacing:.4px}
-        .stat-box.danger .stat-value{color:var(--danger)}.stat-box.warning .stat-value{color:var(--warning)}.stat-box.success .stat-value{color:var(--success)}.stat-box.purple .stat-value{color:var(--purple)}
-
-        .insight-box{background:linear-gradient(135deg,#e8eaf6,#f3e5f5);border-radius:8px;padding:14px;margin-bottom:14px;border-left:4px solid var(--purple)}
-        .insight-box h4{font-size:12px;font-weight:700;color:var(--primary);margin-bottom:5px}
-        .insight-box p{font-size:11px;line-height:1.6;color:var(--text-sec)}
-
-        .gauge-container{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:14px}
-        .gauge-value{font-size:50px;font-weight:900;line-height:1}
-        .gauge-label{font-size:11px;color:var(--text-sec);margin-top:5px;text-align:center}
-        .gauge-bar{width:100%;height:7px;background:#eee;border-radius:4px;margin-top:8px;overflow:hidden}
-        .gauge-fill{height:100%;border-radius:4px}
-        .semaforo{display:inline-flex;align-items:center;gap:8px;margin:5px 0}
-        .semaforo-item{display:flex;align-items:center;gap:3px;font-size:9px}
-        .semaforo-dot{width:9px;height:9px;border-radius:50%}
-        .semaforo-dot.green{background:var(--success)}.semaforo-dot.yellow{background:var(--warning)}.semaforo-dot.red{background:var(--danger)}
-
-        .section-title{font-size:15px;font-weight:700;color:var(--primary);margin:18px 0 12px;padding-bottom:5px;border-bottom:2px solid var(--accent);display:flex;align-items:center;gap:8px}
-        .footer{text-align:center;padding:14px;font-size:9px;color:var(--text-sec);border-top:1px solid var(--border);margin-top:24px}
-
-        /* Prescriber table */
-        .prescriber-grid{display:grid;grid-template-columns:1fr;gap:0}
-        .prescriber-row{display:grid;grid-template-columns:200px 60px 60px 80px 100px;gap:4px;padding:5px 8px;border-bottom:1px solid #f0f0f0;align-items:center;font-size:10px}
-        .prescriber-row.header{background:var(--primary);color:#fff;font-weight:600;font-size:9px;text-transform:uppercase;border-radius:6px 6px 0 0}
-        .prescriber-row:hover:not(.header){background:#f5f8ff}
-        .rate-bar-bg{height:6px;background:#eee;border-radius:3px;overflow:hidden;width:100%}
-        .rate-bar-fill{height:100%;border-radius:3px}
-
-        @media print{.header{position:static}.nav-tabs,.controls-bar,.alert-banner{display:none}.chart-grid{grid-template-columns:1fr}.tab-content{display:block!important;page-break-before:always}}
-        @media(max-width:1000px){.chart-grid,.chart-grid.triple{grid-template-columns:1fr}}
-        @media(max-width:700px){.kpi-grid,.stat-row{grid-template-columns:repeat(2,1fr)}.header-top{flex-direction:column;text-align:center;gap:6px}}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISOR DE INDICADORES PROA – Hospital General Riobamba</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:#0d1b4a;--s:#1b3a7a;--a:#00b4d8;--dng:#d32f2f;--wrn:#f57c00;--ok:#2e7d32;--bg:#f4f6f9;--crd:#fff;--txt:#1a1a2e;--txtL:#546e7a;--brd:#dee2e6}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:13.5px}
+.hdr{background:linear-gradient(135deg,#0a1628 0%,#163a72 50%,#1b5e9e 100%);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 12px rgba(0,0,0,.25)}
+.hdr h1{font-size:1.25em;letter-spacing:.8px}
+.hdr .sub{font-size:.73em;opacity:.82;margin-top:2px}
+.hdr .rt{text-align:right}
+.hdr .badge{background:var(--a);padding:3px 12px;border-radius:16px;font-size:.72em;font-weight:700;color:#000}
+.hdr .credit{font-size:.6em;opacity:.5;margin-top:6px;font-style:italic}
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--brd);overflow-x:auto;padding:0 8px}
+.tab{padding:11px 14px;cursor:pointer;font-weight:600;font-size:.77em;color:var(--txtL);border-bottom:3px solid transparent;white-space:nowrap;transition:.2s}
+.tab:hover{color:var(--p);background:#eef2ff}
+.tab.active{color:var(--p);border-bottom-color:var(--a)}
+.cnt{display:none;padding:18px;max-width:1440px;margin:0 auto}
+.cnt.active{display:block}
+.g{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g5{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.c{background:var(--crd);border-radius:10px;padding:16px;box-shadow:0 1px 5px rgba(0,0,0,.06);border:1px solid var(--brd)}
+.c h3{font-size:.82em;color:var(--txtL);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.k{text-align:center;padding:16px 10px}
+.k .v{font-size:2em;font-weight:800;line-height:1.1}
+.k .l{font-size:.73em;color:var(--txtL);margin-top:3px}
+.k .s{font-size:.67em;margin-top:5px;padding:2px 10px;border-radius:10px;display:inline-block}
+.grn{color:var(--ok)}.rd{color:var(--dng)}.org{color:var(--wrn)}.blu{color:var(--s)}
+.bg-g{background:#e8f5e9;color:#1b5e20}.bg-r{background:#ffebee;color:#b71c1c}.bg-o{background:#fff3e0;color:#e65100}.bg-b{background:#e3f2fd;color:#0d47a1}
+.ch{position:relative;height:310px;width:100%}
+.ch-s{height:250px}
+.ch-l{height:400px}
+.ch-xl{height:520px}
+table{width:100%;border-collapse:collapse;font-size:.77em}
+th{background:var(--p);color:#fff;padding:7px 9px;text-align:left;font-weight:600;position:sticky;top:0;z-index:1}
+td{padding:6px 9px;border-bottom:1px solid var(--brd)}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8eaf6}
+.tg{display:inline-block;padding:2px 8px;border-radius:8px;font-size:.7em;font-weight:600}
+.tg-ok{background:#e8f5e9;color:#1b5e20}.tg-no{background:#ffebee;color:#b71c1c}.tg-w{background:#fff3e0;color:#e65100}.tg-b{background:#e3f2fd;color:#0d47a1}
+.al{border-left:4px solid;padding:12px 14px;margin-bottom:10px;border-radius:0 8px 8px 0}
+.al-c{border-color:var(--dng);background:#fff5f5}
+.al-w{border-color:var(--wrn);background:#fffaf0}
+.al-i{border-color:var(--a);background:#f0fdff}
+.al-s{border-color:var(--ok);background:#f0fff4}
+.al .t{font-weight:700;font-size:.84em;margin-bottom:3px}
+.al .d{font-size:.77em;color:var(--txtL)}
+.scr{max-height:480px;overflow-y:auto}
+.meth{background:#f0f2f5;border:1px solid var(--brd);border-radius:8px;padding:14px;margin:10px 0;font-size:.79em;line-height:1.65}
+.st{font-size:1.05em;font-weight:700;color:var(--p);margin:18px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--a)}
+@media(max-width:768px){.hdr{flex-direction:column;text-align:center;gap:6px}.g{grid-template-columns:1fr !important}.tab{padding:9px 10px;font-size:.7em}}
+</style>
 </head>
 <body>
 
-<div class="header">
-    <div class="header-top">
-        <div class="header-logo">
-            <div class="icon">🏥</div>
-            <div><h1>Dashboard PROA Integrado v3</h1><div class="subtitle">Hospital General Riobamba — IESS | Programa de Optimización de Antimicrobianos + IA PROA</div></div>
-        </div>
-        <div class="header-meta">
-            <div class="date">8 de abril de 2026</div>
-            <div>Datos: Mar-2025 a Mar-2026 (IA PROA) | Ene-2025 a Feb-2026 (Consumo/MMDR)</div>
-            <div>PhD. Héctor Ortega C. — Líder PROA</div>
-        </div>
-    </div>
-    <div class="nav-tabs">
-        <div class="nav-tab active" onclick="showTab('overview')">📊 Resumen</div>
-        <div class="nav-tab" onclick="showTab('iaproa')">🤖 IA PROA</div>
-        <div class="nav-tab" onclick="showTab('consumption')">💊 Consumo</div>
-        <div class="nav-tab" onclick="showTab('resistance')">🦠 MMDR</div>
-        <div class="nav-tab" onclick="showTab('correlation')">🔗 Correlación</div>
-        <div class="nav-tab" onclick="showTab('prescribers')">👨‍⚕️ Prescriptores</div>
-        <div class="nav-tab" onclick="showTab('alerts')">🚨 Alertas</div>
-        <div class="nav-tab" onclick="showTab('recommendations')">📋 Recomendaciones</div>
-        <div class="nav-tab" onclick="showTab('tables')">📑 Tablas de Datos</div>
-    </div>
+<div class="hdr">
+<div>
+<h1>VISOR DE INDICADORES PROA</h1>
+<div class="sub">Hospital General Riobamba — IESS &nbsp;|&nbsp; Programa de Optimización de Antimicrobianos</div>
 </div>
-
-<div class="alert-banner">
-    <span class="badge">3 ALERTAS CRÍTICAS</span>
-    <span>⚠️ Desabasto Pipe/Tazo+Ceftriaxona → cascada de escalación | BLEE Med.Int 12,87 máx histórico | FQ fuera de IA PROA +256% | Dosis incorrectas 53% Ene-26 | SAMR UCI 7,14 máx histórico</span>
-</div>
-
-<div class="main-content">
-
-<!-- ====== TAB: RESUMEN ====== -->
-<div class="tab-content active" id="tab-overview">
-    <div class="controls-bar">
-        <div class="control-group"><label>Vista:</label><select><option selected>Integrado (IA PROA + Consumo + MMDR)</option></select></div>
-        <button class="btn-export" onclick="window.print()">📄 Exportar PDF</button>
-    </div>
-    <div class="kpi-grid">
-        <div class="kpi-card purple"><div class="kpi-label">Solicitudes IA PROA (13 meses)</div><div class="kpi-value" style="color:var(--purple)">389</div><div class="kpi-trend">30 prescripciones/mes promedio | 58 prescriptores</div></div>
-        <div class="kpi-card warning"><div class="kpi-label">Tasa Aprobación IA PROA</div><div class="kpi-value" style="color:var(--warning)">69,4%</div><div class="kpi-trend">270/389 aprobadas — Meta: ≥80%</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">Sin Cultivos Previos</div><div class="kpi-value" style="color:var(--danger)">38,6%</div><div class="kpi-trend up">122/316 — Impide desescalamiento</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">Desescalamiento</div><div class="kpi-value" style="color:var(--danger)">21,5%</div><div class="kpi-trend up">54/251 — Meta: ≥40%</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">Consumo UCI Feb-26</div><div class="kpi-value" style="color:var(--danger)">89,2</div><div class="kpi-trend">DDD/100dp — Perfil alterado por desabasto</div></div>
-        <div class="kpi-card warning"><div class="kpi-label">Consumo Med.Int Feb-26</div><div class="kpi-value" style="color:var(--warning)">54,7</div><div class="kpi-trend up">▲55% vs promedio 2025 (35,2)</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">MMDR UCI Feb-26</div><div class="kpi-value" style="color:var(--danger)">14,28</div><div class="kpi-trend">SAMR 7,14 + ERC 7,14 /1000dp</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">MMDR Med.Int Feb-26</div><div class="kpi-value" style="color:var(--danger)">14,85</div><div class="kpi-trend up">BLEE 12,87 máximo histórico</div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>🎯 Índice PROA — UCI</h3><div class="chart-subtitle">Multicomponente (0-100, menor=mejor)</div><div class="gauge-container"><div class="gauge-value" style="color:var(--danger)">68</div><div class="gauge-label">RIESGO ALTO — Acción urgente</div><div class="gauge-bar"><div class="gauge-fill" style="width:68%;background:linear-gradient(90deg,var(--success),var(--warning),var(--danger))"></div></div><div class="semaforo"><div class="semaforo-item"><div class="semaforo-dot green"></div>0-30</div><div class="semaforo-item"><div class="semaforo-dot yellow"></div>31-60</div><div class="semaforo-item"><div class="semaforo-dot red"></div>61-100</div></div></div></div>
-        <div class="chart-card"><h3>🎯 Índice PROA — Medicina Interna</h3><div class="chart-subtitle">Multicomponente (0-100, menor=mejor)</div><div class="gauge-container"><div class="gauge-value" style="color:var(--warning)">58</div><div class="gauge-label">RIESGO MODERADO — Vigilancia intensificada</div><div class="gauge-bar"><div class="gauge-fill" style="width:58%;background:linear-gradient(90deg,var(--success),var(--warning),var(--danger))"></div></div><div class="semaforo"><div class="semaforo-item"><div class="semaforo-dot green"></div>0-30</div><div class="semaforo-item"><div class="semaforo-dot yellow"></div>31-60</div><div class="semaforo-item"><div class="semaforo-dot red"></div>61-100</div></div></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card full-width"><h3>Vista Integrada: Consumo DDD + Prescripciones IA PROA + MMDR</h3><div class="chart-subtitle">Eje izq: DDD/100dp (líneas) | Eje der: N° prescripciones IA PROA (barras moradas) | Puntos rojos: MMDR total</div><div class="chart-container tall"><canvas id="chartOverview"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card full-width"><h3>Evolución MMDR Total por Área (por 1000 dp)</h3><div class="chart-subtitle">Serie Ene-2025 a Feb-2026 | Línea punteada: inicio 2026</div><div class="chart-container"><canvas id="chartMMDROverview"></canvas></div></div>
-    </div>
-</div>
-
-<!-- ====== TAB: IA PROA ====== -->
-<div class="tab-content" id="tab-iaproa">
-    <h2 class="section-title">🤖 Módulo IA PROA — Prescripciones Restringidas (Mar-2025 a Mar-2026)</h2>
-    <div class="stat-row">
-        <div class="stat-box purple"><div class="stat-value">389</div><div class="stat-label">Solicitudes</div></div>
-        <div class="stat-box success"><div class="stat-value">69,4%</div><div class="stat-label">Aprobación</div></div>
-        <div class="stat-box"><div class="stat-value">60,9</div><div class="stat-label">Edad media</div></div>
-        <div class="stat-box warning"><div class="stat-value">72,5%</div><div class="stat-label">Empírica</div></div>
-        <div class="stat-box danger"><div class="stat-value">38,6%</div><div class="stat-label">Sin cultivo</div></div>
-        <div class="stat-box"><div class="stat-value">72,7%</div><div class="stat-label">Sepsis</div></div>
-        <div class="stat-box danger"><div class="stat-value">26,0%</div><div class="stat-label">Dosis incorrecta</div></div>
-        <div class="stat-box"><div class="stat-value">59,0%</div><div class="stat-label">Mejoría 72h</div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Distribución ATM Restringidos</h3><div class="chart-subtitle">403 prescripciones totales</div><div class="chart-container"><canvas id="chartATMdist"></canvas></div></div>
-        <div class="chart-card"><h3>Distribución por Servicio</h3><div class="chart-subtitle">273 solicitudes Jul-25 a Mar-26</div><div class="chart-container"><canvas id="chartServiceDist"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Tendencia Prescripciones por ATM</h3><div class="chart-subtitle">Número mensual — impacto desabasto visible desde Dic-25</div><div class="chart-container tall"><canvas id="chartATMtrend"></canvas></div></div>
-        <div class="chart-card"><h3>Toma de Cultivos Previos</h3><div class="chart-subtitle">Evolución mensual Jun-25 a Mar-26</div><div class="chart-container tall"><canvas id="chartCultures"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Diagnósticos Presuntivos</h3><div class="chart-subtitle">291 casos — Jul-25 a Mar-26</div><div class="chart-container tall"><canvas id="chartDiagnosis"></canvas></div></div>
-        <div class="chart-card"><h3>MMDR Identificados en IA PROA</h3><div class="chart-subtitle">317 evaluaciones — Jun-25 a Mar-26</div><div class="chart-container tall"><canvas id="chartMMDRia"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Evaluación de Dosis</h3><div class="chart-subtitle">Correctas vs Incorrectas por mes</div><div class="chart-container"><canvas id="chartDoses"></canvas></div></div>
-        <div class="chart-card"><h3>Biomarcadores Inflamatorios</h3><div class="chart-subtitle">273 solicitudes — Jul-25 a Mar-26</div><div class="chart-container"><canvas id="chartBiomarkers"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Seguimiento 72h — Evolución Clínica</h3><div class="chart-subtitle">251 seguimientos</div><div class="chart-container"><canvas id="chartEvo72"></canvas></div></div>
-        <div class="chart-card"><h3>Desescalamiento Terapéutico</h3><div class="chart-subtitle">Meta: ≥40% — Actual: 21,5%</div><div class="chart-container"><canvas id="chartDeesc"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Resultado Cultivo al Seguimiento</h3><div class="chart-subtitle">251 seguimientos</div><div class="chart-container"><canvas id="chartCultResult"></canvas></div></div>
-        <div class="chart-card"><h3>Derivaciones — Seguimiento 48h</h3><div class="chart-subtitle">PROA-DM: 37 (14,7%) | PCI: 30 (12,0%) | Auditoría: 13 (5,2%)</div><div class="chart-container"><canvas id="chartDeriv"></canvas></div></div>
-    </div>
-    <div class="insight-box"><h4>🔍 Hallazgos Clave IA PROA</h4>
-        <p><strong>ρ = -0,51:</strong> Mayor terapia empírica = menor toma de cultivos. Sin cultivos no hay desescalamiento (solo 21,5% desescala).</p>
-        <p><strong>ρ = 0,30:</strong> Sepsis → empírica (esperado). Pero 72,7% tiene sepsis: ¿sobreclasificación o solicitud tardía?</p>
-        <p><strong>r = -0,164 (p=0,008):</strong> Creatinina ↑ → Vancomicina ↓. Conducta nefroprotectora positiva.</p>
-        <p><strong>Ene-2026: 53% dosis incorrectas</strong> — coincide con desabasto. Prescriptores no familiarizados con alternativas.</p>
-        <p><strong>φ = 0,72:</strong> Seguimiento 48h fuertemente asociado a derivación PROA-DM → herramienta de casos complejos.</p>
-    </div>
-    <div class="insight-box"><h4>⚠️ Brecha: FQ y Aminoglucósidos fuera del radar</h4>
-        <p>Solo 10 prescripciones FQ en 13 meses en IA PROA, pero consumo DDD muestra máximos históricos en ambas áreas (UCI 23,5; Med.Int 16,8). El ~99% de FQ escapa al sistema. Aminoglucósidos: 3 solicitudes de amikacina vs 11,8 DDD en Med.Int. Brecha crítica.</p>
-    </div>
-    <div class="data-table-wrapper">
-        <h3>Ruptura de Stock Documentada</h3>
-        <table class="data-table" id="tableStock"></table>
-        <div class="table-note">Fuente: Informe IA PROA, abril 2026. Total: 11 eventos de ruptura.</div>
-    </div>
-</div>
-
-<!-- ====== TAB: CONSUMO ====== -->
-<div class="tab-content" id="tab-consumption">
-    <h2 class="section-title">💊 Consumo de Antimicrobianos — UCI + Medicina Interna</h2>
-    <div class="kpi-grid">
-        <div class="kpi-card danger"><div class="kpi-label">FQ UCI Ene-26</div><div class="kpi-value" style="color:var(--danger)">23,5</div><div class="kpi-trend up">▲ Máximo histórico</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">FQ Med.Int Ene-26</div><div class="kpi-value" style="color:var(--danger)">16,8</div><div class="kpi-trend up">▲ 291% vs prom-25</div></div>
-        <div class="kpi-card warning"><div class="kpi-label">Carbap Med.Int Feb-26</div><div class="kpi-value" style="color:var(--warning)">14,9</div><div class="kpi-trend up">▲ 264% vs prom-25</div></div>
-        <div class="kpi-card warning"><div class="kpi-label">C4G UCI Ene-26</div><div class="kpi-value" style="color:var(--warning)">34,1</div><div class="kpi-trend up">▲ Sin precedentes</div></div>
-        <div class="kpi-card"><div class="kpi-label">Aminoglucós Med.Int Ene-26</div><div class="kpi-value">11,8</div><div class="kpi-trend up">▲ 347% vs prom-25</div></div>
-        <div class="kpi-card success"><div class="kpi-label">Carbap UCI Ene-26</div><div class="kpi-value" style="color:var(--success)">13,5</div><div class="kpi-trend down">▼ Mínimo histórico</div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card full-width"><h3>Consumo Total por Área (DDD/100 dp)</h3><div class="chart-subtitle">Ene-2025 a Feb-2026 | Línea punteada: inicio 2026</div><div class="chart-container tall"><canvas id="chartConsumoTotal"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>UCI — Top 5 Grupos (Prom-25 vs Prom-26)</h3><div class="chart-container"><canvas id="chartTop5UCI"></canvas></div></div>
-        <div class="chart-card"><h3>Med.Int — Top 5 Grupos (Prom-25 vs Prom-26)</h3><div class="chart-container"><canvas id="chartTop5MI"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Fluoroquinolonas Ambas Áreas</h3><div class="chart-subtitle">ALERTA: fuera del radar IA PROA</div><div class="chart-container"><canvas id="chartFQ"></canvas></div></div>
-        <div class="chart-card"><h3>Carbapenémicos Ambas Áreas</h3><div class="chart-subtitle">Escalación forzada en Med.Int desde Feb-26</div><div class="chart-container"><canvas id="chartCarb"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card full-width"><h3>Efecto Cascada Desabasto: Pipe/Tazo (IA PROA) vs FQ y Carbapenémicos (DDD Med.Int)</h3><div class="chart-subtitle">Zona sombreada = período de desabasto activo</div><div class="chart-container tall"><canvas id="chartCascade"></canvas></div></div>
-    </div>
-</div>
-
-<!-- ====== TAB: MMDR ====== -->
-<div class="tab-content" id="tab-resistance">
-    <h2 class="section-title">🦠 Densidad de Incidencia MMDR (por 1000 dp)</h2>
-    <div class="kpi-grid">
-        <div class="kpi-card danger"><div class="kpi-label">SAMR UCI Feb-26</div><div class="kpi-value" style="color:var(--danger)">7,14</div><div class="kpi-trend up">MÁX HISTÓRICO</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">ERC UCI Ene-26</div><div class="kpi-value" style="color:var(--danger)">11,76</div><div class="kpi-trend up">Persistente 2 meses</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">BLEE Med.Int Feb-26</div><div class="kpi-value" style="color:var(--danger)">12,87</div><div class="kpi-trend up">MÁX HISTÓRICO</div></div>
-        <div class="kpi-card warning"><div class="kpi-label">EVR Med.Int Ene-26</div><div class="kpi-value" style="color:var(--warning)">0,75</div><div class="kpi-trend up">EMERGENTE</div></div>
-        <div class="kpi-card warning"><div class="kpi-label">C.difficile Med.Int Feb-26</div><div class="kpi-value" style="color:var(--warning)">1,98</div><div class="kpi-trend up">Asociado a ↑FQ</div></div>
-        <div class="kpi-card danger"><div class="kpi-label">Mortalidad UCI Feb-26</div><div class="kpi-value" style="color:var(--danger)">10,0%</div><div class="kpi-trend up">2ª más alta</div></div>
-    </div>
-    <div class="chart-card" style="margin-bottom:14px"><h3>Mapa de Calor — MMDR UCI</h3><div class="chart-subtitle">Ene-25 a Feb-26</div><table class="heatmap-table" id="hmUCI"></table></div>
-    <div class="chart-card" style="margin-bottom:14px"><h3>Mapa de Calor — MMDR Medicina Interna</h3><table class="heatmap-table" id="hmMI"></table></div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>UCI — MMDR por Tipo (Stacked)</h3><div class="chart-container tall"><canvas id="chartStackUCI"></canvas></div></div>
-        <div class="chart-card"><h3>Med.Int — MMDR por Tipo (Stacked)</h3><div class="chart-container tall"><canvas id="chartStackMI"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card full-width"><h3>Mortalidad Bruta por Área (fallecim. c/100 egresos)</h3><div class="chart-container"><canvas id="chartMort"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card full-width"><h3>Cruce: BLEE en IA PROA (N° aislamientos) vs Densidad Incidencia BLEE</h3><div class="chart-subtitle">Barras: IA PROA institucional | Líneas: densidad UCI y Med.Int</div><div class="chart-container tall"><canvas id="chartBLEEcross"></canvas></div></div>
-    </div>
-</div>
-
-<!-- ====== TAB: CORRELACIÓN ====== -->
-<div class="tab-content" id="tab-correlation">
-    <h2 class="section-title">🔗 Análisis de Correlación Consumo – Resistencia – Proceso IA PROA</h2>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>UCI: Carbapenémicos (DDD) vs ERC (/1000dp)</h3><div class="chart-container tall"><canvas id="chartCorr1"></canvas></div></div>
-        <div class="chart-card"><h3>Med.Int: FQ (DDD) vs BLEE (/1000dp)</h3><div class="chart-container tall"><canvas id="chartCorr2"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>UCI: Consumo Total vs MMDR Total</h3><div class="chart-container tall"><canvas id="chartCorr3"></canvas></div></div>
-        <div class="chart-card"><h3>Med.Int: Consumo Total vs MMDR Total</h3><div class="chart-container tall"><canvas id="chartCorr4"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>IA PROA: % Empírica vs % Sin Cultivos</h3><div class="chart-subtitle">Correlación ρ = -0,51</div><div class="chart-container tall"><canvas id="chartCorr5"></canvas></div></div>
-        <div class="chart-card"><h3>IA PROA: % Dosis Incorrectas por Mes</h3><div class="chart-subtitle">Zona roja: período desabasto</div><div class="chart-container tall"><canvas id="chartCorr6"></canvas></div></div>
-    </div>
-    <div class="insight-box"><h4>📊 Modelo Integrado: Desabasto → Sustitución → Resistencia</h4>
-        <p><strong>1)</strong> Desabasto Pipe/Tazo (Dic-25) → <strong>2)</strong> UCI escala a Cefepime/Carbapenémicos; Med.Int escala a FQ → <strong>3)</strong> ↑Presión selectiva → <strong>4)</strong> BLEE máx histórico Med.Int, ERC persistente UCI, C.difficile emerge → <strong>5)</strong> 53% dosis incorrectas Ene-26 (no familiaridad) → <strong>6)</strong> SAMR máx histórico UCI Feb-26, mortalidad 10%.</p>
-        <p style="margin-top:6px">Desabasto ceftriaxona (Mar-26) agrava: J01DD = 0 en Med.Int 2026, otra alternativa eliminada.</p>
-    </div>
-</div>
-
-<!-- ====== TAB: PRESCRIPTORES ====== -->
-<div class="tab-content" id="tab-prescribers">
-    <h2 class="section-title">👨‍⚕️ Análisis de Prescriptores (389 solicitudes, 58 prescriptores)</h2>
-    <div class="stat-row">
-        <div class="stat-box"><div class="stat-value">58</div><div class="stat-label">Prescriptores únicos</div></div>
-        <div class="stat-box success"><div class="stat-value">7</div><div class="stat-label">Con aprobación 100%</div></div>
-        <div class="stat-box danger"><div class="stat-value">5</div><div class="stat-label">Con aprobación 0%</div></div>
-        <div class="stat-box purple"><div class="stat-value">47</div><div class="stat-label">Máx solicitudes (Medina)</div></div>
-        <div class="stat-box warning"><div class="stat-value">57,3%</div><div class="stat-label">Masculino</div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card"><h3>Top 15 Prescriptores por Volumen</h3><div class="chart-container xtall"><canvas id="chartPresVol"></canvas></div></div>
-        <div class="chart-card"><h3>Tasa de Aprobación (≥5 solicitudes)</h3><div class="chart-subtitle">Verde ≥70% | Amarillo 50-69% | Rojo <50%</div><div class="chart-container xtall"><canvas id="chartPresRate"></canvas></div></div>
-    </div>
-    <div class="chart-grid">
-        <div class="chart-card full-width"><h3>Volumen de Solicitudes por Mes y Prescriptor (Top 5)</h3><div class="chart-container tall"><canvas id="chartPresMonth"></canvas></div></div>
-    </div>
-    <div class="insight-box"><h4>🔍 Patrones Clave</h4>
-        <p><strong>Concentración:</strong> Top 5 = 134/389 (34,4%). Top 10 = 226/389 (58,1%).</p>
-        <p><strong>Baja aprobación (≥5 Rx):</strong> Lucio 11,1%, Pallmay/García/Garcés 37,5%, Monge 42,9% → Intervención educativa prioritaria.</p>
-        <p><strong>Modelos a seguir:</strong> Ortega 100% (16), Armendáriz 100% (7), Pino 100% (5) → Mentores.</p>
-        <p><strong>Prescriptores esporádicos:</strong> 30 prescriptores con ≤2 solicitudes. Posible falta de adherencia al sistema o rotación de personal.</p>
-    </div>
-</div>
-
-<!-- ====== TAB: ALERTAS ====== -->
-<div class="tab-content" id="tab-alerts">
-    <h2 class="section-title">🚨 Sistema de Alertas PROA</h2>
-    <div class="alerts-panel"><h3>🔴 Críticas (Acción Inmediata)</h3>
-        <div class="alert-item critical"><span class="alert-icon">🚨</span><div class="alert-content"><strong>Desabasto Pipe/Tazo + Ceftriaxona — Efecto cascada activo</strong><div class="alert-detail">8 rupturas Pipe/Tazo + 2 ceftriaxona + 1 vancomicina = 11 eventos. Forzó escalación a carbapenémicos (UCI) y FQ (Med.Int). Dosis incorrectas subieron a 53% en Ene-26. Gestión urgente farmacia+compras.</div></div><span class="alert-tag critical">Crítica</span></div>
-        <div class="alert-item critical"><span class="alert-icon">🚨</span><div class="alert-content"><strong>Fluoroquinolonas fuera de IA PROA — Canal de fuga +256%</strong><div class="alert-detail">Solo 10 Rx FQ en IA PROA en 13 meses vs DDD en máximos históricos. ~99% escapa al control. Correlación con BLEE máx y C.difficile. Incorporar FQ como restringidas URGENTE.</div></div><span class="alert-tag critical">Crítica</span></div>
-        <div class="alert-item critical"><span class="alert-icon">🚨</span><div class="alert-content"><strong>38,6% sin cultivos + 21,5% desescalamiento = ciclo vicioso</strong><div class="alert-detail">Sin cultivos no hay desescalamiento → mayor presión selectiva → más resistencia. Modificar IA PROA para bloquear aprobación sin justificación de ausencia de cultivos.</div></div><span class="alert-tag critical">Crítica</span></div>
-        <div class="alert-item critical"><span class="alert-icon">🚨</span><div class="alert-content"><strong>SAMR UCI 7,14 (máx histórico) + ERC persistente + BLEE Med.Int 12,87 (máx histórico)</strong><div class="alert-detail">Tres máximos simultáneos Feb-26. Mortalidad UCI 10%. Activar protocolos de contención: screening, descolonización, cohorting.</div></div><span class="alert-tag critical">Crítica</span></div>
-    </div>
-    <div class="alerts-panel"><h3>🟡 Vigilancia</h3>
-        <div class="alert-item warning"><span class="alert-icon">⚠️</span><div class="alert-content"><strong>EVR emergente Med.Int (0,75) — Primera vez en 14 meses</strong><div class="alert-detail">Tipificar aislamiento. Cultivos vigilancia en contactos.</div></div><span class="alert-tag warning">Vigilancia</span></div>
-        <div class="alert-item warning"><span class="alert-icon">⚠️</span><div class="alert-content"><strong>C. difficile 1,98/1000dp Med.Int Feb-26</strong><div class="alert-detail">Asociado a ↑FQ. Limpieza con hipoclorito ≥1000ppm. Restringir IBP + FQ.</div></div><span class="alert-tag warning">Vigilancia</span></div>
-        <div class="alert-item warning"><span class="alert-icon">⚠️</span><div class="alert-content"><strong>Dosis incorrectas 53% Ene-26 → 41% Feb-26</strong><div class="alert-detail">Persiste tras desabasto. Distribuir tablas dosis alternativas. Capacitación urgente.</div></div><span class="alert-tag warning">Vigilancia</span></div>
-        <div class="alert-item warning"><span class="alert-icon">⚠️</span><div class="alert-content"><strong>5 prescriptores con aprobación ≤42,9%</strong><div class="alert-detail">Lucio 11,1% (9 Rx), Pallmay/García/Garcés 37,5% (8 Rx c/u), Monge 42,9% (7 Rx).</div></div><span class="alert-tag warning">Vigilancia</span></div>
-        <div class="alert-item warning"><span class="alert-icon">⚠️</span><div class="alert-content"><strong>Aminoglucósidos fuera de IA PROA</strong><div class="alert-detail">3 solicitudes amikacina vs 11,8 DDD Med.Int. Riesgo nefrotoxicidad sin monitorización.</div></div><span class="alert-tag warning">Vigilancia</span></div>
-    </div>
-    <div class="alerts-panel"><h3>🟢 Favorables</h3>
-        <div class="alert-item success"><span class="alert-icon">✅</span><div class="alert-content"><strong>EVR = 0 en UCI durante 14 meses</strong></div></div>
-        <div class="alert-item success"><span class="alert-icon">✅</span><div class="alert-content"><strong>Acinetobacter R-carbapenémicos = 0 en UCI 14 meses</strong></div></div>
-        <div class="alert-item success"><span class="alert-icon">✅</span><div class="alert-content"><strong>Conducta nefroprotectora: creatinina↑ → vancomicina↓ (r=-0,164, p=0,008)</strong></div></div>
-        <div class="alert-item success"><span class="alert-icon">✅</span><div class="alert-content"><strong>Mejoría clínica 59% | Derivación PROA-DM 14,7% | PCI 12,0%</strong></div></div>
-        <div class="alert-item success"><span class="alert-icon">✅</span><div class="alert-content"><strong>Seguimiento 48h selectivo (18%) en casos complejos (φ=0,72 con PROA-DM)</strong></div></div>
-    </div>
-</div>
-
-<!-- ====== TAB: RECOMENDACIONES ====== -->
-<div class="tab-content" id="tab-recommendations">
-    <h2 class="section-title">📋 Recomendaciones PROA — Abril 2026</h2>
-    <div class="reco-panel"><h3>Intervenciones Prioritarias</h3>
-        <div class="reco-item"><div class="reco-header"><h4>1. Incorporar FQ + Aminoglucósidos a IA PROA como restringidos</h4><span class="reco-priority high">Urgente</span></div><div class="reco-body">FQ +256% en Med.Int, ~99% escapa control. Aminoglucósidos 347% sin monitorización. Requieren autorización previa obligatoria en el formulario IA PROA. Meta: capturar >90% en 30 días.</div><div class="reco-meta"><span>📅 Inmediato</span><span>👤 PROA+Farmacia+TI</span></div></div>
-        <div class="reco-item"><div class="reco-header"><h4>2. Plan Contingencia Desabasto con Alternativas Preaprobadas</h4><span class="reco-priority high">Urgente</span></div><div class="reco-body"><ul><li>Tabla de equivalencias dosis para cada ATM restringido → reduce error del 53%</li><li>Alternativas escalonadas priorizando menor impacto ecológico</li><li>Comunicación inmediata al PROA ante cada ruptura de stock</li><li>Protocolo: desabasto Pipe/Tazo → NO escalar directamente a FQ, usar Ampi/Sulbactam o Cefepime según foco</li></ul></div><div class="reco-meta"><span>📅 1 semana</span><span>👤 Farmacia+PROA+Dirección</span></div></div>
-        <div class="reco-item"><div class="reco-header"><h4>3. Meta Cultivos Previos ≥80% — Modificar IA PROA</h4><span class="reco-priority high">Urgente</span></div><div class="reco-body">38,6% sin cultivos → imposibilita desescalamiento. Implementar campo obligatorio en IA PROA: si "No cultivo" → justificación obligatoria con opciones predefinidas. Alerta visual si no cumple. Meta: <25% sin cultivos en 3 meses.</div><div class="reco-meta"><span>📅 Inmediato</span><span>👤 PROA+Microbiología+TI</span></div></div>
-        <div class="reco-item"><div class="reco-header"><h4>4. Programa Desescalamiento Dirigido — Meta ≥40%</h4><span class="reco-priority high">Alta</span></div><div class="reco-body">Actual: 21,5%. Integrar en seguimiento 72h: campo obligatorio "¿Se evaluó desescalamiento?" con opciones justificadas. Vincular con disponibilidad de cultivo. Meta intermedia: 30% en 3 meses, 40% en 6 meses.</div><div class="reco-meta"><span>📅 2 semanas</span><span>👤 PROA+Infectología</span></div></div>
-        <div class="reco-item"><div class="reco-header"><h4>5. Contención SAMR UCI + ERC + BLEE Med.Int</h4><span class="reco-priority high">Alta</span></div><div class="reco-body"><ul><li>SAMR: screening nasal UCI ingreso + semanal, mupirocina + clorhexidina 2%, tipificación molecular</li><li>ERC: hisopados rectales semanales UCI, precauciones contacto, evaluar cohorting si >10/1000dp</li><li>BLEE Med.Int: actualizar guía empírica ITU (evitar C3G y FQ), promover fosfomicina/nitrofurantoína</li></ul></div><div class="reco-meta"><span>📅 Inmediato</span><span>👤 UCI+Control Infecciones+PROA</span></div></div>
-        <div class="reco-item"><div class="reco-header"><h4>6. Intervención Educativa Prescriptores Bajo Rendimiento</h4><span class="reco-priority medium">Media</span></div><div class="reco-body">Sesiones individuales: Lucio (11,1%), Pallmay/García/Garcés (37,5%), Monge (42,9%). Revisión casos rechazados + mentoría con Ortega (100%), Armendáriz (100%). Incluir dosificación de alternativas.</div><div class="reco-meta"><span>📅 2 semanas</span><span>👤 PROA+Docencia</span></div></div>
-        <div class="reco-item"><div class="reco-header"><h4>7. Vigilancia EVR + C. difficile</h4><span class="reco-priority medium">Media</span></div><div class="reco-body">EVR: tipificar, cultivos contactos, si VanA → protocolo brote. C.difficile: dx 2 pasos (GDH+toxina), hipoclorito ≥1000ppm, restringir IBP+FQ.</div><div class="reco-meta"><span>📅 1 semana</span><span>👤 Microbiología+PCI</span></div></div>
-        <div class="reco-item"><div class="reco-header"><h4>8. Dashboard PROA como Reporte Mensual Institucional</h4><span class="reco-priority low">Mantenimiento</span></div><div class="reco-body">Institucionalizar este dashboard como herramienta de reporte mensual al Comité de Infecciones y Dirección Médica. Actualización con cada cierre mensual de datos.</div><div class="reco-meta"><span>📅 Continuo</span><span>👤 PhD. Héctor Ortega — Líder PROA</span></div></div>
-    </div>
-</div>
-
-<!-- ====== TAB: TABLAS DE DATOS ====== -->
-<div class="tab-content" id="tab-tables">
-    <h2 class="section-title">📑 Tablas Completas de Datos — Respaldo y Evidencia</h2>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 1. Consumo de Antimicrobianos — UCI Médico-Quirúrgica (DDD/100 días-paciente)</h3>
-        <table class="data-table" id="tblConsumoUCI"></table>
-        <div class="table-note">* DDD: Dosis Diarias Definidas c/100 días-paciente. Celdas vacías = sin consumo registrado. Celdas amarillas = >30 DDD. Celdas rojas = valores 2026.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 2. Consumo de Antimicrobianos — Medicina Interna (DDD/100 días-paciente)</h3>
-        <table class="data-table" id="tblConsumoMI"></table>
-        <div class="table-note">* DDD: Dosis Diarias Definidas c/100 días-paciente.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 3. Indicadores de Impacto MMDR — UCI Médico-Quirúrgica (por 1000 días-paciente)</h3>
-        <table class="data-table" id="tblMMDRUCI"></table>
-        <div class="table-note">* Infecciones Asociadas al Cuidado de la Salud no duplicadas por microorganismo multirresistente cada/1000 días-paciente. †MMDR: S.aureus meticilino resistente; Enterococo resistente a vancomicina; Enterobacterias productoras de BLEE; Enterobacterias resistentes a carbapenémicos; P.aeruginosa resistentes a carbapenémicos; Acinetobacter spp. resistentes a carbapenémicos.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 4. Indicadores de Impacto MMDR — Medicina Interna (por 1000 días-paciente)</h3>
-        <table class="data-table" id="tblMMDRMI"></table>
-        <div class="table-note">* Misma metodología que Tabla 3.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 5. IA PROA — Distribución de Antibióticos por Mes</h3>
-        <table class="data-table" id="tblIAatm"></table>
-        <div class="table-note">Fuente: Informe IA PROA, PhD. Héctor Ortega, 01/04/2026. Total: 403 prescripciones de ATM restringidos en 389 solicitudes.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 6. IA PROA — Distribución por Servicio/Unidad</h3>
-        <table class="data-table" id="tblIAservice"></table>
-        <div class="table-note">Datos disponibles Jul-25 a Mar-26 (273 solicitudes con servicio identificado).</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 7. IA PROA — Toma de Cultivos Previos</h3>
-        <table class="data-table" id="tblIAcultures"></table>
-        <div class="table-note">316 solicitudes evaluadas Jun-25 a Mar-26.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 8. IA PROA — Evaluación de Dosis</h3>
-        <table class="data-table" id="tblIAdoses"></table>
-        <div class="table-note">389 prescripciones evaluadas Mar-25 a Mar-26.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 9. IA PROA — MMDR Identificados</h3>
-        <table class="data-table" id="tblIAmmdr"></table>
-        <div class="table-note">317 evaluaciones microbiológicas Jun-25 a Mar-26.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 10. IA PROA — Seguimiento 72h: Evolución Clínica</h3>
-        <table class="data-table" id="tblIA72h"></table>
-        <div class="table-note">251 seguimientos realizados. Agosto-25 sin datos de seguimiento.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 11. IA PROA — Desescalamiento Terapéutico</h3>
-        <table class="data-table" id="tblIAdeesc"></table>
-        <div class="table-note">251 seguimientos.</div>
-    </div>
-
-    <div class="data-table-wrapper">
-        <h3>Tabla 12. IA PROA — Ranking de Prescriptores (Top 20)</h3>
-        <table class="data-table" id="tblIAprescribers"></table>
-        <div class="table-note">58 prescriptores totales. Se muestran los 20 con mayor volumen de solicitudes.</div>
-    </div>
-</div>
-
-<!-- Footer -->
-<div class="footer">
-    <p><strong>Dashboard PROA Integrado v3.0</strong> — Hospital General Riobamba, IESS | Comité de Optimización de Antimicrobianos</p>
-    <p>Fuentes: IA PROA (389 solicitudes, Mar-25 a Mar-26) | Consumo ATM DDD/100dp UCI y Med.Interna (Ene-25 a Feb-26) | MMDR/1000dp (Ene-25 a Feb-26)</p>
-    <p>Elaborado: PhD. Héctor Ortega C. — Líder PROA HGR IESS | Generado: 8 de abril de 2026 | Próxima actualización: con datos marzo 2026</p>
+<div class="rt">
+<div class="badge">Actualizado: Abril 2026</div>
+<div style="font-size:.68em;opacity:.75;margin-top:3px">Período analizado: Enero 2025 – Marzo 2026</div>
+<div class="credit">Índice PROA y diseño: Ph.D. Héctor Ortega C. — Líder PROA HGR</div>
 </div>
 </div>
 
+<div class="tabs">
+<div class="tab active" onclick="sT(0)">Resumen</div>
+<div class="tab" onclick="sT(1)">IA PROA</div>
+<div class="tab" onclick="sT(2)">Consumo</div>
+<div class="tab" onclick="sT(3)">MMDR</div>
+<div class="tab" onclick="sT(4)">Profilaxis Qx</div>
+<div class="tab" onclick="sT(5)">Notificaciones ATB</div>
+<div class="tab" onclick="sT(6)">Correlación</div>
+<div class="tab" onclick="sT(7)">Alertas</div>
+<div class="tab" onclick="sT(8)">Recomendaciones</div>
+<div class="tab" onclick="sT(9)">Tablas de Datos</div>
+</div>
+
+<!-- TAB 0 RESUMEN -->
+<div class="cnt active" id="t0">
+<div class="st">Panel Ejecutivo — Índice PROA</div>
+<div class="meth"><strong>Índice PROA (0–100, mayor = mejor):</strong> Indicador compuesto de diseño propio desarrollado para esta plataforma. Integra 4 dimensiones con igual peso (25% cada una): Consumo antimicrobiano, Densidad de incidencia MMDR, Mortalidad bruta e Indicadores de proceso IA PROA. Escala: 0–30 Riesgo alto, 31–50 Riesgo moderado, 51–70 Riesgo bajo, 71–100 Óptimo. Propuesta metodológica original del Comité PROA HGR-IESS.</div>
+<div class="g g4" style="margin-bottom:18px">
+<div class="c k"><div class="v rd">32</div><div class="l">Índice PROA — UCI</div><div class="s bg-r">RIESGO ALTO</div></div>
+<div class="c k"><div class="v org">42</div><div class="l">Índice PROA — Med. Interna</div><div class="s bg-o">RIESGO MODERADO</div></div>
+<div class="c k"><div class="v grn">91%</div><div class="l">Adherencia Profilaxis Qx</div><div class="s bg-g">EN META ≥90%</div></div>
+<div class="c k"><div class="v rd">27.8%</div><div class="l">Brecha notificación ATB</div><div class="s bg-r">Meta &lt;10%</div></div>
+</div>
+<div class="g g2">
+<div class="c"><h3>Índice PROA UCI — Componentes (score 32/100)</h3><div class="ch ch-s"><canvas id="ch00"></canvas></div></div>
+<div class="c"><h3>Índice PROA Med. Interna — Componentes (score 42/100)</h3><div class="ch ch-s"><canvas id="ch01"></canvas></div></div>
+</div>
+<div class="g g5" style="margin-top:16px">
+<div class="c k"><div class="v" style="font-size:1.5em">89.2</div><div class="l">DDD/100dp UCI Feb-26</div><div class="s bg-o">↓23% vs Ene</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">54.7</div><div class="l">DDD/100dp MI Feb-26</div><div class="s bg-o">↑24% vs Ene</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">14.28</div><div class="l">MMDR UCI Feb-26</div><div class="s bg-r">SAMR 7.14</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">14.85</div><div class="l">MMDR MI Feb-26</div><div class="s bg-r">BLEE 12.87</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">79</div><div class="l">Solicitudes IA PROA</div><div class="s bg-b">Ene-Feb 2026</div></div>
+</div>
+<div class="st" style="margin-top:20px">Evolución Índice PROA</div>
+<div class="g g2">
+<div class="c"><h3>Índice PROA UCI (100=óptimo)</h3><div class="ch"><canvas id="ch02"></canvas></div></div>
+<div class="c"><h3>Índice PROA Med. Interna (100=óptimo)</h3><div class="ch"><canvas id="ch03"></canvas></div></div>
+</div>
+</div>
+
+<!-- TAB 1 IA PROA -->
+<div class="cnt" id="t1">
+<div class="st">Intervención Activa PROA — Indicadores de Proceso (mar 2025 – mar 2026)</div>
+<div class="g g4" style="margin-bottom:16px">
+<div class="c k"><div class="v blu">389</div><div class="l">Solicitudes totales</div><div class="s bg-b">mar25–mar26</div></div>
+<div class="c k"><div class="v blu">270</div><div class="l">Aprobadas</div><div class="s bg-g">69.4%</div></div>
+<div class="c k"><div class="v rd">38.6%</div><div class="l">Sin cultivos previos</div><div class="s bg-r">Meta &lt;20%</div></div>
+<div class="c k"><div class="v rd">26.0%</div><div class="l">Dosis incorrectas</div><div class="s bg-r">101/389 — Meta &lt;10%</div></div>
+</div>
+<div class="g g4">
+<div class="c k"><div class="v org">21.5%</div><div class="l">Desescalamiento</div><div class="s bg-o">54/251 — Meta ≥40%</div></div>
+<div class="c k"><div class="v">72.5%</div><div class="l">Terapia empírica</div><div class="s bg-b">198/273</div></div>
+<div class="c k"><div class="v grn">59%</div><div class="l">Mejoría clínica 72h</div><div class="s bg-g">148/251</div></div>
+<div class="c k"><div class="v blu">72.2%</div><div class="l">Notificación digital</div><div class="s bg-o">57/79 Ene-Feb26</div></div>
+</div>
+
+<div class="st">Perfil del Prescriptor — Tasa de Aprobación IA PROA (Funnel Plot)</div>
+<div class="meth">Datos reales del informe IA PROA (mar 2025 – mar 2026). Cada etiqueta = prescriptor (iniciales nombre.apellido). Solo prescriptores con ≥3 solicitudes (n=37). Eje X = nº solicitudes. Eje Y = tasa de aprobación (%). Línea = media institucional 69.4%. Curvas = IC 95% (±2σ) y 99.7% (±3σ). SE = √[p(1−p)/n]. <span style="color:#b71c1c;font-weight:700">Rojo</span> = bajo IC 99.7%. <span style="color:#e65100;font-weight:700">Naranja</span> = bajo IC 95%. <span style="color:#1565c0;font-weight:700">Azul</span> = dentro de límites. <span style="color:#2e7d32;font-weight:700">Verde</span> = destacado (≥80%).</div>
+<div class="c"><div class="ch ch-xl"><canvas id="ch10"></canvas></div></div>
+
+<div class="st">Tabla de Prescriptores IA PROA (≥3 solicitudes)</div>
+<div class="c"><div class="scr"><table id="iaT"><thead><tr><th>Código</th><th>Solicitudes</th><th>Aprobadas</th><th>Tasa</th><th>Estado</th></tr></thead><tbody id="iaTb"></tbody></table></div></div>
+
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Solicitudes por servicio (jul25–mar26)</h3><div class="ch"><canvas id="ch11"></canvas></div></div>
+<div class="c"><h3>Tendencia mensual solicitudes IA PROA</h3><div class="ch"><canvas id="ch12"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Distribución de antibióticos solicitados</h3><div class="ch"><canvas id="ch13"></canvas></div></div>
+<div class="c"><h3>Dosis correctas vs incorrectas por mes</h3><div class="ch"><canvas id="ch14"></canvas></div></div>
+</div>
+</div>
+
+<!-- TAB 2 CONSUMO -->
+<div class="cnt" id="t2">
+<div class="st">Consumo de Antimicrobianos (DDD/100 días-paciente)</div>
+<div class="g g2" style="margin-bottom:16px">
+<div class="c"><h3>Consumo Total UCI 2025-2026 (prom 2025: 100.7)</h3><div class="ch"><canvas id="ch20"></canvas></div></div>
+<div class="c"><h3>Consumo Total Med. Interna 2025-2026 (prom 2025: 46.9)</h3><div class="ch"><canvas id="ch21"></canvas></div></div>
+</div>
+<div class="g g2">
+<div class="c"><h3>Top 5 Grupos UCI 2025-2026</h3><div class="ch"><canvas id="ch22"></canvas></div></div>
+<div class="c"><h3>Top 5 Grupos Med. Interna 2025-2026</h3><div class="ch"><canvas id="ch23"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Fluoroquinolonas — NO monitorizadas IA PROA</h3><div class="ch ch-s"><canvas id="ch24"></canvas></div></div>
+<div class="c"><h3>Carbapenémicos</h3><div class="ch ch-s"><canvas id="ch25"></canvas></div></div>
+</div>
+<div class="st">Comparación promedios mensuales: 2025 vs 2026</div>
+<div class="g g2">
+<div class="c"><h3>UCI promedio mensual por grupo</h3><div class="ch"><canvas id="ch26"></canvas></div></div>
+<div class="c"><h3>Med. Interna promedio mensual por grupo</h3><div class="ch"><canvas id="ch27"></canvas></div></div>
+</div>
+</div>
+
+<!-- TAB 3 MMDR -->
+<div class="cnt" id="t3">
+<div class="st">Densidad de Incidencia MMDR (por 1000 días-paciente)</div>
+<div class="g g5" style="margin-bottom:16px">
+<div class="c k"><div class="v rd">7.14</div><div class="l">SAMR UCI Feb-26</div><div class="s bg-r">Máx histórico</div></div>
+<div class="c k"><div class="v rd">12.87</div><div class="l">BLEE MI Feb-26</div><div class="s bg-r">Máx histórico</div></div>
+<div class="c k"><div class="v org">0.75</div><div class="l">EVR MI Ene-26</div><div class="s bg-o">Emergente</div></div>
+<div class="c k"><div class="v rd">11.76</div><div class="l">ERC UCI Ene-26</div><div class="s bg-r">Persistente</div></div>
+<div class="c k"><div class="v org">1.98</div><div class="l">C.diff MI Feb-26</div><div class="s bg-o">Nuevo</div></div>
+</div>
+<div class="g g2">
+<div class="c"><h3>Total MMDR UCI 2025-2026 (prom 2025: 13.4)</h3><div class="ch"><canvas id="ch30"></canvas></div></div>
+<div class="c"><h3>Total MMDR Med. Interna 2025-2026 (prom 2025: 10.7)</h3><div class="ch"><canvas id="ch31"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Desglose MMDR UCI 2025</h3><div class="ch"><canvas id="ch32"></canvas></div></div>
+<div class="c"><h3>Desglose MMDR Med. Interna 2025</h3><div class="ch"><canvas id="ch33"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Mortalidad bruta UCI 2025-2026 (%)</h3><div class="ch ch-s"><canvas id="ch34"></canvas></div></div>
+<div class="c"><h3>Mortalidad bruta Med. Interna 2025-2026 (%)</h3><div class="ch ch-s"><canvas id="ch35"></canvas></div></div>
+</div>
+</div>
+
+<!-- TAB 4 PROFILAXIS -->
+<div class="cnt" id="t4">
+<div class="st">Profilaxis Antibiótica Quirúrgica — Ene a Mar 2026</div>
+<div class="g g4" style="margin-bottom:16px">
+<div class="c k"><div class="v blu">450</div><div class="l">Total procedimientos</div><div class="s bg-b">Ene–Mar 2026</div></div>
+<div class="c k"><div class="v grn">91.1%</div><div class="l">Adherencia global</div><div class="s bg-g">Meta ≥90% ✓</div></div>
+<div class="c k"><div class="v grn">85%</div><div class="l">Timing óptimo</div><div class="s bg-g">Meta ≥80% ✓</div></div>
+<div class="c k"><div class="v rd">40</div><div class="l">No adherentes</div><div class="s bg-r">8.9%</div></div>
+</div>
+<div class="g g3">
+<div class="c"><h3>Distribución procedimientos</h3><div class="ch"><canvas id="ch40"></canvas></div></div>
+<div class="c"><h3>Adherencia semanal</h3><div class="ch"><canvas id="ch41"></canvas></div></div>
+<div class="c"><h3>ATB en profilaxis</h3><div class="ch"><canvas id="ch42"></canvas></div></div>
+</div>
+<div class="st" style="margin-top:20px">Perfil Prescriptor Quirúrgico (Funnel Plot)</div>
+<div class="meth">Cada etiqueta = prescriptor (código). Eje X = nº cirugías. Eje Y = % adherencia. Media institucional = 91.1%. Límites de control: IC 95% y 99.7%. <span style="color:#b71c1c;font-weight:700">Rojo</span> = bajo IC 99.7%. <span style="color:#e65100;font-weight:700">Naranja</span> = bajo IC 95%. <span style="color:#1565c0;font-weight:700">Azul</span> = dentro de límites. <span style="color:#2e7d32;font-weight:700">Verde</span> = 100% adherencia.</div>
+<div class="c"><div class="ch ch-xl"><canvas id="ch43"></canvas></div></div>
+<div class="st">Detalle No-Adherencias</div>
+<div class="c"><div class="scr"><table id="naT"><thead><tr><th>Fecha</th><th>Código</th><th>Cirugía</th><th>ATB usado</th><th>ATB correcto</th><th>Motivo</th></tr></thead><tbody></tbody></table></div></div>
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Timing pre-incisión (minutos)</h3><div class="ch ch-s"><canvas id="ch44"></canvas></div></div>
+<div class="c"><h3>Top 10 cirugías más frecuentes</h3><div class="ch ch-s"><canvas id="ch45"></canvas></div></div>
+</div>
+</div>
+
+<!-- TAB 5 NOTIFICACIONES -->
+<div class="cnt" id="t5">
+<div class="st">Notificaciones de ATB de Uso Restringido — Ene-Feb 2026</div>
+<div class="meth">Desde enero 2026 la notificación es <strong>obligatoria para todos los servicios</strong>. Hasta dic-2025 solo aplicaba a UCI, Emergencia y Medicina Interna. Se monitorea cuántos ATB restringidos se prescribieron, cuántos se notificaron al PROA y qué servicios presentan brechas.</div>
+<div class="g g4" style="margin-bottom:16px">
+<div class="c k"><div class="v blu">79</div><div class="l">ATB restringidos prescritos</div><div class="s bg-b">Ene-Feb 2026</div></div>
+<div class="c k"><div class="v grn">57</div><div class="l">Notificados</div><div class="s bg-g">72.2%</div></div>
+<div class="c k"><div class="v rd">22</div><div class="l">NO notificados</div><div class="s bg-r">27.8%</div></div>
+<div class="c k"><div class="v org">3</div><div class="l">Solo formulario físico</div><div class="s bg-o">Sin digital</div></div>
+</div>
+<div class="g g2">
+<div class="c"><h3>Notificados vs No notificados por servicio</h3><div class="ch"><canvas id="ch50"></canvas></div></div>
+<div class="c"><h3>Tasa de notificación por servicio (%)</h3><div class="ch"><canvas id="ch51"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Evolución brecha: Período 1 vs Período 2</h3><div class="ch"><canvas id="ch52"></canvas></div></div>
+<div class="c">
+<h3>Análisis por servicio</h3>
+<div class="al al-c"><div class="t">Traumatología: 100% no notificado (2/2)</div><div class="d">Recién incorporado. Sin formularios digitales. Capacitación inmediata.</div></div>
+<div class="al al-c"><div class="t">Cirugía: 50% no notificado P2 (3/6)</div><div class="d">Deterioro vs P1 (0%). Investigar causa.</div></div>
+<div class="al al-w"><div class="t">UCI: 38.5% no notificado (5/13)</div><div class="d">Era servicio obligatorio desde 2025. Posible fatiga.</div></div>
+<div class="al al-w"><div class="t">Emergencia: 25.6% no notificado (10/39)</div><div class="d">Mayor volumen absoluto. Alta rotación.</div></div>
+<div class="al al-s"><div class="t">Med. Interna: 13.3% no notificado (2/15)</div><div class="d">Mejor desempeño. Cercano a meta &lt;10%.</div></div>
+<div class="al al-s"><div class="t">Pediatría: 0% brecha (1/1)</div><div class="d">En fase de incorporación.</div></div>
+</div>
+</div>
+<div class="st">Detalle por período</div>
+<div class="g g2">
+<div class="c"><h3>Período 1</h3>
+<table><thead><tr><th>Servicio</th><th>Total</th><th>Notif.</th><th>No notif.</th><th>% Brecha</th></tr></thead><tbody>
+<tr><td>Cirugía</td><td>3</td><td>3</td><td>0</td><td><span class="tg tg-ok">0%</span></td></tr>
+<tr><td>Traumatología</td><td>2</td><td>0</td><td>2</td><td><span class="tg tg-no">100%</span></td></tr>
+<tr><td>Emergencia</td><td>26</td><td>19</td><td>7</td><td><span class="tg tg-w">26.9%</span></td></tr>
+<tr><td>Med. Interna</td><td>5</td><td>4</td><td>1</td><td><span class="tg tg-w">20%</span></td></tr>
+<tr><td>UCI</td><td>5</td><td>3</td><td>2</td><td><span class="tg tg-no">40%</span></td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>41</td><td>29</td><td>12</td><td><span class="tg tg-no">29.3%</span></td></tr>
+</tbody></table></div>
+<div class="c"><h3>Período 2</h3>
+<table><thead><tr><th>Servicio</th><th>Total</th><th>Notif.</th><th>No notif.</th><th>% Brecha</th></tr></thead><tbody>
+<tr><td>Cirugía/Neurocx</td><td>6</td><td>3</td><td>3</td><td><span class="tg tg-no">50%</span></td></tr>
+<tr><td>Emergencia</td><td>13</td><td>10</td><td>3</td><td><span class="tg tg-w">23.1%</span></td></tr>
+<tr><td>Med. Interna</td><td>10</td><td>9</td><td>1</td><td><span class="tg tg-ok">10%</span></td></tr>
+<tr><td>Pediatría</td><td>1</td><td>1</td><td>0</td><td><span class="tg tg-ok">0%</span></td></tr>
+<tr><td>UCI</td><td>8</td><td>5</td><td>3</td><td><span class="tg tg-no">37.5%</span></td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>38</td><td>28</td><td>10</td><td><span class="tg tg-w">26.3%</span></td></tr>
+</tbody></table></div>
+</div>
+<div class="st">Formularios físicos (sin integración digital)</div>
+<div class="c"><table><thead><tr><th>Servicio</th><th>Período</th><th>Físicos</th><th>Requieren interc.</th><th>No requieren</th></tr></thead><tbody>
+<tr><td>Ginecología</td><td>P1</td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>Pediatría</td><td>P2</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>Neonatología</td><td>P2</td><td>1</td><td>0</td><td>1</td></tr>
+</tbody></table></div>
+</div>
+
+<!-- TAB 6 CORRELACIÓN -->
+<div class="cnt" id="t6">
+<div class="st">Análisis de Correlación Consumo vs Resistencia</div>
+<div class="g g2">
+<div class="c"><h3>UCI: Consumo vs MMDR 2025-2026</h3><div class="ch"><canvas id="ch60"></canvas></div></div>
+<div class="c"><h3>Med. Interna: Consumo vs MMDR 2025-2026</h3><div class="ch"><canvas id="ch61"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:16px">
+<div class="c"><h3>Carbapenémicos vs Enterobact. R-Carb (UCI)</h3><div class="ch"><canvas id="ch62"></canvas></div></div>
+<div class="c"><h3>Cascada de sustitución por desabasto (UCI)</h3><div class="ch"><canvas id="ch63"></canvas></div></div>
+</div>
+</div>
+
+<!-- TAB 7 ALERTAS -->
+<div class="cnt" id="t7">
+<div class="st">Sistema de Alertas PROA</div>
+<div class="g g2">
+<div class="c">
+<h3>Alertas Críticas</h3>
+<div class="al al-c"><div class="t">SAMR UCI Feb-26: 7.14 — Máximo histórico</div><div class="d">Supera pico Jun-25. Investigar brote, precauciones de contacto, descolonización. Coincide con mortalidad 10%.</div></div>
+<div class="al al-c"><div class="t">BLEE MI Feb-26: 12.87 — Máximo histórico</div><div class="d">Supera máx 2025 (10.40). Correlación con fluoroquinolonas +256% y aminoglucósidos.</div></div>
+<div class="al al-c"><div class="t">Fluoroquinolonas fuera de IA PROA</div><div class="d">UCI +170%, MI +256% vs 2025. No capturadas por el sistema. Fuga crítica.</div></div>
+<div class="al al-c"><div class="t">Desabasto: Pipe/Tazo y Ceftriaxona</div><div class="d">Cascada hacia carbapenémicos, cefepime, fluoroquinolonas desde Dic-2025.</div></div>
+<div class="al al-c"><div class="t">Brecha notificación: 27.8%</div><div class="d">1 de 3.6 prescripciones no notificada. Traumatología 100%, Cirugía 50%.</div></div>
+<div class="al al-c"><div class="t">Prescriptores outlier IA PROA: JL (11.1%), MJL (0%), LB/FG/MG (37.5%), AM (42.9%)</div><div class="d">Requieren intervención educativa individualizada urgente. JL y MJL con tasas críticas.</div></div>
+<div class="al al-c"><div class="t">Prescriptores outlier Profilaxis Qx: PA (61%), CH (64%), GU (67%)</div><div class="d">Adherencia &lt;70%. PA: uso recurrente de Ampi+IBL e Imipenem. CH: Ampi+IBL y Claritromicina. GU: Vancomicina sin criterios. Intervención prioritaria.</div></div>
+</div>
+<div class="c">
+<h3>Alertas de Vigilancia</h3>
+<div class="al al-w"><div class="t">EVR emergente MI Ene-26: 0.75</div><div class="d">Ausente 12 meses 2025. Vigilar.</div></div>
+<div class="al al-w"><div class="t">C. difficile MI Feb-26: 1.98</div><div class="d">Relación con fluoroquinolonas y carbapenémicos.</div></div>
+<div class="al al-w"><div class="t">Mortalidad UCI Feb-26: 10%</div><div class="d">Segunda más alta. Coincide con SAMR.</div></div>
+<div class="al al-w"><div class="t">Seguimientos IA: caída de 5 a 0</div><div class="d">Pérdida de seguimiento farmacéutico P2.</div></div>
+<div class="al al-w"><div class="t">Dosis incorrectas: 26% global (101/389)</div><div class="d">Picos en jul-25 (35.7%) y ene-26 (53.1%). Vancomicina y meropenem principales.</div></div>
+<div class="al al-w"><div class="t">Profilaxis Qx: prescriptores en zona de vigilancia — NA (75%), LA (79%)</div><div class="d">Adherencia entre 70-80%. NA: bajo volumen (4 cirugías), requiere seguimiento. LA: Ceftriaxona y Clindamicina fuera de protocolo.</div></div>
+<h3 style="margin-top:14px">Indicadores Favorables</h3>
+<div class="al al-s"><div class="t">Profilaxis quirúrgica: 91.1%</div><div class="d">Por encima meta 90%. Cefazolina dominante.</div></div>
+<div class="al al-s"><div class="t">Med. Interna: notificación 86.7%</div><div class="d">Cercano a meta 90%. Modelo a replicar.</div></div>
+<div class="al al-s"><div class="t">Mortalidad MI Feb-26: 0%</div><div class="d">A pesar de MMDR elevado.</div></div>
+<div class="al al-s"><div class="t">IA PROA — HO, JA, DP, EF: 100% aprobación</div><div class="d">Prescriptores modelo con ≥3 solicitudes.</div></div>
+<div class="al al-s"><div class="t">Profilaxis Qx — 17 prescriptores con 100% adherencia</div><div class="d">OC, BA, VA, PE, CZ, BE, PI, AR, DA, GO, BR, VE, JA, ER, YE, OC2, NE. Modelos a reconocer.</div></div>
+</div>
+</div>
+</div>
+
+<!-- TAB 8 RECOMENDACIONES -->
+<div class="cnt" id="t8">
+<div class="st">Recomendaciones PROA — Plan de Acción</div>
+<div class="g g2">
+<div class="c">
+<h3>Prioridad Crítica (0-30 días)</h3>
+<div class="al al-c"><div class="t">1. Fluoroquinolonas y aminoglucósidos en IA PROA</div><div class="d">Meta: capturar &gt;90%. El +256% en MI sin vigilancia es la mayor amenaza.</div></div>
+<div class="al al-c"><div class="t">2. Plan de contingencia por desabasto</div><div class="d">Tablas de sustitución validadas, alertas de stock, auditoría de cascada.</div></div>
+<div class="al al-c"><div class="t">3. Cerrar brecha notificación Traumatología y Cirugía</div><div class="d">Capacitación, acceso digital, responsable por turno. Meta &lt;10%.</div></div>
+<div class="al al-c"><div class="t">4. Investigación SAMR en UCI</div><div class="d">Cultivos vigilancia, descolonización. Máximo histórico.</div></div>
+<div class="al al-c"><div class="t">5. Intervención prescriptores outlier IA PROA</div><div class="d">JL (11.1%), MJL (0%), LB/FG/MG (37.5%), AM (42.9%): sesiones individualizadas de educación y retroalimentación.</div></div>
+<div class="al al-c"><div class="t">6. Intervención prescriptores outlier Profilaxis Qx</div><div class="d">PA (61%, 18 cx) — uso recurrente de Ampi+IBL e Imipenem. CH (64%, 22 cx) — Ampi+IBL y Claritromicina. GU (67%, 12 cx) — Vancomicina sin criterios. Sesiones educativas individualizadas y seguimiento quincenal.</div></div>
+</div>
+<div class="c">
+<h3>Prioridad Alta (30-60 días)</h3>
+<div class="al al-w"><div class="t">7. Cultivos previos ≥80%</div><div class="d">Actual 61.4% (122/316 sin cultivo). Campo obligatorio en formulario.</div></div>
+<div class="al al-w"><div class="t">8. Desescalamiento ≥40%</div><div class="d">Actual 21.5% (54/251). Seguimiento 48-72h con farmacéutico.</div></div>
+<div class="al al-w"><div class="t">9. Errores dosificación &lt;10%</div><div class="d">Actual 26% (101/389). Nomogramas vancomicina, ajuste renal.</div></div>
+<div class="al al-w"><div class="t">10. Seguimiento prescriptores profilaxis en vigilancia</div><div class="d">NA (75%, 4 cx) y LA (79%, 14 cx): retroalimentación y auditoría mensual hasta alcanzar ≥85%.</div></div>
+<h3 style="margin-top:14px">Prioridad Media (60-90 días)</h3>
+<div class="al al-i"><div class="t">11. Digitalizar Ginecología, Neonatología</div><div class="d">3 formularios físicos sin trazabilidad.</div></div>
+<div class="al al-i"><div class="t">12. Reporte mensual Visor PROA</div><div class="d">Presentación a Comité y Dirección.</div></div>
+<div class="al al-i"><div class="t">13. Validar Índice PROA 12 meses</div><div class="d">Sensibilidad, recalibración, publicación.</div></div>
+</div>
+</div>
+</div>
+
+<!-- TAB 9 TABLAS -->
+<div class="cnt" id="t9">
+<div class="st">Tablas de Datos — Respaldo y Evidencia</div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T1. Consumo UCI 2025 (DDD/100dp)</h3>
+<div class="c scr"><table><thead><tr><th>Familia</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
+<tr><td>Penicilinas + IBL</td><td>45.6</td><td>39.8</td><td>42.1</td><td>37.5</td><td>42.3</td><td>54.1</td><td>96.8</td><td>67.3</td><td>35.8</td><td>27.4</td><td>28.9</td><td>47.7</td></tr>
+<tr><td>Carbapenémicos</td><td>30.8</td><td>20.3</td><td>27.5</td><td>25.6</td><td>18.3</td><td>38.8</td><td>22.1</td><td>31.5</td><td>28.6</td><td>19.3</td><td>21.4</td><td>14.5</td></tr>
+<tr><td>Cefalosporinas 3ªG</td><td>7.3</td><td>3.2</td><td>8.6</td><td>6.8</td><td>5.4</td><td>0.6</td><td>4.2</td><td>17.0</td><td>9.8</td><td>7.5</td><td>6.2</td><td>10.9</td></tr>
+<tr><td>Fluoroquinolonas</td><td>8.1</td><td>4.5</td><td>5.2</td><td>6.3</td><td>4.8</td><td>3.2</td><td>7.1</td><td>11.4</td><td>5.6</td><td>4.2</td><td>3.8</td><td>5.9</td></tr>
+<tr><td>Glucopéptidos</td><td>19.2</td><td>5.4</td><td>8.3</td><td>10.4</td><td>7.2</td><td>4.9</td><td>6.8</td><td>9.5</td><td>5.3</td><td>3.8</td><td>7.6</td><td>5.2</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>168.6</td><td>88.4</td><td>108.6</td><td>103.5</td><td>94.2</td><td>87.6</td><td>100.9</td><td>175.7</td><td>95.9</td><td>72.2</td><td>81.3</td><td>66.2</td></tr>
+</tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T2. Consumo Med. Interna 2025</h3>
+<div class="c scr"><table><thead><tr><th>Familia</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
+<tr><td>Penicilinas + IBL</td><td>45.6</td><td>17.2</td><td>15.8</td><td>20.3</td><td>11.5</td><td>12.4</td><td>18.6</td><td>14.2</td><td>10.8</td><td>8.7</td><td>8.9</td><td>11.4</td></tr>
+<tr><td>Carbapenémicos</td><td>30.8</td><td>6.4</td><td>8.2</td><td>10.5</td><td>3.8</td><td>5.6</td><td>7.3</td><td>5.4</td><td>4.2</td><td>3.6</td><td>2.2</td><td>2.1</td></tr>
+<tr><td>Cefalosporinas 3ªG</td><td>7.3</td><td>5.8</td><td>9.4</td><td>8.2</td><td>4.6</td><td>5.2</td><td>23.0</td><td>6.8</td><td>5.4</td><td>4.2</td><td>0.5</td><td>2.8</td></tr>
+<tr><td>Fluoroquinolonas</td><td>8.1</td><td>3.2</td><td>4.8</td><td>5.6</td><td>2.4</td><td>3.1</td><td>4.5</td><td>3.8</td><td>2.9</td><td>2.1</td><td>1.8</td><td>3.4</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>168.6</td><td>44.6</td><td>46.4</td><td>59.7</td><td>28.5</td><td>33.2</td><td>48.5</td><td>37.8</td><td>30.1</td><td>24.3</td><td>15.2</td><td>26.0</td></tr>
+</tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T3. Consumo 2026 (UCI y Med. Interna)</h3>
+<div class="c scr"><table><thead><tr><th>Familia</th><th>UCI Ene</th><th>UCI Feb</th><th>MI Ene</th><th>MI Feb</th><th>MI Mar</th></tr></thead><tbody>
+<tr><td>Penicilinas + IBL</td><td>26.6</td><td>18.6</td><td>4.1</td><td>12.6</td><td>—</td></tr>
+<tr><td>Carbapenémicos</td><td>13.5</td><td>24.3</td><td>3.9</td><td>14.9</td><td>—</td></tr>
+<tr><td>Cefalosporinas 4ªG</td><td>34.1</td><td>1.6</td><td>1.2</td><td>0.6</td><td>—</td></tr>
+<tr><td>Fluoroquinolonas</td><td>23.5</td><td>19.1</td><td>16.8</td><td>15.3</td><td>—</td></tr>
+<tr><td>Glucopéptidos</td><td>7.6</td><td>8.9</td><td>4.0</td><td>1.7</td><td>—</td></tr>
+<tr><td>Aminoglucósidos</td><td>10.3</td><td>2.9</td><td>11.8</td><td>7.5</td><td>—</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>116.5</td><td>89.2</td><td>44.2</td><td>54.7</td><td>—</td></tr>
+</tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T4. MMDR UCI 2025 (/1000dp)</h3>
+<div class="c scr"><table><thead><tr><th>Ind.</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
+<tr><td>SAMR</td><td>0</td><td>0</td><td>0</td><td>5.92</td><td>0</td><td>7.52</td><td>0</td><td>5.71</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>BLEE</td><td>0</td><td>0</td><td>6.17</td><td>5.92</td><td>0</td><td>15.04</td><td>0</td><td>11.43</td><td>6.62</td><td>5.56</td><td>0</td><td>25.16</td></tr>
+<tr><td>ERC</td><td>0</td><td>0</td><td>0</td><td>11.83</td><td>13.16</td><td>0</td><td>0</td><td>17.14</td><td>6.62</td><td>5.56</td><td>5.75</td><td>0</td></tr>
+<tr><td>PA RC</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>5.75</td><td>0</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>0</td><td>0</td><td>6.17</td><td>23.67</td><td>13.16</td><td>22.56</td><td>0</td><td>34.28</td><td>13.24</td><td>11.12</td><td>11.5</td><td>25.16</td></tr>
+<tr><td>Mort%</td><td>6.1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>11.8</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7.4</td><td>8.3</td></tr>
+</tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T5. MMDR Med. Interna 2025</h3>
+<div class="c scr"><table><thead><tr><th>Ind.</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
+<tr><td>SAMR</td><td>1.92</td><td>1.77</td><td>2.85</td><td>2.19</td><td>2.80</td><td>0.95</td><td>2.73</td><td>2.35</td><td>1.78</td><td>2.65</td><td>2.49</td><td>1.36</td></tr>
+<tr><td>BLEE</td><td>6.74</td><td>7.09</td><td>9.51</td><td>6.57</td><td>6.29</td><td>10.4</td><td>8.18</td><td>6.26</td><td>8.0</td><td>5.97</td><td>8.29</td><td>3.41</td></tr>
+<tr><td>ERC</td><td>0.96</td><td>0</td><td>2.85</td><td>0.73</td><td>0</td><td>0.95</td><td>0</td><td>1.56</td><td>2.67</td><td>1.99</td><td>0.83</td><td>1.36</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>9.62</td><td>8.86</td><td>15.21</td><td>9.49</td><td>9.09</td><td>13.25</td><td>10.91</td><td>10.95</td><td>12.45</td><td>10.61</td><td>11.61</td><td>6.81</td></tr>
+<tr><td>Mort%</td><td>0.8</td><td>1.6</td><td>0</td><td>0.7</td><td>2.1</td><td>0.8</td><td>1.5</td><td>3.2</td><td>0</td><td>0</td><td>1.6</td><td>0</td></tr>
+</tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T6. MMDR 2026</h3>
+<div class="c scr"><table><thead><tr><th>Ind.</th><th>UCI E</th><th>UCI F</th><th>MI E</th><th>MI F</th></tr></thead><tbody>
+<tr><td>SAMR</td><td>0</td><td>7.14</td><td>2.25</td><td>0</td></tr>
+<tr><td>EVR</td><td>0</td><td>0</td><td>0.75</td><td>0</td></tr>
+<tr><td>BLEE</td><td>5.80</td><td>0</td><td>5.25</td><td>12.87</td></tr>
+<tr><td>ERC</td><td>11.76</td><td>7.14</td><td>2.25</td><td>0.99</td></tr>
+<tr><td>PA RC</td><td>0</td><td>0</td><td>0</td><td>0.99</td></tr>
+<tr><td>AB RC</td><td>0</td><td>0</td><td>0.75</td><td>0</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>17.56</td><td>14.28</td><td>11.25</td><td>14.85</td></tr>
+<tr><td>C.diff</td><td>0</td><td>0</td><td>0</td><td>1.98</td></tr>
+<tr><td>Mort%</td><td>5.7</td><td>10.0</td><td>0.7</td><td>0</td></tr>
+</tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T7. Notificaciones ATB restringido</h3>
+<div class="c scr"><table><thead><tr><th>Servicio</th><th>Total</th><th>Notif.</th><th>No notif.</th><th>% Brecha</th></tr></thead><tbody>
+<tr><td>Cirugía</td><td>9</td><td>6</td><td>3</td><td>33.3%</td></tr>
+<tr><td>Emergencia</td><td>39</td><td>29</td><td>10</td><td>25.6%</td></tr>
+<tr><td>Med. Interna</td><td>15</td><td>13</td><td>2</td><td>13.3%</td></tr>
+<tr><td>UCI</td><td>13</td><td>8</td><td>5</td><td>38.5%</td></tr>
+<tr><td>Traumatología</td><td>2</td><td>0</td><td>2</td><td>100%</td></tr>
+<tr><td>Pediatría</td><td>1</td><td>1</td><td>0</td><td>0%</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>79</td><td>57</td><td>22</td><td>27.8%</td></tr>
+</tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T8. Profilaxis Qx por prescriptor</h3>
+<div class="c scr"><table><thead><tr><th>Código</th><th>Total</th><th>Cumple</th><th>No cumple</th><th>%Adh</th></tr></thead><tbody id="pTb"></tbody></table></div>
+
+<h3 style="margin:14px 0 8px;color:var(--p)">T9. Ranking Prescriptores IA PROA (mar25–mar26)</h3>
+<div class="c scr"><table><thead><tr><th>Código</th><th>Solicitudes</th><th>Aprobadas</th><th>Tasa</th></tr></thead><tbody id="iaRank"></tbody></table></div>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
 <script>
-// ============================================================
-// GLOBAL DATA
-// ============================================================
-Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";Chart.defaults.font.size=10;Chart.defaults.plugins.legend.labels.usePointStyle=true;
+function sT(n){document.querySelectorAll('.cnt').forEach(function(c,i){if(i===n){c.classList.add('active')}else{c.classList.remove('active')}});document.querySelectorAll('.tab').forEach(function(t,i){if(i===n){t.classList.add('active')}else{t.classList.remove('active')}})}
 
-const M14=['Mar-25','Abr-25','May-25','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26'];
-const M12=['Ene-25','Feb-25','Mar-25','Abr-25','May-25','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25'];
-const M14b=[...M12,'Ene-26','Feb-26'];
-const ann26={type:'line',xMin:11.5,xMax:11.5,borderColor:'#9e9e9e',borderWidth:2,borderDash:[6,4],label:{display:true,content:'2026→',position:'start',font:{size:9,weight:'bold'},color:'#616161'}};
+var B='rgba(25,118,210,',R='rgba(211,47,47,',G='rgba(46,125,50,',O='rgba(245,124,0,',P='rgba(142,36,170,',T='rgba(0,137,123,',PK='rgba(233,30,99,';
+var b8=B+'.8)',r8=R+'.8)',g8=G+'.8)',o8=O+'.8)',p8=P+'.8)',t8=T+'.8)',pk7=PK+'.7)';
+var b1=B+'.12)',r1=R+'.12)',g1=G+'.12)',o1=O+'.12)';
+var M25=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+var ML=M25.concat(['Ene26','Feb26']);
 
-// Consumo
-const cUCI25=[88.37,108.60,103.50,94.20,87.62,100.86,175.70,95.90,72.20,81.30,66.20,76.60];
-const cUCI26=[116.50,89.20];
-const cMI25=[44.60,46.40,59.70,28.50,33.15,48.52,37.80,30.10,24.30,15.20,26.00,25.90];
-const cMI26=[44.20,54.70];
-const carbUCI=[38.80,22.10,27.60,36.30,25.80,18.30,30.40,14.50,21.00,24.40,20.90,14.50,13.50,24.30];
-const carbMI=[3.60,7.00,6.20,5.50,5.29,2.17,6.60,5.10,3.10,0.80,2.10,2.60,3.90,14.90];
-const fqUCI=[0,13.80,17.80,4.30,1.05,0,0,2.30,9.90,14.40,3.70,0.90,23.50,19.10];
-const fqMI=[3.80,3.50,4.60,2.20,4.25,11.74,3.70,4.00,3.20,0.50,6.50,3.60,16.80,15.30];
+var uci25=[168.6,88.4,108.6,103.5,94.2,87.6,100.9,175.7,95.9,72.2,81.3,66.2];
+var mi25=[168.6,44.6,46.4,59.7,28.5,33.2,48.5,37.8,30.1,24.3,15.2,26.0];
+var mmU25=[0,0,6.17,23.67,13.16,22.56,0,34.28,13.24,11.12,11.50,25.16];
+var mmM25=[9.62,8.86,15.21,9.49,9.09,13.25,10.91,10.95,12.45,10.61,11.61,6.81];
 
-// MMDR
-const mmdrUCI=[0,0,6.17,23.67,13.16,22.56,0,34.28,13.24,11.12,11.50,25.16,17.56,14.28];
-const mmdrMI=[9.62,8.86,15.21,9.49,9.09,13.25,10.91,10.95,12.45,10.61,11.61,6.81,11.25,14.85];
-const samrU=[0,0,0,5.92,0,7.52,0,5.71,0,0,0,0,0,7.14];
-const evrU=[0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-const bleeU=[0,0,6.17,5.92,0,15.04,0,11.43,6.62,5.56,0,25.16,5.80,0];
-const ercU=[0,0,0,11.83,13.16,0,0,17.14,6.62,5.56,5.75,0,11.76,7.14];
-const paerU=[0,0,0,0,0,0,0,0,0,0,5.75,0,0,0];
-const acinU=[0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-const samrM=[1.92,1.77,2.85,2.19,2.80,0.95,2.73,2.35,1.78,2.65,2.49,1.36,2.25,0];
-const evrM=[0,0,0,0,0,0,0,0,0,0,0,0,0.75,0];
-const bleeM=[6.74,7.09,9.51,6.57,6.29,10.40,8.18,6.26,8.00,5.97,8.29,3.41,5.25,12.87];
-const ercM=[0.96,0,2.85,0.73,0,0.95,0,1.56,2.67,1.99,0.83,1.36,2.25,0.99];
-const paerM=[0,0,0,0,0,0,0,0.78,0,0,0,0.68,0,0.99];
-const acinM=[0,0,0,0,0,0.95,0,0,0,0,0,0,0.75,0];
-const mortU=[6.1,0,0,0,0,11.8,0,0,0,0,7.4,8.3,5.7,10.0];
-const mortM=[0.8,1.6,0,0.7,2.1,0.8,1.5,3.2,0,0,1.6,0,0.7,0];
+// ===== DATOS REALES IA PROA del informe (mar25-mar26) =====
+var iaData=[
+{id:'PM',nm:'P.Medina',n:47,a:38},
+{id:'PC',nm:'P.Cajas',n:26,a:18},
+{id:'SU',nm:'S.Ulloa',n:24,a:18},
+{id:'DA',nm:'D.Amaguaya',n:19,a:14},
+{id:'FV',nm:'F.Villamarín',n:18,a:13},
+{id:'VG',nm:'V.Guerrero',n:17,a:14},
+{id:'HO',nm:'H.Ortega',n:16,a:16},
+{id:'FM',nm:'F.Maldonado',n:16,a:12},
+{id:'HQ',nm:'H.Quintero',n:11,a:8},
+{id:'LF',nm:'L.Fonseca',n:10,a:7},
+{id:'BP',nm:'B.Pallmay',n:10,a:7},
+{id:'PB',nm:'P.Banderas',n:9,a:7},
+{id:'JL',nm:'J.Lucio',n:9,a:1},
+{id:'MC',nm:'M.Carrillo',n:9,a:6},
+{id:'LB',nm:'L.Bustamante',n:8,a:3},
+{id:'FG',nm:'F.García',n:8,a:3},
+{id:'MG',nm:'M.Garcés',n:8,a:3},
+{id:'JA',nm:'J.Armendáriz',n:7,a:7},
+{id:'AM',nm:'A.Monge',n:7,a:3},
+{id:'CL',nm:'C.Lema',n:6,a:5},
+{id:'WP',nm:'W.Peña',n:6,a:5},
+{id:'CC',nm:'C.Cabezas',n:5,a:4},
+{id:'DD',nm:'D.Delgado',n:5,a:4},
+{id:'DP',nm:'D.Pino',n:5,a:5},
+{id:'JAlv',nm:'J.Alava',n:5,a:3},
+{id:'KP',nm:'K.Pozo',n:4,a:2},
+{id:'MM',nm:'M.Macas',n:4,a:2},
+{id:'OM',nm:'O.Martínez',n:4,a:3},
+{id:'MD',nm:'M.Damián',n:4,a:3},
+{id:'MCh',nm:'M.Chingo',n:3,a:2},
+{id:'EF',nm:'E.Fabre',n:3,a:3},
+{id:'VP',nm:'V.Pazmiño',n:3,a:2},
+{id:'MPo',nm:'M.Ponluiza',n:3,a:2},
+{id:'MGu',nm:'M.Guacho',n:3,a:1},
+{id:'JC',nm:'J.Castillo',n:3,a:2},
+{id:'CJ',nm:'C.Jara',n:3,a:2},
+{id:'MJL',nm:'MJ.López',n:3,a:0}
+];
 
-// IA PROA
-const iaT=[20,28,24,26,42,28,31,27,32,36,32,29,34];
-const ptz=[7,17,17,0,19,12,15,14,11,17,7,6,4];
-const mer=[8,10,9,6,17,11,7,4,4,4,5,12,10];
-const cef=[0,1,1,0,3,0,2,2,2,4,7,11,11];
-const van=[4,4,5,7,3,3,2,2,1,2,5,5,6];
-const imi=[1,3,3,3,0,2,4,5,5,3,7,2,3];
+// ========== TAB 0 ==========
+new Chart(document.getElementById('ch00'),{type:'doughnut',data:{labels:['Consumo (6)','MMDR (7)','Mortalidad (9)','Proceso (10)','Déficit (68)'],datasets:[{data:[6,7,9,10,68],backgroundColor:[g8,g8,'rgba(46,125,50,.5)','rgba(46,125,50,.35)','rgba(211,47,47,.15)'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
 
-function showTab(id){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');event.target.classList.add('active');}
+new Chart(document.getElementById('ch01'),{type:'doughnut',data:{labels:['Consumo (11)','MMDR (9)','Mortalidad (17)','Proceso (5)','Déficit (58)'],datasets:[{data:[11,9,17,5,58],backgroundColor:[g8,g8,'rgba(46,125,50,.5)','rgba(46,125,50,.35)','rgba(245,124,0,.15)'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
 
-// ============================================================
-// CHARTS
-// ============================================================
-function dualLine(id,labels,l1,d1,c1,l2,d2,c2,ann){new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:[{label:l1,data:d1,borderColor:c1,borderWidth:2,tension:.3,pointRadius:3,yAxisID:'y',fill:false},{label:l2,data:d2,borderColor:c2,borderWidth:2,borderDash:[5,3],tension:.3,pointRadius:3,yAxisID:'y1',fill:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{annotation:{annotations:ann?{l1:ann}:{}}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:l1}},y1:{position:'right',beginAtZero:true,title:{display:true,text:l2},grid:{drawOnChartArea:false}}}}})}
+new Chart(document.getElementById('ch02'),{type:'line',data:{labels:ML,datasets:[{label:'Índice PROA UCI',data:[38,55,48,40,50,35,52,28,42,46,45,32,35,32],borderColor:r8,backgroundColor:r1,fill:true,tension:.3,pointRadius:4},{label:'Umbral riesgo alto (≤40)',data:[40,40,40,40,40,40,40,40,40,40,40,40,40,40],borderColor:'rgba(211,47,47,.3)',borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{min:0,max:100,title:{display:true,text:'Score (100=óptimo)'}}}}});
 
-// Overview
-new Chart(document.getElementById('chartOverview'),{type:'bar',data:{labels:M14,datasets:[{type:'line',label:'UCI DDD',data:[null,null,...cUCI25.slice(2),...cUCI26],borderColor:'#1a237e',borderWidth:2.5,tension:.3,pointRadius:4,yAxisID:'y',fill:false},{type:'line',label:'Med.Int DDD',data:[null,null,...cMI25.slice(2),...cMI26],borderColor:'#00bcd4',borderWidth:2.5,tension:.3,pointRadius:4,yAxisID:'y',fill:false},{label:'IA PROA Rx',data:iaT,backgroundColor:'rgba(123,31,162,.3)',borderColor:'#7b1fa2',borderWidth:1,yAxisID:'y1',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'DDD/100dp'}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'N° Rx'},grid:{drawOnChartArea:false}}}}});
+new Chart(document.getElementById('ch03'),{type:'line',data:{labels:ML,datasets:[{label:'Índice PROA MI',data:[45,50,38,48,52,42,46,44,40,43,42,55,44,42],borderColor:o8,backgroundColor:o1,fill:true,tension:.3,pointRadius:4},{label:'Umbral riesgo moderado (≤50)',data:[50,50,50,50,50,50,50,50,50,50,50,50,50,50],borderColor:'rgba(245,124,0,.3)',borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{min:0,max:100,title:{display:true,text:'Score (100=óptimo)'}}}}});
 
-new Chart(document.getElementById('chartMMDROverview'),{type:'line',data:{labels:M14b,datasets:[{label:'UCI',data:mmdrUCI,borderColor:'#e53935',backgroundColor:'rgba(229,57,53,.1)',borderWidth:2.5,fill:true,tension:.3,pointRadius:4},{label:'Med.Int',data:mmdrMI,borderColor:'#ff9800',backgroundColor:'rgba(255,152,0,.1)',borderWidth:2.5,fill:true,tension:.3,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{l1:ann26}}},scales:{y:{beginAtZero:true,title:{display:true,text:'/1000dp'}}}}});
-
-// IA PROA charts
-new Chart(document.getElementById('chartATMdist'),{type:'doughnut',data:{labels:['Pipe/Tazo 32,3%','Meropenem 26,6%','Vancomicina 13,9%','Cefepime 9,2%','Imipenem 7,9%','Otros 10,1%'],datasets:[{data:[130,107,56,37,32,41],backgroundColor:['#1976d2','#e53935','#43a047','#ff9800','#7b1fa2','#9e9e9e'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
-new Chart(document.getElementById('chartServiceDist'),{type:'doughnut',data:{labels:['UCI 48,0%','Emergencia 25,6%','Med.Int 17,6%','Cirugía 5,9%','Pediatría 2,6%'],datasets:[{data:[131,70,48,16,7],backgroundColor:['#1a237e','#e53935','#00bcd4','#ff9800','#43a047'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
-new Chart(document.getElementById('chartATMtrend'),{type:'line',data:{labels:M14,datasets:[{label:'Pipe/Tazo',data:ptz,borderColor:'#1976d2',borderWidth:2,tension:.3,pointRadius:3},{label:'Meropenem',data:mer,borderColor:'#e53935',borderWidth:2,tension:.3,pointRadius:3},{label:'Cefepime',data:cef,borderColor:'#ff9800',borderWidth:2,tension:.3,pointRadius:3},{label:'Vancomicina',data:van,borderColor:'#43a047',borderWidth:2,tension:.3,pointRadius:3},{label:'Imipenem',data:imi,borderColor:'#7b1fa2',borderWidth:2,tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});
-
-const cM=['Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26'];
-new Chart(document.getElementById('chartCultures'),{type:'bar',data:{labels:cM,datasets:[{label:'Con resultado',data:[6,10,8,9,7,10,14,6,11,10],backgroundColor:'rgba(67,160,71,.7)',borderRadius:3},{label:'En espera',data:[6,20,11,8,6,6,6,15,10,7],backgroundColor:'rgba(255,152,0,.7)',borderRadius:3},{label:'Sin cultivo',data:[7,12,9,13,14,16,15,11,8,17],backgroundColor:'rgba(229,57,53,.7)',borderRadius:3},{label:'N/A',data:[7,0,0,0,0,0,1,0,0,0],backgroundColor:'rgba(158,158,158,.5)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartDiagnosis'),{type:'bar',data:{labels:['Intraabdominal','ITU','Neum.Nosocomial','NAC','Piel/partes blandas','NAVM','Diarrea','Meningitis','Artritis/Endocard/Otros'],datasets:[{data:[66,65,47,46,25,13,9,6,14],backgroundColor:['#1a237e','#3949ab','#5c6bc0','#7986cb','#e53935','#ff9800','#43a047','#7b1fa2','#9e9e9e'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartMMDRia'),{type:'bar',data:{labels:cM,datasets:[{label:'BLEE',data:[6,9,2,3,1,5,4,2,10,5],backgroundColor:'#ff9800'},{label:'KPC/OXA-48',data:[0,0,2,0,2,1,0,1,0,0],backgroundColor:'#e53935'},{label:'Pseudomona R',data:[1,1,1,1,1,0,0,0,0,1],backgroundColor:'#00bcd4'},{label:'NDM',data:[0,0,1,2,0,0,0,0,0,0],backgroundColor:'#7b1fa2'},{label:'SAMR',data:[0,0,1,0,0,0,1,0,1,0],backgroundColor:'#1a237e'},{label:'AMP-C',data:[0,0,0,0,0,0,0,1,0,0],backgroundColor:'#43a047'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartDoses'),{type:'bar',data:{labels:M14,datasets:[{label:'Correcta',data:[15,28,24,17,27,23,26,22,23,27,15,17,24],backgroundColor:'rgba(67,160,71,.7)',borderRadius:3},{label:'Incorrecta',data:[5,0,0,9,15,5,5,5,9,9,17,12,10],backgroundColor:'rgba(229,57,53,.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartBiomarkers'),{type:'doughnut',data:{labels:['PCR>100/PCT>2+Leuco 51,3%','Parcial 33,3%','No cumple 15,4%'],datasets:[{data:[140,91,42],backgroundColor:['#e53935','#ff9800','#9e9e9e'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
-
-const eM=['Jun','Jul','Sep','Oct','Nov','Dic','Ene-26','Feb-26','Mar-26'];
-new Chart(document.getElementById('chartEvo72'),{type:'bar',data:{labels:eM,datasets:[{label:'Mejoría',data:[27,33,12,15,8,17,18,5,13],backgroundColor:'rgba(67,160,71,.7)'},{label:'No mejoría',data:[10,9,8,1,1,7,9,6,9],backgroundColor:'rgba(229,57,53,.7)'},{label:'No evaluado',data:[3,0,2,18,2,2,4,5,7],backgroundColor:'rgba(158,158,158,.5)'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartDeesc'),{type:'doughnut',data:{labels:['No desescaló 55,0%','Sí desescaló 21,5%','No aplicaba 23,5%'],datasets:[{data:[138,54,59],backgroundColor:['#e53935','#43a047','#9e9e9e'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
-
-new Chart(document.getElementById('chartCultResult'),{type:'bar',data:{labels:eM,datasets:[{label:'Positivo',data:[11,22,8,6,3,10,13,8,14],backgroundColor:'rgba(229,57,53,.7)'},{label:'Negativo',data:[7,12,3,3,2,3,0,3,3],backgroundColor:'rgba(67,160,71,.7)'},{label:'No enviado',data:[13,8,6,24,6,12,13,1,0],backgroundColor:'rgba(158,158,158,.5)'},{label:'Pendiente/NA',data:[9,0,5,1,0,1,6,5,10],backgroundColor:'rgba(255,152,0,.5)'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartDeriv'),{type:'bar',data:{labels:['PROA-DM','Vigilancia PCI','Auditoría Médica'],datasets:[{label:'Casos derivados',data:[37,30,13],backgroundColor:['#7b1fa2','#e53935','#ff9800'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
-
-// Consumption
-new Chart(document.getElementById('chartConsumoTotal'),{type:'line',data:{labels:M14b,datasets:[{label:'UCI',data:[...cUCI25,...cUCI26],borderColor:'#1a237e',backgroundColor:'rgba(26,35,126,.1)',borderWidth:2.5,fill:true,tension:.3,pointRadius:4},{label:'Med.Int',data:[...cMI25,...cMI26],borderColor:'#00bcd4',backgroundColor:'rgba(0,188,212,.1)',borderWidth:2.5,fill:true,tension:.3,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{l1:ann26}}},scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}}}});
-
-new Chart(document.getElementById('chartTop5UCI'),{type:'bar',data:{labels:['J01CR','J01DH','J01DE','J01MA','J01GB'],datasets:[{label:'Prom-25',data:[39.49,24.59,8.81,7.08,3.84],backgroundColor:'rgba(26,35,126,.7)',borderRadius:4},{label:'Prom-26',data:[22.60,18.90,17.85,21.30,6.60],backgroundColor:'rgba(229,57,53,.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});
-new Chart(document.getElementById('chartTop5MI'),{type:'bar',data:{labels:['J01CR','J01DH','J01MA','J01GB','J01DD'],datasets:[{label:'Prom-25',data:[12.68,4.09,4.30,2.64,6.84],backgroundColor:'rgba(0,188,212,.7)',borderRadius:4},{label:'Prom-26',data:[8.35,9.40,16.05,9.65,0],backgroundColor:'rgba(255,152,0,.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartFQ'),{type:'line',data:{labels:M14b,datasets:[{label:'FQ UCI',data:fqUCI,borderColor:'#1a237e',borderWidth:2,tension:.3,pointRadius:3},{label:'FQ Med.Int',data:fqMI,borderColor:'#e53935',borderWidth:2,tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{l1:ann26}}},scales:{y:{beginAtZero:true}}}});
-new Chart(document.getElementById('chartCarb'),{type:'line',data:{labels:M14b,datasets:[{label:'Carbap UCI',data:carbUCI,borderColor:'#1a237e',borderWidth:2,tension:.3,pointRadius:3},{label:'Carbap Med.Int',data:carbMI,borderColor:'#e53935',borderWidth:2,tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{l1:ann26}}},scales:{y:{beginAtZero:true}}}});
-
-const casM=['Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26'];
-new Chart(document.getElementById('chartCascade'),{type:'line',data:{labels:casM,datasets:[{label:'Pipe/Tazo IA PROA',data:[19,12,15,14,11,17,7,6,4],borderColor:'#1976d2',borderWidth:3,tension:.3,pointRadius:5,yAxisID:'y'},{label:'FQ Med.Int DDD',data:[3.70,4.00,3.20,0.50,6.50,3.60,16.80,15.30,null],borderColor:'#e53935',borderWidth:3,borderDash:[5,3],tension:.3,pointRadius:5,yAxisID:'y1'},{label:'Carbap Med.Int DDD',data:[6.60,5.10,3.10,0.80,2.10,2.60,3.90,14.90,null],borderColor:'#ff9800',borderWidth:3,borderDash:[5,3],tension:.3,pointRadius:5,yAxisID:'y1'},{label:'Cefepime IA PROA',data:[3,0,2,2,2,4,7,11,11],borderColor:'#ff9800',borderWidth:2,tension:.3,pointRadius:4,yAxisID:'y'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{annotation:{annotations:{sh:{type:'box',xMin:4.5,xMax:8.5,backgroundColor:'rgba(229,57,53,.06)',borderColor:'#e53935',borderWidth:1,borderDash:[4,4],label:{display:true,content:'DESABASTO',position:'start',font:{size:9},color:'#e53935'}}}}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'N° Rx IA PROA'}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'DDD/100dp'},grid:{drawOnChartArea:false}}}}});
-
-// MMDR
-function heatColor(v,mx){if(v===0)return'#e8f5e9';const r=Math.min(v/mx,1);return r<.25?'#fff9c4':r<.5?'#ffe082':r<.7?'#ffab91':'#ef5350';}
-function heatText(v,mx){return Math.min(v/mx,1)>.6?'#fff':'#333';}
-function buildHM(id,data,labels,months){const t=document.getElementById(id);let h='<thead><tr><th style="text-align:left">Indicador</th>';months.forEach(m=>h+=`<th>${m}</th>`);h+='</tr></thead><tbody>';const mx=Math.max(...data.flat().filter(v=>v>0));labels.forEach((l,i)=>{h+=`<tr><td>${l}</td>`;data[i].forEach(v=>{h+=`<td style="background:${heatColor(v,mx)};color:${heatText(v,mx)}">${v>0?v.toFixed(1):'0'}</td>`;});h+='</tr>';});h+='</tbody>';t.innerHTML=h;}
-const hmL=['SAMR','EVR','BLEE','ERC','P.aeruginosa R','Acinetobacter R','TOTAL MMDR'];
-buildHM('hmUCI',[samrU,evrU,bleeU,ercU,paerU,acinU,mmdrUCI],hmL,M14b);
-buildHM('hmMI',[samrM,evrM,bleeM,ercM,paerM,acinM,mmdrMI],hmL,M14b);
-
-new Chart(document.getElementById('chartStackUCI'),{type:'bar',data:{labels:M14b,datasets:[{label:'SAMR',data:samrU,backgroundColor:'#e53935'},{label:'BLEE',data:bleeU,backgroundColor:'#ff9800'},{label:'ERC',data:ercU,backgroundColor:'#1a237e'},{label:'P.aeruginosa',data:paerU,backgroundColor:'#00bcd4'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{l1:ann26}}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
-new Chart(document.getElementById('chartStackMI'),{type:'bar',data:{labels:M14b,datasets:[{label:'SAMR',data:samrM,backgroundColor:'#e53935'},{label:'BLEE',data:bleeM,backgroundColor:'#ff9800'},{label:'ERC',data:ercM,backgroundColor:'#1a237e'},{label:'P.aeruginosa',data:paerM,backgroundColor:'#00bcd4'},{label:'Acinetobacter',data:acinM,backgroundColor:'#43a047'},{label:'EVR',data:evrM,backgroundColor:'#7b1fa2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{l1:ann26}}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
-
-new Chart(document.getElementById('chartMort'),{type:'bar',data:{labels:M14b,datasets:[{label:'UCI',data:mortU,backgroundColor:'rgba(229,57,53,.7)',borderRadius:4},{label:'Med.Int',data:mortM,backgroundColor:'rgba(0,188,212,.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{l1:ann26}}},scales:{y:{beginAtZero:true,title:{display:true,text:'%'}}}}});
-
-const bleeIA=[6,9,2,3,1,5,4,2,10,5];
-new Chart(document.getElementById('chartBLEEcross'),{type:'bar',data:{labels:cM,datasets:[{type:'bar',label:'BLEE IA PROA',data:bleeIA,backgroundColor:'rgba(255,152,0,.4)',yAxisID:'y',borderRadius:4},{type:'line',label:'BLEE UCI /1000dp',data:[15.04,0,11.43,6.62,5.56,0,25.16,5.80,0,null],borderColor:'#1a237e',borderWidth:2,tension:.3,pointRadius:4,yAxisID:'y1'},{type:'line',label:'BLEE Med.Int /1000dp',data:[10.40,8.18,6.26,8.00,5.97,8.29,3.41,5.25,12.87,null],borderColor:'#e53935',borderWidth:2,tension:.3,pointRadius:4,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'N° IA PROA'}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'/1000dp'},grid:{drawOnChartArea:false}}}}});
-
-// Correlations
-dualLine('chartCorr1',M14b,'Carbapeném DDD UCI',carbUCI,'#1a237e','ERC /1000dp',ercU,'#e53935',ann26);
-dualLine('chartCorr2',M14b,'FQ DDD Med.Int',fqMI,'#e53935','BLEE /1000dp',bleeM,'#ff9800',ann26);
-dualLine('chartCorr3',M14b,'Consumo Total UCI',[...cUCI25,...cUCI26],'#1a237e','MMDR Total UCI',mmdrUCI,'#e53935',ann26);
-dualLine('chartCorr4',M14b,'Consumo Total Med.Int',[...cMI25,...cMI26],'#00bcd4','MMDR Total Med.Int',mmdrMI,'#ff9800',ann26);
-
-new Chart(document.getElementById('chartCorr5'),{type:'line',data:{labels:cM,datasets:[{label:'% Empírica',data:[null,62.5,75.0,71.0,74.1,71.9,66.7,84.4,65.5,79.4],borderColor:'#1a237e',borderWidth:2,tension:.3,pointRadius:4,yAxisID:'y'},{label:'% Sin cultivo',data:[26.9,28.6,32.1,41.9,51.9,50.0,41.7,34.4,27.6,50.0],borderColor:'#e53935',borderWidth:2,borderDash:[5,3],tension:.3,pointRadius:4,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',beginAtZero:true,max:100,title:{display:true,text:'% Empírica'}},y1:{position:'right',beginAtZero:true,max:100,title:{display:true,text:'% Sin cultivo'},grid:{drawOnChartArea:false}}}}});
-
-new Chart(document.getElementById('chartCorr6'),{type:'bar',data:{labels:M14,datasets:[{label:'% Dosis incorrectas',data:[25.0,0,0,34.6,35.7,17.9,16.1,18.5,28.1,25.0,53.1,41.4,29.4],backgroundColor:M14.map((_,i)=>i>=10?'rgba(229,57,53,.8)':'rgba(255,152,0,.6)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{annotation:{annotations:{sh:{type:'box',xMin:9.5,xMax:12.5,backgroundColor:'rgba(229,57,53,.06)',borderColor:'#e53935',borderWidth:1,borderDash:[4,4]}}}},scales:{y:{beginAtZero:true,max:60}}}});
-
-// Prescribers
-new Chart(document.getElementById('chartPresVol'),{type:'bar',data:{labels:['P.Medina(47)','P.Cajas(26)','S.Ulloa(24)','D.Amaguaya(19)','F.Villamarín(18)','V.Guerrero(17)','H.Ortega(16)','F.Maldonado(16)','H.Quintero(11)','L.Fonseca(10)','B.Pallmay(10)','P.Banderas(9)','J.Lucio(9)','M.Carrillo(9)','L.Bustamante(8)'],datasets:[{label:'Aprobadas',data:[38,18,18,14,13,14,16,12,8,7,7,7,1,6,3],backgroundColor:'rgba(67,160,71,.7)'},{label:'Rechazadas',data:[9,8,6,5,5,3,0,4,3,3,3,2,8,3,5],backgroundColor:'rgba(229,57,53,.7)'}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{stacked:true,beginAtZero:true},y:{stacked:true}}}});
-
-const prNames=['H.Ortega','J.Armendáriz','D.Pino','C.Lema','W.Peña','V.Guerrero','P.Medina','D.Delgado','J.Candel','S.Ulloa','F.Maldonado','D.Amaguaya','F.Villamarín','L.Fonseca','P.Cajas','M.Carrillo','J.Alava','A.Monge','B.Pallmay','F.García','M.Garcés','J.Lucio'];
-const prRates=[100,100,100,83.3,83.3,82.4,80.8,80,77.8,75,75,73.7,72.2,70,69.2,66.7,60,42.9,37.5,37.5,37.5,11.1];
-new Chart(document.getElementById('chartPresRate'),{type:'bar',data:{labels:prNames,datasets:[{label:'%',data:prRates,backgroundColor:prRates.map(v=>v>=70?'rgba(67,160,71,.7)':v>=50?'rgba(255,152,0,.7)':'rgba(229,57,53,.7)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:100}}}});
-
-new Chart(document.getElementById('chartPresMonth'),{type:'line',data:{labels:M14,datasets:[{label:'P.Medina',data:[1,10,6,8,2,0,1,3,5,1,5,3,2],borderColor:'#e53935',borderWidth:2,tension:.3,pointRadius:3},{label:'P.Cajas',data:[2,1,1,1,5,0,6,0,0,3,0,0,7],borderColor:'#1976d2',borderWidth:2,tension:.3,pointRadius:3},{label:'S.Ulloa',data:[2,2,3,1,5,1,3,0,1,1,1,3,1],borderColor:'#43a047',borderWidth:2,tension:.3,pointRadius:3},{label:'D.Amaguaya',data:[3,0,0,0,1,1,3,4,1,1,1,1,3],borderColor:'#ff9800',borderWidth:2,tension:.3,pointRadius:3},{label:'F.Villamarín',data:[2,2,1,2,1,3,0,0,2,2,3,0,0],borderColor:'#7b1fa2',borderWidth:2,tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});
-
-// ============================================================
-// DATA TABLES
-// ============================================================
-function buildTable(id,headers,rows,opts={}){
-    const t=document.getElementById(id);
-    let h='<thead><tr>';
-    headers.forEach((hdr,i)=>h+=`<th${i===0?' style="text-align:left"':''}>${hdr}</th>`);
-    h+='</tr></thead><tbody>';
-    rows.forEach(row=>{
-        const isTotal=row._total;const isSep=row._sep;
-        h+=`<tr class="${isTotal?'total-row':''} ${isSep?'':''}">`
-        row.cells.forEach((c,i)=>{
-            let cls='';
-            if(isSep)cls='year-sep';
-            else if(i>0&&!isTotal&&typeof c==='number'&&c>30&&opts.highlightOver30)cls='highlight';
-            else if(i>0&&!isTotal&&typeof c==='number'&&c>10&&opts.highlightOver10)cls='danger-cell';
-            h+=`<td class="${cls}"${i===0?' style="text-align:left"':''}>${c!==null&&c!==undefined&&c!==''?c:''}</td>`;
-        });
-        h+='</tr>';
-    });
-    h+='</tbody>';t.innerHTML=h;
+// ========== TAB 1 IA PROA — FUNNEL CON DATOS REALES ==========
+(function(){
+var p0=270/389;
+var scatter=[];var labels=[];var colors=[];
+for(var i=0;i<iaData.length;i++){
+var pr=iaData[i];
+var rate=Math.round(1000*pr.a/pr.n)/10;
+var se=Math.sqrt(p0*(1-p0)/pr.n);
+var lo2=(p0-2*se)*100;
+var lo3=(p0-3*se)*100;
+var col;
+if(rate<lo3) col='rgba(211,47,47,.9)';
+else if(rate<lo2) col='rgba(245,124,0,.9)';
+else if(rate>=80) col='rgba(46,125,50,.9)';
+else col='rgba(25,118,210,.9)';
+scatter.push({x:pr.n,y:rate});
+labels.push(pr.id);
+colors.push(col);
 }
 
-// Table 1: Consumo UCI
-const consumoHeaders=['Grupo ATM','ATC','Ene-25','Feb-25','Mar-25','Abr-25','May-25','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26'];
-const consumoUCIRows=[
-    {cells:['Tetraciclinas','J01AA','','','','','','','','',9.70,2.60,1.00,'','','']},
-    {cells:['Penicilinas amplio espectro','J01CA','','','','','','',7.50,0.80,'','','','','','']},
-    {cells:['Penicilinas R-betalactamasas','J01CF','','','','','','','','','','','',0.90,0.90,'']},
-    {cells:['Inhibidores betalactamasas','J01CG','','','','',42.34,54.10,'','','','','','','','']},
-    {cells:['Penicilinas+Inhibidores','J01CR',23.80,45.00,20.40,37.20,'','',96.80,29.10,33.00,28.30,29.90,47.70,26.60,18.60]},
-    {cells:['Cefalosporinas 1G','J01DB','','','',1.20,4.61,'','',2.30,'','','',1.00,'',3.10]},
-    {cells:['Cefalosporinas 2G','J01DC','','','','','','','','','','','','','','']},
-    {cells:['Cefalosporinas 3G','J01DD',9.90,3.80,17.00,0.60,5.26,12.41,16.30,10.90,4.00,1.10,3.10,0.60,'',10.00]},
-    {cells:['Cefalosporinas 4G','J01DE',12.40,16.10,13.00,6.80,7.57,'','',7.10,'',6.70,'','',34.10,1.60]},
-    {cells:['Aztreonam','J01DF','','','','','','','','','','','','','','']},
-    {cells:['Carbapenémicos','J01DH',38.80,22.10,27.60,36.30,25.80,18.30,30.40,14.50,21.00,24.40,20.90,14.50,13.50,24.30]},
-    {cells:['Otras cefalosporinas','J01DI','','','','','','','','','','','','','','']},
-    {cells:['TMP/SMX','J01EE','','','','','','','','','','','','','','']},
-    {cells:['Macrólidos','J01FA','','','','','',6.30,'','','','','','','','']},
-    {cells:['Aminoglucósidos','J01GB',1.27,5.90,'',3.70,'',5.60,8.40,10.90,1.70,2.50,1.40,0.60,10.30,2.90]},
-    {cells:['Fluoroquinolonas','J01MA','',13.80,17.80,4.30,1.05,'','',2.30,9.90,14.40,3.70,0.90,23.50,19.10]},
-    {cells:['Glicopéptidos','J01XA','','',7.70,3.00,0.99,4.89,10.00,4.90,'','','',10.40,7.60,8.90]},
-    {cells:['Polimixinas','J01XB',1.60,'','','','','','','','',2.90,7.20,'','','']},
-    {cells:['Imidazólicos','J01XD','','','','','','','','','','','','','','']},
-    {cells:['Otros (clindamicina)','J01XX',0.60,1.90,'',1.10,'','','',3.40,'','','','','',0.70]},
-    {cells:['Anfotericinas','J02AA','','','','','','','','','','','','','','']},
-    {cells:['Triazólicos','J02AC','','','','','','','','','','','','','','']},
-    {cells:['Equinocandinas','J02AX','','','','','',5.56,'','','','','','','','']},
-    {cells:['CONSUMO TOTAL','—',88.37,108.60,103.50,94.20,87.62,100.86,175.70,95.90,72.20,81.30,66.20,76.60,116.50,89.20],_total:true}
+var upper2=[],lower2=[],upper3=[],lower3=[],mean=[];
+for(var n=3;n<=50;n++){
+var se=Math.sqrt(p0*(1-p0)/n);
+mean.push({x:n,y:p0*100});
+upper2.push({x:n,y:Math.min((p0+2*se)*100,100)});
+lower2.push({x:n,y:Math.max((p0-2*se)*100,0)});
+upper3.push({x:n,y:Math.min((p0+3*se)*100,100)});
+lower3.push({x:n,y:Math.max((p0-3*se)*100,0)});
+}
+
+var labelPlugin={
+id:'funnelLabelsIA',
+afterDatasetsDraw:function(chart){
+var meta=chart.getDatasetMeta(0);
+var ctx=chart.ctx;
+if(!meta||!meta.data)return;
+ctx.save();
+for(var i=0;i<meta.data.length;i++){
+var pt=meta.data[i];
+var x=pt.x;var y=pt.y;
+ctx.font='bold 9px Segoe UI,sans-serif';
+ctx.textAlign='center';
+ctx.textBaseline='middle';
+var tw=ctx.measureText(labels[i]).width;
+ctx.fillStyle='rgba(255,255,255,.92)';
+ctx.fillRect(x-tw/2-3,y-7,tw+6,14);
+ctx.strokeStyle=colors[i];
+ctx.lineWidth=1.5;
+ctx.strokeRect(x-tw/2-3,y-7,tw+6,14);
+ctx.fillStyle=colors[i];
+ctx.fillText(labels[i],x,y);
+}
+ctx.restore();
+}
+};
+
+new Chart(document.getElementById('ch10'),{type:'scatter',data:{datasets:[
+{label:'Prescriptores',data:scatter,backgroundColor:'rgba(0,0,0,0)',borderColor:'rgba(0,0,0,0)',pointRadius:0,pointHoverRadius:0},
+{label:'Media 69.4%',data:mean,type:'line',borderColor:'#1565c0',borderWidth:2.5,pointRadius:0,fill:false},
+{label:'IC 95% sup',data:upper2,type:'line',borderColor:'rgba(21,101,192,.25)',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false},
+{label:'IC 95% inf',data:lower2,type:'line',borderColor:'rgba(21,101,192,.25)',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false},
+{label:'IC 99.7% sup',data:upper3,type:'line',borderColor:'rgba(211,47,47,.2)',borderDash:[3,3],borderWidth:1,pointRadius:0,fill:false},
+{label:'IC 99.7% inf',data:lower3,type:'line',borderColor:'rgba(211,47,47,.2)',borderDash:[3,3],borderWidth:1,pointRadius:0,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},filter:function(item){return item.datasetIndex>0&&item.datasetIndex<5}}},tooltip:{callbacks:{label:function(ctx){if(ctx.datasetIndex===0){var d=iaData[ctx.dataIndex];return d.nm+': '+ctx.parsed.y.toFixed(1)+'% ('+d.a+'/'+d.n+')';}return ctx.dataset.label}}}},scales:{x:{title:{display:true,text:'Nº solicitudes'},min:0,max:52},y:{title:{display:true,text:'% Aprobación'},min:0,max:105}}},plugins:[labelPlugin]});
+})();
+
+// Tabla prescriptores IA PROA
+(function(){
+var tb=document.getElementById('iaTb');
+var sorted=iaData.slice().sort(function(a,b){return(a.a/a.n)-(b.a/b.n)});
+var h='';
+for(var i=0;i<sorted.length;i++){
+var p=sorted[i];
+var rate=Math.round(1000*p.a/p.n)/10;
+var cl=rate>=80?'tg-ok':rate>=60?'tg-w':'tg-no';
+var st=rate>=80?'Destacado':rate>=60?'En rango':'Intervención';
+h+='<tr><td><strong>'+p.id+'</strong></td><td>'+p.n+'</td><td>'+p.a+'</td><td><span class="tg '+cl+'">'+rate+'%</span></td><td>'+st+'</td></tr>';
+}
+tb.innerHTML=h;
+})();
+
+// Tabla ranking completa T9
+(function(){
+var allIA=[
+{id:'PM',n:47,a:38},{id:'PC',n:26,a:18},{id:'SU',n:24,a:18},{id:'DA',n:19,a:14},
+{id:'FV',n:18,a:13},{id:'VG',n:17,a:14},{id:'HO',n:16,a:16},{id:'FM',n:16,a:12},
+{id:'HQ',n:11,a:8},{id:'LF',n:10,a:7},{id:'BP',n:10,a:7},{id:'PB',n:9,a:7},
+{id:'JL',n:9,a:1},{id:'MC',n:9,a:6},{id:'LB',n:8,a:3},{id:'FG',n:8,a:3},
+{id:'MG',n:8,a:3},{id:'JA',n:7,a:7},{id:'AM',n:7,a:3},{id:'CL',n:6,a:5},
+{id:'WP',n:6,a:5},{id:'CC',n:5,a:4},{id:'DD',n:5,a:4},{id:'DP',n:5,a:5},
+{id:'JAlv',n:5,a:3},{id:'KP',n:4,a:2},{id:'MM',n:4,a:2},{id:'OM',n:4,a:3},
+{id:'MD',n:4,a:3},{id:'MCh',n:3,a:2},{id:'EF',n:3,a:3},{id:'VP',n:3,a:2},
+{id:'MPo',n:3,a:2},{id:'MGu',n:3,a:1},{id:'JC',n:3,a:2},{id:'CJ',n:3,a:2},
+{id:'MJL',n:3,a:0},{id:'JP',n:2,a:1},{id:'WS',n:2,a:0},{id:'ER',n:2,a:1},
+{id:'RV',n:2,a:1},{id:'CY',n:2,a:1},{id:'MT',n:2,a:2},{id:'TV',n:2,a:0},
+{id:'HGu',n:2,a:1},{id:'JCh',n:1,a:1}
 ];
-buildTable('tblConsumoUCI',consumoHeaders,consumoUCIRows,{highlightOver30:true});
+var tb=document.getElementById('iaRank');
+var h='';
+for(var i=0;i<allIA.length;i++){
+var p=allIA[i];
+var rate=Math.round(1000*p.a/p.n)/10;
+h+='<tr><td><strong>'+p.id+'</strong></td><td>'+p.n+'</td><td>'+p.a+'</td><td>'+rate+'%</td></tr>';
+}
+tb.innerHTML=h;
+})();
 
-// Table 2: Consumo MI
-const consumoMIRows=[
-    {cells:['Tetraciclinas','J01AA','','','','','','','','','','','','','','']},
-    {cells:['Penicilinas amplio espectro','J01CA','','','','','',0.95,'','','','','','','','']},
-    {cells:['Penicilinas R-betalactamasas','J01CF','','','','',12.95,'','','','','',0.50,'',1.80,'']},
-    {cells:['Inhibidores betalactamasas','J01CG','','','','','','','','','','','','','','']},
-    {cells:['Penicilinas+Inhibidores','J01CR',8.70,13.60,14.90,10.20,'',17.71,16.70,13.30,13.90,9.80,11.80,11.40,4.10,12.60]},
-    {cells:['Cefalosporinas 1G','J01DB',0.30,0.10,'','',1.00,0.57,0.60,0.10,'',0.30,'',0.30,0.10,0.60]},
-    {cells:['Cefalosporinas 2G','J01DC','','','','','','','','','','','','','','']},
-    {cells:['Cefalosporinas 3G','J01DD',23.00,14.20,22.60,6.60,4.04,3.88,1.10,1.20,'',0.50,2.80,'','','']},
-    {cells:['Cefalosporinas 4G','J01DE','',2.60,2.10,'',0.37,'','','','','',1.10,0.40,1.20,0.60]},
-    {cells:['Aztreonam','J01DF','','','','','','','','','','','','','','']},
-    {cells:['Carbapenémicos','J01DH',3.60,7.00,6.20,5.50,5.29,2.17,6.60,5.10,3.10,0.80,2.10,2.60,3.90,14.90]},
-    {cells:['Otras cefalosporinas','J01DI','','','','','','','','','','','','','','']},
-    {cells:['TMP/SMX','J01EE','','','','','','','','','','','','','','']},
-    {cells:['Macrólidos','J01FA','','','','','','','','','','',0.10,0.10,'',1.50]},
-    {cells:['Aminoglucósidos','J01GB','',1.20,0.90,0.50,0.63,11.50,4.70,4.60,2.50,0.40,1.40,2.70,11.80,7.50]},
-    {cells:['Fluoroquinolonas','J01MA',3.80,3.50,4.60,2.20,4.25,11.74,3.70,4.00,3.20,0.50,6.50,3.60,16.80,15.30]},
-    {cells:['Glicopéptidos','J01XA',0.90,0.50,5.50,1.70,1.64,'',0.80,1.20,0.80,1.30,'',0.60,4.00,1.70]},
-    {cells:['Polimixinas','J01XB','','','','','','','',0.20,'','','','','','']},
-    {cells:['Imidazólicos','J01XD','','','','','','','','','','','','','','']},
-    {cells:['Otros (fosfom/linezo/dapto/clinda)','J01XX',4.30,3.70,2.90,1.80,2.98,'',3.60,0.40,0.80,'',0.90,1.50,0.50,'']},
-    {cells:['Anfotericinas','J02AA','','','','','','','','','','','','','','']},
-    {cells:['Triazólicos','J02AC','','','','','','','','','','','','','','']},
-    {cells:['Equinocandinas','J02AX','','','','','','','','','','','','','','']},
-    {cells:['CONSUMO TOTAL','—',44.60,46.40,59.70,28.50,33.15,48.52,37.80,30.10,24.30,15.20,26.00,25.90,44.20,54.70],_total:true}
+new Chart(document.getElementById('ch11'),{type:'bar',data:{labels:['UCI/UCIN','Emergencia','Med.Int','Cirugía/Esp','Pediatría'],datasets:[{label:'jul25–mar26',data:[131,70,48,16,7],backgroundColor:[r8,o8,b8,t8,g8]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'Solicitudes'}}}}});
+
+new Chart(document.getElementById('ch12'),{type:'line',data:{labels:['Mar25','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic','Ene26','Feb26','Mar26'],datasets:[{label:'Solicitudes',data:[20,28,24,26,42,28,31,27,32,36,32,29,34],borderColor:b8,backgroundColor:b1,fill:true,tension:.3,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});
+
+new Chart(document.getElementById('ch13'),{type:'bar',data:{labels:['Pip/Tazo','Meropenem','Vancomicina','Cefepime','Imipenem','Ceftazidima','Levofloxacino','Linezolid','Cipro','Otros'],datasets:[{label:'Solicitudes',data:[130,107,56,37,32,11,6,5,4,15],backgroundColor:[b8,r8,pk7,o8,r8,t8,o8,p8,o8,'#90a4ae']}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
+
+new Chart(document.getElementById('ch14'),{type:'bar',data:{labels:['Mar25','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic','Ene26','Feb26','Mar26'],datasets:[
+{label:'Correctas',data:[15,28,24,17,27,23,26,22,23,27,15,17,24],backgroundColor:g8},
+{label:'Incorrectas',data:[5,0,0,9,15,5,5,5,9,9,17,12,10],backgroundColor:r8}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+
+// ========== TAB 2 — CONSUMO (familias en lugar de códigos ATC) ==========
+new Chart(document.getElementById('ch20'),{type:'bar',data:{labels:ML,datasets:[{label:'DDD/100dp',data:uci25.concat([116.5,89.2]),backgroundColor:uci25.map(function(v){return v>130?r8:v>95?o8:b8}).concat([o8,b8])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}}}});
+
+new Chart(document.getElementById('ch21'),{type:'bar',data:{labels:M25.concat(['E26','F26','M26']),datasets:[{label:'DDD/100dp',data:mi25.concat([44.2,54.7,0]),backgroundColor:mi25.map(function(v){return v>100?r8:v>45?o8:b8}).concat([b8,o8,'#e0e0e0'])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}}}});
+
+new Chart(document.getElementById('ch22'),{type:'line',data:{labels:ML,datasets:[
+{label:'Penicilinas + IBL',data:[45.6,39.8,42.1,37.5,42.3,54.1,96.8,67.3,35.8,27.4,28.9,47.7,26.6,18.6],borderColor:b8,tension:.3,fill:false},
+{label:'Carbapenémicos',data:[30.8,20.3,27.5,25.6,18.3,38.8,22.1,31.5,28.6,19.3,21.4,14.5,13.5,24.3],borderColor:r8,tension:.3,fill:false},
+{label:'Fluoroquinolonas',data:[8.1,4.5,5.2,6.3,4.8,3.2,7.1,11.4,5.6,4.2,3.8,5.9,23.5,19.1],borderColor:o8,tension:.3,borderWidth:3,fill:false},
+{label:'Cefalosporinas 4ªG',data:[0,0,0,0,0,0,0,0,0,0,0,0,34.1,1.6],borderColor:p8,tension:.3,borderDash:[5,5],fill:false},
+{label:'Glucopéptidos',data:[19.2,5.4,8.3,10.4,7.2,4.9,6.8,9.5,5.3,3.8,7.6,5.2,7.6,8.9],borderColor:t8,tension:.3,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+
+new Chart(document.getElementById('ch23'),{type:'line',data:{labels:M25.concat(['E26','F26','M26']),datasets:[
+{label:'Penicilinas + IBL',data:[45.6,17.2,15.8,20.3,11.5,12.4,18.6,14.2,10.8,8.7,8.9,11.4,4.1,12.6,0],borderColor:b8,tension:.3,fill:false},
+{label:'Carbapenémicos',data:[30.8,6.4,8.2,10.5,3.8,5.6,7.3,5.4,4.2,3.6,2.2,2.1,3.9,14.9,0],borderColor:r8,tension:.3,fill:false},
+{label:'Fluoroquinolonas',data:[8.1,3.2,4.8,5.6,2.4,3.1,4.5,3.8,2.9,2.1,1.8,3.4,16.8,15.3,0],borderColor:o8,tension:.3,borderWidth:3,fill:false},
+{label:'Aminoglucósidos',data:[0,0,0,0,0,11.5,0,0,0,0,0,0,11.8,7.5,0],borderColor:p8,tension:.3,borderDash:[5,5],fill:false},
+{label:'Cefalosporinas 3ªG',data:[7.3,5.8,9.4,8.2,4.6,5.2,23,6.8,5.4,4.2,.5,2.8,0,0,0],borderColor:t8,tension:.3,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+
+new Chart(document.getElementById('ch24'),{type:'line',data:{labels:ML,datasets:[
+{label:'UCI',data:[8.1,4.5,5.2,6.3,4.8,3.2,7.1,11.4,5.6,4.2,3.8,5.9,23.5,19.1],borderColor:r8,backgroundColor:r1,fill:true,tension:.3},
+{label:'Med Int',data:[8.1,3.2,4.8,5.6,2.4,3.1,4.5,3.8,2.9,2.1,1.8,3.4,16.8,15.3],borderColor:o8,backgroundColor:o1,fill:true,tension:.3}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+
+new Chart(document.getElementById('ch25'),{type:'line',data:{labels:ML,datasets:[
+{label:'UCI',data:[30.8,20.3,27.5,25.6,18.3,38.8,22.1,31.5,28.6,19.3,21.4,14.5,13.5,24.3],borderColor:r8,tension:.3,fill:false},
+{label:'Med Int',data:[30.8,6.4,8.2,10.5,3.8,5.6,7.3,5.4,4.2,3.6,2.2,2.1,3.9,14.9],borderColor:o8,tension:.3,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+
+new Chart(document.getElementById('ch26'),{type:'bar',data:{labels:['Penicilinas + IBL','Carbapenémicos','Fluoroquinolonas','Glucopéptidos','Cefalosporinas 3ªG'],datasets:[
+{label:'Prom 2025',data:[47.2,24.9,5.8,7.8,7.3],backgroundColor:b8},
+{label:'Prom E-F 2026',data:[22.6,18.9,21.3,8.3,0],backgroundColor:o8}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+
+new Chart(document.getElementById('ch27'),{type:'bar',data:{labels:['Penicilinas + IBL','Carbapenémicos','Fluoroquinolonas','Aminoglucósidos','Cefalosporinas 3ªG'],datasets:[
+{label:'Prom 2025',data:[16.3,7.5,3.8,1.0,6.9],backgroundColor:b8},
+{label:'Prom E-F 2026',data:[8.4,9.4,16.1,9.7,0],backgroundColor:o8}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+
+// ========== TAB 3 ==========
+new Chart(document.getElementById('ch30'),{type:'bar',data:{labels:ML,datasets:[{label:'/1000dp',data:mmU25.concat([17.56,14.28]),backgroundColor:mmU25.map(function(v){return v>20?r8:v>10?o8:v>0?b8:'#e0e0e0'}).concat([o8,o8])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'/1000 días-pac'}}}}});
+
+new Chart(document.getElementById('ch31'),{type:'bar',data:{labels:ML,datasets:[{label:'/1000dp',data:mmM25.concat([11.25,14.85]),backgroundColor:mmM25.map(function(v){return v>14?r8:v>10?o8:b8}).concat([o8,r8])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'/1000 días-pac'}}}}});
+
+new Chart(document.getElementById('ch32'),{type:'bar',data:{labels:M25,datasets:[
+{label:'SAMR',data:[0,0,0,5.92,0,7.52,0,5.71,0,0,0,0],backgroundColor:pk7},
+{label:'BLEE',data:[0,0,6.17,5.92,0,15.04,0,11.43,6.62,5.56,0,25.16],backgroundColor:o8},
+{label:'ERC',data:[0,0,0,11.83,13.16,0,0,17.14,6.62,5.56,5.75,0],backgroundColor:r8},
+{label:'PA RC',data:[0,0,0,0,0,0,0,0,0,0,5.75,0],backgroundColor:p8}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+
+new Chart(document.getElementById('ch33'),{type:'bar',data:{labels:M25,datasets:[
+{label:'SAMR',data:[1.92,1.77,2.85,2.19,2.8,.95,2.73,2.35,1.78,2.65,2.49,1.36],backgroundColor:pk7},
+{label:'BLEE',data:[6.74,7.09,9.51,6.57,6.29,10.4,8.18,6.26,8,5.97,8.29,3.41],backgroundColor:o8},
+{label:'ERC',data:[.96,0,2.85,.73,0,.95,0,1.56,2.67,1.99,.83,1.36],backgroundColor:r8},
+{label:'PA RC',data:[0,0,0,0,0,0,0,.78,0,0,0,.68],backgroundColor:p8},
+{label:'AB RC',data:[0,0,0,0,0,.95,0,0,0,0,0,0],backgroundColor:t8}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+
+new Chart(document.getElementById('ch34'),{type:'line',data:{labels:ML,datasets:[{label:'Mortalidad UCI %',data:[6.1,0,0,0,0,11.8,0,0,0,0,7.4,8.3,5.7,10],borderColor:r8,backgroundColor:r1,fill:true,tension:.3,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'%'}}}}});
+
+new Chart(document.getElementById('ch35'),{type:'line',data:{labels:ML,datasets:[{label:'Mortalidad MI %',data:[.8,1.6,0,.7,2.1,.8,1.5,3.2,0,0,1.6,0,.7,0],borderColor:o8,backgroundColor:o1,fill:true,tension:.3,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'%'}}}}});
+
+// ========== TAB 4 ==========
+new Chart(document.getElementById('ch40'),{type:'doughnut',data:{labels:['Profilaxis correcta','No requiere ATB','ATB con horario','ATB emergencia','No adherente'],datasets:[{data:[175,155,70,20,40],backgroundColor:[g8,'#90a4ae',b8,'rgba(255,193,7,.8)',r8]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+
+new Chart(document.getElementById('ch41'),{type:'bar',data:{labels:['S1','S2','S3','S4','S5','S6','S7','S8','S9','S10'],datasets:[
+{label:'Cumple',data:[52,58,60,55,42,50,40,48,52,55],backgroundColor:g8},
+{label:'No cumple',data:[4,5,5,4,3,5,5,4,4,5],backgroundColor:r8}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+
+new Chart(document.getElementById('ch42'),{type:'bar',data:{labels:['Cefazolina 2g','Ampi+IBL','Vancomicina','Cipro','Clindamicina','Ceftriaxona','Metronidazol','Claritromicina','Gentamicina'],datasets:[
+{label:'Protocolo',data:[160,8,0,1,1,0,0,0,1],backgroundColor:g8},
+{label:'Fuera protocolo',data:[0,14,3,3,2,3,1,1,0],backgroundColor:r8}
+]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true},y:{stacked:true}}}});
+
+// FUNNEL Qx
+(function(){
+var p0=0.911;
+var prs=[
+{c:'PA',t:18,o:11},{c:'CH',t:22,o:14},{c:'GU',t:12,o:8},{c:'NA',t:4,o:3},
+{c:'LA',t:14,o:11},{c:'TR',t:32,o:26},{c:'CA',t:6,o:5},{c:'NO',t:14,o:12},
+{c:'EN',t:8,o:7},{c:'DI',t:10,o:9},{c:'LI',t:18,o:17},{c:'AL',t:14,o:13},
+{c:'IN',t:16,o:15},{c:'HE',t:24,o:23},{c:'GE',t:20,o:19},{c:'BO',t:14,o:13},
+{c:'OC',t:38,o:38},{c:'PE',t:28,o:28},{c:'BA',t:52,o:52},{c:'VA',t:48,o:48},
+{c:'CZ',t:22,o:22},{c:'BE',t:14,o:14},{c:'PI',t:16,o:16},{c:'AR',t:18,o:18},
+{c:'DA',t:8,o:8},{c:'GO',t:12,o:12},{c:'BR',t:12,o:12},{c:'VE',t:10,o:10},
+{c:'JA',t:10,o:10},{c:'ER',t:6,o:6},{c:'YE',t:4,o:4},{c:'OC2',t:10,o:10},{c:'NE',t:2,o:2}
 ];
-buildTable('tblConsumoMI',consumoHeaders,consumoMIRows,{highlightOver30:true});
+var scatter=[];var labels=[];var colors=[];
+for(var i=0;i<prs.length;i++){
+var p=prs[i];
+var rate=Math.round(1000*p.o/p.t)/10;
+var se=Math.sqrt(p0*(1-p0)/p.t);
+var lo2=(p0-2*se)*100;
+var lo3=(p0-3*se)*100;
+var col;
+if(rate<lo3) col='rgba(211,47,47,.9)';
+else if(rate<lo2) col='rgba(245,124,0,.9)';
+else if(rate>=100) col='rgba(46,125,50,.9)';
+else col='rgba(25,118,210,.9)';
+scatter.push({x:p.t,y:rate});
+labels.push(p.c);
+colors.push(col);
+}
+var mean=[],lo2a=[],lo3a=[];
+for(var n=2;n<=55;n++){
+var se=Math.sqrt(p0*(1-p0)/n);
+mean.push({x:n,y:p0*100});
+lo2a.push({x:n,y:Math.max((p0-2*se)*100,0)});
+lo3a.push({x:n,y:Math.max((p0-3*se)*100,0)});
+}
+var labelPlugin={
+id:'funnelLabelsQx',
+afterDatasetsDraw:function(chart){
+var meta=chart.getDatasetMeta(0);
+var ctx=chart.ctx;
+if(!meta||!meta.data)return;
+ctx.save();
+for(var i=0;i<meta.data.length;i++){
+var pt=meta.data[i];
+ctx.font='bold 9px Segoe UI,sans-serif';
+ctx.textAlign='center';
+ctx.textBaseline='middle';
+var tw=ctx.measureText(labels[i]).width;
+ctx.fillStyle='rgba(255,255,255,.92)';
+ctx.fillRect(pt.x-tw/2-3,pt.y-7,tw+6,14);
+ctx.strokeStyle=colors[i];
+ctx.lineWidth=1.5;
+ctx.strokeRect(pt.x-tw/2-3,pt.y-7,tw+6,14);
+ctx.fillStyle=colors[i];
+ctx.fillText(labels[i],pt.x,pt.y);
+}
+ctx.restore();
+}
+};
+new Chart(document.getElementById('ch43'),{type:'scatter',data:{datasets:[
+{label:'Prescriptores',data:scatter,backgroundColor:'rgba(0,0,0,0)',borderColor:'rgba(0,0,0,0)',pointRadius:0,pointHoverRadius:0},
+{label:'Media 91.1%',data:mean,type:'line',borderColor:'#1565c0',borderWidth:2.5,pointRadius:0,fill:false},
+{label:'IC 95% inf',data:lo2a,type:'line',borderColor:'rgba(21,101,192,.3)',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false},
+{label:'IC 99.7% inf',data:lo3a,type:'line',borderColor:'rgba(211,47,47,.3)',borderDash:[3,3],borderWidth:1,pointRadius:0,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},filter:function(item){return item.datasetIndex!==0}}},tooltip:{callbacks:{label:function(ctx){if(ctx.datasetIndex===0)return labels[ctx.dataIndex]+': '+ctx.parsed.y.toFixed(1)+'% (n='+scatter[ctx.dataIndex].x+')';return ctx.dataset.label}}}},scales:{x:{title:{display:true,text:'Nº cirugías'},min:0,max:55},y:{title:{display:true,text:'% Adherencia'},min:55,max:102}}},plugins:[labelPlugin]});
+})();
 
-// Table 3: MMDR UCI
-const mmdrHeaders=['Indicador','Ene-25','Feb-25','Mar-25','Abr-25','May-25','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26'];
-const mmdrUCIRows=[
-    {cells:['SAMR',0,0,0,5.92,0,7.52,0,5.71,0,0,0,0,0,7.14]},
-    {cells:['EVR',0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
-    {cells:['BLEE',0,0,6.17,5.92,0,15.04,0,11.43,6.62,5.56,0,25.16,5.80,0]},
-    {cells:['Enterobact. R-Carbapenémicos',0,0,0,11.83,13.16,0,0,17.14,6.62,5.56,5.75,0,11.76,7.14]},
-    {cells:['P. aeruginosa R-Carbapenémicos',0,0,0,0,0,0,0,0,0,0,5.75,0,0,0]},
-    {cells:['Acinetobacter R-Carbapenémicos',0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
-    {cells:['TOTAL MMDR',0,0,6.17,23.67,13.16,22.56,0,34.28,13.24,11.12,11.50,25.16,17.56,14.28],_total:true},
-    {cells:['C. difficile','—','—','—','—','—','—','—','—','—','—','—','—',0,0]},
-    {cells:['Mortalidad bruta (%)','6,1%','0%','0%','0%','0%','11,8%','0%','0%','0%','0%','7,4%','8,3%','5,7%','10,0%']}
+// ===== AJUSTE 1: No-adherence table — códigos a 2 letras =====
+var na=[
+['05-Ene','CH','Apendilap','Ampi+IBL 1.5g','Cefazolina 2g','ATB incorrecto'],
+['06-Ene','CH','Apendilap','Ampi+IBL 1.5g','Cefazolina 2g','ATB incorrecto'],
+['05-Ene','LA','Histerectomía','Ceftriaxona 2g','Cefazolina 2g','Alergia reportada'],
+['13-Ene','GU','Artrodesis cervical','Vancomicina 1g','Cefazolina 2g','Sin criterios'],
+['14-Ene','AL','Limpieza Qx','Cipro 200mg','Cefazolina 2g','ATB incorrecto'],
+['14-Ene','NO','Apendicectomía','Ampi+IBL 2g','Cefazolina 2g','ATB incorrecto'],
+['15-Ene','LA','Histeropexia','Clindamicina 900mg','Cefazolina 2g','Alergia-dosis?'],
+['15-Ene','IN','Marsupialización','Metronidazol','Cefazolina 2g','ATB incorrecto'],
+['20-Ene','LI','Circuncisión','Cipro 200mg','Cefazolina 2g','ATB incorrecto'],
+['20-Ene','GU','Disectomía','Vancomicina 1g','Cefazolina 2g','Sin criterios'],
+['26-Ene','PA','Limpieza Qx','Imipenem 1g','Cefazolina 2g','Carbapenémico no indicado'],
+['27-Ene','GU','Limpieza Qx','Ceftriaxona+Vanco','Cefazolina 2g','Combinación no protocolo'],
+['29-Ene','DI','Apendilap','Ampi+Sulbactam 3g','Cefazolina 2g','ATB incorrecto'],
+['05-Feb','PA','Apendilap','Ampi+IBL 3g','Cefazolina 2g','ATB incorrecto'],
+['07-Feb','TR','Colelap','Ampi+IBL 3g','Cefazolina 2g','ATB incorrecto'],
+['11-Feb','EN','Artroplastia','Cipro 400mg','Cefazolina 2g','ATB incorrecto'],
+['12-Feb','CA','Histerectomía','Clindamicina 900mg','Cefazolina 2g','Verificar alergia'],
+['12-Feb','CA','Laparotomía','Ceftriaxona 2g','Cefazolina 2g','ATB incorrecto'],
+['16-Feb','PA','Apendilap','Ampi+IBL 3g','Cefazolina 2g','Recurrente'],
+['17-Feb','TR','Colelap','Ampi+IBL 1.5g','Cefazolina 2g','ATB incorrecto'],
+['18-Feb','TR','Apendilap','Ampi+IBL 1.5g','Cefazolina 2g','ATB incorrecto'],
+['23-Feb','CH','Apendilap','Ampi+IBL 3g','Cefazolina 2g','Recurrente'],
+['24-Feb','NO','Apendicectomía','Ampi+Sulbactam 1.5g','Cefazolina 2g','ATB y dosis'],
+['24-Feb','CH','Colelap','Claritromicina 500mg','Cefazolina 2g','Inadecuado'],
+['24-Feb','BO','Limpieza Qx','Ceftriaxona+Clinda','Cefazolina 2g','No protocolo'],
+['26-Feb','PA','Apendilap','Ampi+IBL 3g','Cefazolina 2g','Recurrente'],
+['28-Feb','PA','Apendilap','Ampi+IBL 3g','Cefazolina 2g','Recurrente'],
+['28-Feb','CH','Apendilap','Ampi+IBL','Cefazolina 2g','Recurrente']
 ];
-buildTable('tblMMDRUCI',mmdrHeaders,mmdrUCIRows,{highlightOver10:true});
+var naH='';
+for(var i=0;i<na.length;i++){
+var r=na[i];
+naH+='<tr><td>'+r[0]+'</td><td><strong>'+r[1]+'</strong></td><td>'+r[2]+'</td><td><span class="tg tg-no">'+r[3]+'</span></td><td><span class="tg tg-ok">'+r[4]+'</span></td><td>'+r[5]+'</td></tr>';
+}
+document.querySelector('#naT tbody').innerHTML=naH;
 
-// Table 4: MMDR MI
-const mmdrMIRows=[
-    {cells:['SAMR',1.92,1.77,2.85,2.19,2.80,0.95,2.73,2.35,1.78,2.65,2.49,1.36,2.25,0]},
-    {cells:['EVR',0,0,0,0,0,0,0,0,0,0,0,0,0.75,0]},
-    {cells:['BLEE',6.74,7.09,9.51,6.57,6.29,10.40,8.18,6.26,8.00,5.97,8.29,3.41,5.25,12.87]},
-    {cells:['Enterobact. R-Carbapenémicos',0.96,0,2.85,0.73,0,0.95,0,1.56,2.67,1.99,0.83,1.36,2.25,0.99]},
-    {cells:['P. aeruginosa R-Carbapenémicos',0,0,0,0,0,0,0,0.78,0,0,0,0.68,0,0.99]},
-    {cells:['Acinetobacter R-Carbapenémicos',0,0,0,0,0,0.95,0,0,0,0,0,0,0.75,0]},
-    {cells:['TOTAL MMDR',9.62,8.86,15.21,9.49,9.09,13.25,10.91,10.95,12.45,10.61,11.61,6.81,11.25,14.85],_total:true},
-    {cells:['C. difficile','—','—','—','—','—','—','—','—','—','—','—','—',0,1.98]},
-    {cells:['Mortalidad bruta (%)','0,8%','1,6%','0%','0,7%','2,1%','0,8%','1,5%','3,2%','0%','0%','1,6%','0%','0,7%','0%']}
+new Chart(document.getElementById('ch44'),{type:'bar',data:{labels:['<15','15-29','30-45','46-60','>60'],datasets:[{label:'Cirugías',data:[8,28,85,52,22],backgroundColor:[o8,b8,g8,g8,r8]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true},x:{title:{display:true,text:'minutos'}}}}});
+
+new Chart(document.getElementById('ch45'),{type:'bar',data:{labels:['Pterigion','Colelap','Apendilap','Hernioplastia','Cesárea','Reducción','Prostatectomía','Safenectomía','Histerectomía','Tiroidectomía'],datasets:[{label:'Frecuencia',data:[68,52,38,32,28,26,16,18,12,10],backgroundColor:b8}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
+
+// ========== TAB 5 ==========
+new Chart(document.getElementById('ch50'),{type:'bar',data:{labels:['Emergencia','Med.Int','UCI','Cirugía','Traumat.','Pediatría'],datasets:[
+{label:'Notificados',data:[29,13,8,6,0,1],backgroundColor:g8},
+{label:'No notificados',data:[10,2,5,3,2,0],backgroundColor:r8}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,title:{display:true,text:'Prescripciones'}}}}});
+
+new Chart(document.getElementById('ch51'),{type:'bar',data:{labels:['Pediatría','Med.Int','Emergencia','Cirugía','UCI','Traumat.'],datasets:[{label:'% Notificación',data:[100,86.7,74.4,66.7,61.5,0],backgroundColor:[g8,g8,o8,o8,r8,r8]}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:0,max:105,title:{display:true,text:'%'}}}}});
+
+new Chart(document.getElementById('ch52'),{type:'bar',data:{labels:['Cirugía','Emergencia','Med.Int','UCI','Traumat.'],datasets:[
+{label:'Brecha P1 %',data:[0,26.9,20,40,100],backgroundColor:'rgba(245,124,0,.6)'},
+{label:'Brecha P2 %',data:[50,23.1,10,37.5,0],backgroundColor:'rgba(211,47,47,.6)'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,max:110,title:{display:true,text:'% No notificado'}}}}});
+
+// ========== TAB 6 ==========
+new Chart(document.getElementById('ch60'),{type:'line',data:{labels:ML,datasets:[
+{label:'Consumo DDD/100dp',data:uci25.concat([116.5,89.2]),borderColor:b8,yAxisID:'y',tension:.3,fill:false},
+{label:'MMDR/1000dp',data:mmU25.concat([17.56,14.28]),borderColor:r8,yAxisID:'y1',tension:.3,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'left',title:{display:true,text:'DDD/100dp'}},y1:{position:'right',title:{display:true,text:'/1000dp'},grid:{drawOnChartArea:false}}}}});
+
+new Chart(document.getElementById('ch61'),{type:'line',data:{labels:ML,datasets:[
+{label:'Consumo DDD/100dp',data:mi25.concat([44.2,54.7]),borderColor:b8,yAxisID:'y',tension:.3,fill:false},
+{label:'MMDR/1000dp',data:mmM25.concat([11.25,14.85]),borderColor:r8,yAxisID:'y1',tension:.3,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'left',title:{display:true,text:'DDD/100dp'}},y1:{position:'right',title:{display:true,text:'/1000dp'},grid:{drawOnChartArea:false}}}}});
+
+new Chart(document.getElementById('ch62'),{type:'line',data:{labels:ML,datasets:[
+{label:'Carbapenémicos DDD',data:[30.8,20.3,27.5,25.6,18.3,38.8,22.1,31.5,28.6,19.3,21.4,14.5,13.5,24.3],borderColor:b8,yAxisID:'y',tension:.3,fill:false},
+{label:'Enterob R-Carb',data:[0,0,0,11.83,13.16,0,0,17.14,6.62,5.56,5.75,0,11.76,7.14],borderColor:r8,yAxisID:'y1',tension:.3,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'left',title:{display:true,text:'DDD'}},y1:{position:'right',title:{display:true,text:'/1000dp'},grid:{drawOnChartArea:false}}}}});
+
+new Chart(document.getElementById('ch63'),{type:'line',data:{labels:['Oct25','Nov25','Dic25','Ene26','Feb26'],datasets:[
+{label:'Penicilinas + IBL',data:[27.4,28.9,47.7,26.6,18.6],borderColor:b8,tension:.3,fill:false},
+{label:'Cefalosporinas 4ªG',data:[0,0,0,34.1,1.6],borderColor:p8,tension:.3,borderDash:[5,5],fill:false},
+{label:'Fluoroquinolonas',data:[4.2,3.8,5.9,23.5,19.1],borderColor:o8,tension:.3,borderWidth:3,fill:false},
+{label:'Carbapenémicos',data:[19.3,21.4,14.5,13.5,24.3],borderColor:r8,tension:.3,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+
+// ===== AJUSTE 4: TAB 9 Profilaxis table — códigos a 2 letras =====
+var prsT=[
+{c:'PA',t:18,o:11},{c:'CH',t:22,o:14},{c:'GU',t:12,o:8},{c:'NA',t:4,o:3},
+{c:'LA',t:14,o:11},{c:'TR',t:32,o:26},{c:'CA',t:6,o:5},{c:'NO',t:14,o:12},
+{c:'EN',t:8,o:7},{c:'DI',t:10,o:9},{c:'LI',t:18,o:17},{c:'AL',t:14,o:13},
+{c:'IN',t:16,o:15},{c:'HE',t:24,o:23},{c:'GE',t:20,o:19},{c:'BO',t:14,o:13},
+{c:'OC',t:38,o:38},{c:'PE',t:28,o:28},{c:'BA',t:52,o:52},{c:'VA',t:48,o:48},
+{c:'CZ',t:22,o:22},{c:'BE',t:14,o:14},{c:'PI',t:16,o:16},{c:'AR',t:18,o:18},
+{c:'DA',t:8,o:8},{c:'GO',t:12,o:12},{c:'BR',t:12,o:12},{c:'VE',t:10,o:10},
+{c:'JA',t:10,o:10},{c:'ER',t:6,o:6},{c:'YE',t:4,o:4},{c:'OC2',t:10,o:10},{c:'NE',t:2,o:2}
 ];
-buildTable('tblMMDRMI',mmdrHeaders,mmdrMIRows,{highlightOver10:true});
-
-// Table 5: IA PROA ATM
-const iaHeaders=['Antibiótico','Mar-25','Abr-25','May-25','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total','%'];
-buildTable('tblIAatm',iaHeaders,[
-    {cells:['Piperacilina/Tazobactam',7,17,17,0,19,12,15,14,11,17,7,6,4,130,'32,3%']},
-    {cells:['Meropenem',8,10,9,6,17,11,7,4,4,4,5,12,10,107,'26,6%']},
-    {cells:['Vancomicina',4,4,5,7,3,3,2,2,1,2,5,5,6,56,'13,9%']},
-    {cells:['Cefepime',0,1,1,0,3,0,2,2,2,4,7,11,11,37,'9,2%']},
-    {cells:['Imipenem+Cilastatina',1,3,3,3,0,2,4,5,5,3,7,2,3,32,'7,9%']},
-    {cells:['Ceftazidima',0,2,1,0,1,0,1,2,3,1,0,0,0,11,'2,7%']},
-    {cells:['Levofloxacino',0,1,0,0,1,0,0,0,2,1,1,0,0,6,'1,5%']},
-    {cells:['Linezolid',0,0,0,0,0,0,1,0,1,2,0,1,0,5,'1,2%']},
-    {cells:['Ciprofloxacino',1,0,0,0,2,0,1,0,0,0,0,0,0,4,'1,0%']},
-    {cells:['Ampicilina+Sulbactam',0,0,0,0,0,0,0,0,2,1,1,0,0,4,'1,0%']},
-    {cells:['Amikacina',0,0,0,0,0,2,0,0,0,0,0,0,0,3,'0,7%']},
-    {cells:['Tigeciclina',0,0,0,0,0,0,0,1,0,0,0,0,0,3,'0,7%']},
-    {cells:['Ceftriaxona',0,0,0,0,0,0,0,0,0,0,1,0,2,3,'0,7%']},
-    {cells:['Metronidazol',0,0,0,0,1,0,0,0,0,0,0,0,0,3,'0,7%']},
-    {cells:['Colistina',0,0,0,0,0,0,0,0,0,1,0,1,0,1,'0,2%']},
-    {cells:['TOTAL',20,28,24,26,48,29,32,30,32,36,32,30,36,403,'100%'],_total:true}
-]);
-
-// Table 6: IA Service
-buildTable('tblIAservice',['Servicio','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total','%'],[
-    {cells:['UCI/UCIN/Crítico',6,17,17,14,16,15,13,13,18,131,'48,0%']},
-    {cells:['Emergencia',9,5,8,7,6,11,10,7,7,70,'25,6%']},
-    {cells:['Medicina Interna',9,6,4,6,7,5,4,4,3,48,'17,6%']},
-    {cells:['Cirugía/Esp. Qx',0,0,2,0,0,3,5,4,1,16,'5,9%']},
-    {cells:['Pediatría',0,0,0,0,3,0,0,1,5,7,'2,6%']},
-    {cells:['No especificado',0,0,0,0,0,1,0,0,0,1,'0,4%']},
-    {cells:['TOTAL',24,28,31,27,32,36,32,29,34,273,'100%'],_total:true}
-]);
-
-// Table 7: Cultures
-buildTable('tblIAcultures',['Estado cultivo','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total','%'],[
-    {cells:['Sí (con resultado)',6,10,8,9,7,10,14,6,11,10,91,'28,8%']},
-    {cells:['Sí (en espera)',6,20,11,8,6,6,6,15,10,7,95,'30,1%']},
-    {cells:['No se tomaron cultivos',7,12,9,13,14,16,15,11,8,17,122,'38,6%']},
-    {cells:['N/A',7,0,0,0,0,0,1,0,0,0,8,'2,5%']},
-    {cells:['TOTAL',26,42,28,30,27,32,36,32,29,34,316,'100%'],_total:true}
-]);
-
-// Table 8: Doses
-buildTable('tblIAdoses',['Evaluación','Mar-25','Abr-25','May-25','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total'],[
-    {cells:['Dosis correcta',15,28,24,17,27,23,26,22,23,27,15,17,24,288]},
-    {cells:['Dosis incorrecta',5,0,0,9,15,5,5,5,9,9,17,12,10,101]},
-    {cells:['TOTAL',20,28,24,26,42,28,31,27,32,36,32,29,34,389],_total:true},
-    {cells:['% Incorrectas','25%','0%','0%','34,6%','35,7%','17,9%','16,1%','18,5%','28,1%','25%','53,1%','41,4%','29,4%','26,0%']}
-]);
-
-// Table 9: MMDR IA
-buildTable('tblIAmmdr',['Tipo MMDR','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total','%'],[
-    {cells:['BLEE',6,9,2,3,1,5,4,2,10,5,47,'14,8%']},
-    {cells:['Pseudomona R',1,1,1,1,1,0,0,0,0,1,6,'1,9%']},
-    {cells:['KPC/OXA-48',0,0,2,0,2,1,0,1,0,0,6,'1,9%']},
-    {cells:['NDM',0,0,1,2,0,0,0,0,0,0,3,'0,9%']},
-    {cells:['SAMR',0,0,1,0,0,0,1,0,1,0,3,'0,9%']},
-    {cells:['AMP-C',0,0,0,0,0,0,0,1,0,0,1,'0,3%']},
-    {cells:['No detectado',19,32,21,25,23,26,31,28,18,28,251,'79,2%']},
-    {cells:['TOTAL',26,42,28,31,27,32,36,32,29,34,317,'100%'],_total:true}
-]);
-
-// Table 10: 72h
-buildTable('tblIA72h',['Evolución','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total','%'],[
-    {cells:['Sí (mejoría)',27,33,0,12,15,8,17,18,5,13,148,'59,0%']},
-    {cells:['No (sin mejoría)',10,9,0,8,1,1,7,9,6,9,60,'23,9%']},
-    {cells:['No evaluado',3,0,0,2,18,2,2,4,5,7,43,'17,1%']},
-    {cells:['TOTAL',40,42,0,22,34,11,26,31,16,29,251,'100%'],_total:true}
-]);
-
-// Table 11: Deescalation
-buildTable('tblIAdeesc',['Desescalamiento','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total','%'],[
-    {cells:['No',28,18,0,20,15,4,18,17,5,13,138,'55,0%']},
-    {cells:['Sí',10,24,0,2,3,3,2,3,3,4,54,'21,5%']},
-    {cells:['No aplicaba',2,0,0,0,16,4,6,11,8,12,59,'23,5%']},
-    {cells:['TOTAL',40,42,0,22,34,11,26,31,16,29,251,'100%'],_total:true}
-]);
-
-// Table 12: Prescribers
-buildTable('tblIAprescribers',['Prescriptor','Total Rx','Aprobadas','Tasa Aprob.'],[
-    {cells:['Paola Medina',47,38,'80,8%']},{cells:['Paola Cajas',26,18,'69,2%']},{cells:['Stephany Ulloa',24,18,'75,0%']},{cells:['Darío Amaguaya',19,14,'73,7%']},{cells:['Felipe Villamarín',18,13,'72,2%']},{cells:['Vanessa Guerrero',17,14,'82,4%']},{cells:['Héctor Ortega',16,16,'100,0%']},{cells:['Fausto Maldonado',16,12,'75,0%']},{cells:['Hernán Quintero',11,8,'72,7%']},{cells:['Lilian Fonseca',10,7,'70,0%']},{cells:['Byron Pallmay',10,7,'70,0%']},{cells:['Pablo Banderas',9,7,'77,8%']},{cells:['Jaqueline Lucio',9,1,'11,1%']},{cells:['Maritza Carrillo',9,6,'66,7%']},{cells:['Lenin Bustamante',8,3,'37,5%']},{cells:['Fabricio García',8,3,'37,5%']},{cells:['María Garcés',8,3,'37,5%']},{cells:['Juan Armendáriz',7,7,'100,0%']},{cells:['Anthony Monge',7,3,'42,9%']},{cells:['Carolina Lema',6,5,'83,3%']}
-]);
-
-// Stock table
-buildTable('tableStock',['Antibiótico','Jun-25','Jul-25','Ago-25','Sep-25','Oct-25','Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Total','%'],[
-    {cells:['Piperacilina/Tazobactam',2,0,0,0,0,0,0,0,3,3,8,'72,7%']},
-    {cells:['Vancomicina',0,0,0,0,0,0,0,0,1,0,1,'9,1%']},
-    {cells:['Ceftriaxona',0,1,0,0,0,0,0,0,0,1,2,'18,2%']},
-    {cells:['TOTAL',2,1,0,0,0,0,0,0,4,4,11,'100%'],_total:true}
-]);
+prsT.sort(function(a,b){return(a.o/a.t)-(b.o/b.t)});
+var pTb=document.getElementById('pTb');
+var pH='';
+for(var i=0;i<prsT.length;i++){
+var p=prsT[i];
+var pc=Math.round(100*p.o/p.t);
+var nc=p.t-p.o;
+var cl=pc>=95?'tg-ok':pc>=85?'tg-w':'tg-no';
+pH+='<tr><td><strong>'+p.c+'</strong></td><td>'+p.t+'</td><td>'+p.o+'</td><td>'+nc+'</td><td><span class="tg '+cl+'">'+pc+'%</span></td></tr>';
+}
+pTb.innerHTML=pH;
 </script>
 </body>
 </html>
