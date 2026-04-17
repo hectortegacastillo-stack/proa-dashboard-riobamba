@@ -59,21 +59,29 @@ tr:hover{background:#e8eaf6}
 .formula{background:#eef2fa;border:1px solid #b0c4de;border-radius:8px;padding:14px 16px;margin:10px 0;font-size:.82em;line-height:1.7;font-family:'Courier New',monospace}
 .legend-box{background:#f0f2f5;border:1px solid var(--brd);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.76em;line-height:1.6}
 .legend-box span{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.abg-wrap{overflow-x:auto}
+.abg{border-collapse:collapse;font-size:.72em;min-width:700px}
+.abg th,.abg td{padding:5px 7px;text-align:center;border:1px solid #ccc;white-space:nowrap}
+.abg th{background:var(--p);color:#fff;font-size:.8em}
+.abg .rn{text-align:left;font-weight:600;background:#f5f5f5;min-width:160px}
+.abg .s{background:#c8e6c9;color:#1b5e20;font-weight:700}
+.abg .i{background:#fff9c4;color:#e65100;font-weight:700}
+.abg .r{background:#ffcdd2;color:#b71c1c;font-weight:700}
+.abg .na{background:#eceff1;color:#90a4ae;font-size:.85em}
+.svc-sel{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.svc-btn{padding:8px 16px;border:2px solid var(--brd);border-radius:8px;background:#fff;cursor:pointer;font-weight:600;font-size:.8em;transition:.2s}
+.svc-btn:hover{border-color:var(--a);background:#f0fdff}
+.svc-btn.active{border-color:var(--a);background:var(--a);color:#000}
+.insight{background:#f8f9fb;border-left:3px solid var(--a);padding:10px 14px;margin-top:8px;font-size:.76em;color:var(--txtL);line-height:1.55;border-radius:0 6px 6px 0}
+.insight b{color:var(--txt)}
 @media(max-width:768px){.hdr{flex-direction:column;text-align:center;gap:6px}.g{grid-template-columns:1fr !important}.tab{padding:9px 10px;font-size:.7em}}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-<div>
-<h1>VISOR DE INDICADORES PROA</h1>
-<div class="sub">Hospital General Riobamba — IESS &nbsp;|&nbsp; Programa de Optimización de Antimicrobianos</div>
-</div>
-<div class="rt">
-<div class="badge">Actualizado: Abril 2026</div>
-<div style="font-size:.68em;opacity:.75;margin-top:3px">Período analizado: Enero 2025 – Marzo 2026</div>
-<div class="credit">Índice PROA y diseño: Ph.D. Héctor Ortega C. — Líder PROA HGR</div>
-</div>
+<div><h1>VISOR DE INDICADORES PROA</h1><div class="sub">Hospital General Riobamba — IESS &nbsp;|&nbsp; Programa de Optimización de Antimicrobianos</div></div>
+<div class="rt"><div class="badge">Actualizado: Abril 2026</div><div style="font-size:.68em;opacity:.75;margin-top:3px">Período analizado: Enero 2025 – Marzo 2026</div><div class="credit">Índice PROA y diseño: Ph.D. Héctor Ortega C. — Líder PROA HGR</div></div>
 </div>
 
 <div class="tabs">
@@ -84,27 +92,17 @@ tr:hover{background:#e8eaf6}
 <div class="tab" onclick="sT(4)">Profilaxis Qx</div>
 <div class="tab" onclick="sT(5)">Notificaciones ATB</div>
 <div class="tab" onclick="sT(6)">Correlación</div>
-<div class="tab" onclick="sT(7)">Alertas</div>
-<div class="tab" onclick="sT(8)">Recomendaciones</div>
-<div class="tab" onclick="sT(9)">Tablas de Datos</div>
+<div class="tab" onclick="sT(7)">Antibiograma</div>
+<div class="tab" onclick="sT(8)">Alertas</div>
+<div class="tab" onclick="sT(9)">Recomendaciones</div>
+<div class="tab" onclick="sT(10)">Tablas de Datos</div>
 </div>
 
-<!-- ============ TAB 0 RESUMEN ============ -->
+<!-- ====== TAB 0 RESUMEN ====== -->
 <div class="cnt active" id="t0">
 <div class="st">Panel Ejecutivo — Índice PROA</div>
-<div class="meth"><strong>Índice PROA (0–100, mayor = mejor):</strong> Indicador compuesto de diseño propio desarrollado para esta plataforma. Integra 4 dimensiones con igual peso (25 % cada una): Consumo antimicrobiano, Densidad de incidencia MMDR, Mortalidad bruta e Indicadores de proceso IA PROA. Escala: 0–30 Riesgo alto · 31–50 Riesgo moderado · 51–70 Riesgo bajo · 71–100 Óptimo. Propuesta metodológica original del Comité PROA HGR-IESS. <em>Indicador en fase de validación interna (primeros 12 meses); no constituye un estándar internacional.</em></div>
-
-<div class="formula">
-<strong>Fórmula del Índice PROA:</strong><br>
-Índice PROA = 0.25 × S<sub>consumo</sub> + 0.25 × S<sub>MMDR</sub> + 0.25 × S<sub>mortalidad</sub> + 0.25 × S<sub>IA&nbsp;PROA</sub><br><br>
-Donde cada sub-índice S se normaliza a 0–100:<br>
-&nbsp;&nbsp;S<sub>consumo</sub> = 100 × (1 − DDD<sub>obs</sub> / DDD<sub>ref</sub>), truncado a [0,100]. DDD<sub>ref</sub> = percentil 90 histórico del servicio.<br>
-&nbsp;&nbsp;S<sub>MMDR</sub> = 100 × (1 − MMDR<sub>obs</sub> / MMDR<sub>ref</sub>), truncado a [0,100]. MMDR<sub>ref</sub> = percentil 90 histórico.<br>
-&nbsp;&nbsp;S<sub>mortalidad</sub> = 100 × (1 − Mort<sub>obs</sub> / Mort<sub>ref</sub>), truncado a [0,100]. Mort<sub>ref</sub> = percentil 90 histórico.<br>
-&nbsp;&nbsp;S<sub>IA PROA</sub> = promedio ponderado de: tasa adecuación (40 %), cultivos previos (20 %), desescalamiento (20 %), dosis correcta (20 %).<br><br>
-<strong>Periodicidad:</strong> Cálculo mensual · Evaluación formal trimestral · Reporte al Comité PROA.
-</div>
-
+<div class="meth"><strong>Índice PROA (0–100, mayor = mejor):</strong> Indicador compuesto. Integra 4 dimensiones (25 % c/u): Consumo, MMDR, Mortalidad, IA PROA. Escala: 0–30 Riesgo alto · 31–50 Moderado · 51–70 Bajo · 71–100 Óptimo. <em>Fase de validación interna.</em></div>
+<div class="formula"><strong>Fórmula:</strong> Índice PROA = 0.25×S<sub>consumo</sub> + 0.25×S<sub>MMDR</sub> + 0.25×S<sub>mortalidad</sub> + 0.25×S<sub>IA PROA</sub><br>Cada S = 100×(1 − Obs/Ref), truncado [0,100]. Ref = P90 histórico 2025.</div>
 <div class="g g4" style="margin-bottom:18px">
 <div class="c k"><div class="v rd">32</div><div class="l">Índice PROA — UCI</div><div class="s bg-r">RIESGO ALTO</div></div>
 <div class="c k"><div class="v org">42</div><div class="l">Índice PROA — Clínica</div><div class="s bg-o">RIESGO MODERADO</div></div>
@@ -112,34 +110,34 @@ Donde cada sub-índice S se normaliza a 0–100:<br>
 <div class="c k"><div class="v rd">27.8%</div><div class="l">Brecha notificación ATB</div><div class="s bg-r">Meta &lt;10 %</div></div>
 </div>
 <div class="g g2">
-<div class="c"><h3>Índice PROA UCI — Componentes (score 32/100)</h3><div class="ch ch-s"><canvas id="ch00"></canvas></div>
-<div class="leg">Cada barra representa un componente del Índice PROA (0–25 puntos máx.). UCI presenta consumo y MMDR como dimensiones más críticas. Meta: alcanzar ≥51 (riesgo bajo).</div></div>
-<div class="c"><h3>Índice PROA Clínica — Componentes (score 42/100)</h3><div class="ch ch-s"><canvas id="ch01"></canvas></div>
-<div class="leg">Clínica muestra mejor desempeño relativo en mortalidad e IA PROA, pero MMDR y consumo presionan el índice a la baja. Meta: alcanzar ≥51.</div></div>
+<div class="c"><h3>Índice PROA UCI — Componentes (32/100)</h3><div class="ch ch-s"><canvas id="ch00"></canvas></div>
+<div class="insight"><b>Interpretación:</b> La UCI presenta un índice de riesgo alto (32/100). Los componentes más débiles son consumo (6) y MMDR (5), reflejando una presión antimicrobiana elevada y alta carga de microorganismos multirresistentes. Mortalidad (12) e IA PROA (9) aportan moderadamente pero permanecen lejos del óptimo (25 c/u).</div></div>
+<div class="c"><h3>Índice PROA Clínica — Componentes (42/100)</h3><div class="ch ch-s"><canvas id="ch01"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Clínica se ubica en riesgo moderado (42/100). Mortalidad es el componente más fuerte (15/25), mientras que MMDR (7) y consumo (10) continúan por debajo de lo esperado. La dimensión IA PROA (10) sugiere oportunidad de mejora en la adherencia a las recomendaciones del programa.</div></div>
 </div>
 <div class="g g5" style="margin-top:16px">
-<div class="c k"><div class="v" style="font-size:1.5em">89.2</div><div class="l">DDD/100dp UCI Feb-26</div><div class="s bg-o">↓23 % vs Ene</div></div>
-<div class="c k"><div class="v" style="font-size:1.5em">54.7</div><div class="l">DDD/100dp Clínica Feb-26</div><div class="s bg-o">↑24 % vs Ene</div></div>
-<div class="c k"><div class="v" style="font-size:1.5em">14.28</div><div class="l">MMDR UCI Feb-26</div><div class="s bg-r">SAMR 7.14</div></div>
-<div class="c k"><div class="v" style="font-size:1.5em">14.85</div><div class="l">MMDR Clínica Feb-26</div><div class="s bg-r">BLEE 12.87</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">90.7</div><div class="l">DDD/100dp UCI Mar-26</div><div class="s bg-o">↑2 % vs Feb</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">42.8</div><div class="l">DDD/100dp Clínica Mar-26</div><div class="s bg-g">↓22 % vs Feb</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">6.49</div><div class="l">MMDR UCI Mar-26</div><div class="s bg-g">↓55 % vs Feb</div></div>
+<div class="c k"><div class="v" style="font-size:1.5em">6.83</div><div class="l">MMDR Clínica Mar-26</div><div class="s bg-g">↓54 % vs Feb</div></div>
 <div class="c k"><div class="v" style="font-size:1.5em">79</div><div class="l">Solicitudes IA PROA</div><div class="s bg-b">Ene-Feb 2026</div></div>
 </div>
 <div class="st" style="margin-top:20px">Evolución Índice PROA</div>
 <div class="g g2">
-<div class="c"><h3>Índice PROA UCI (100 = óptimo)</h3><div class="ch"><canvas id="ch02"></canvas></div>
-<div class="leg">Evolución mensual del índice compuesto UCI. La zona roja (0–30) indica riesgo alto. Se busca tendencia ascendente sostenida. Meta: ≥51 en 6 meses.</div></div>
-<div class="c"><h3>Índice PROA Clínica (100 = óptimo)</h3><div class="ch"><canvas id="ch03"></canvas></div>
-<div class="leg">Evolución mensual del índice compuesto Clínica. La zona naranja (31–50) indica riesgo moderado. Meta: ≥51 en 6 meses.</div></div>
+<div class="c"><h3>Índice PROA UCI</h3><div class="ch"><canvas id="ch02"></canvas></div>
+<div class="insight"><b>Interpretación:</b> El índice UCI ha oscilado entre 22 (ago-25, peor mes coincidente con brote BLEE+ERC) y 48 (mar-26). Marzo 2026 representa el mejor registro de todo el período gracias al descenso simultáneo de MMDR y mortalidad 0 %, aunque aún no alcanza la zona de riesgo bajo (≥51).</div></div>
+<div class="c"><h3>Índice PROA Clínica</h3><div class="ch"><canvas id="ch03"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Clínica muestra una tendencia más estable (rango 32–50). Marzo 2026 alcanza 50, el mejor valor del período, impulsado por la caída de MMDR a 6.83 y consumo a 42.8. Para cruzar al rango de riesgo bajo se requiere sostener esta tendencia al menos 3 meses consecutivos.</div></div>
 </div>
 </div>
 
-<!-- ============ TAB 1 IA PROA ============ -->
+<!-- ====== TAB 1 IA PROA ====== -->
 <div class="cnt" id="t1">
 <div class="st">Intervención Activa PROA — Indicadores de Proceso (mar 2025 – mar 2026)</div>
-<div class="meth"><strong>Periodicidad de evaluación:</strong> Indicadores de proceso = mensual. Metas PROA según literatura (IDSA/SHEA 2023, PRAN España 2022). La <em>tasa de aprobación</em> mide el porcentaje de solicitudes que cumplieron criterios; no es sinónimo de calidad — una tasa muy alta puede indicar sub-registro. El indicador primario de calidad es la <strong>tasa de adecuación global</strong> (indicación + dosis + duración + desescalamiento).</div>
+<div class="meth"><strong>Periodicidad:</strong> mensual. Metas según IDSA/SHEA 2023, PRAN España 2022.</div>
 <div class="g g4" style="margin-bottom:16px">
 <div class="c k"><div class="v blu">389</div><div class="l">Solicitudes totales</div><div class="s bg-b">mar 25 – mar 26</div></div>
-<div class="c k"><div class="v blu">69.4 %</div><div class="l">Tasa de aprobación</div><div class="s bg-o">270/389 · Eval. mensual</div></div>
+<div class="c k"><div class="v blu">69.4 %</div><div class="l">Tasa de aprobación</div><div class="s bg-o">270/389</div></div>
 <div class="c k"><div class="v rd">38.6 %</div><div class="l">Sin cultivos previos</div><div class="s bg-r">Meta &lt;20 %</div></div>
 <div class="c k"><div class="v rd">26.0 %</div><div class="l">Dosis incorrectas</div><div class="s bg-r">101/389 · Meta &lt;10 %</div></div>
 </div>
@@ -149,166 +147,146 @@ Donde cada sub-índice S se normaliza a 0–100:<br>
 <div class="c k"><div class="v grn">59 %</div><div class="l">Mejoría clínica 72 h</div><div class="s bg-g">148/251</div></div>
 <div class="c k"><div class="v blu">72.2 %</div><div class="l">Notificación digital</div><div class="s bg-o">57/79 · Meta ≥90 %</div></div>
 </div>
-
-<div class="st">Perfil del Prescriptor — Tasa de Aprobación IA PROA (Funnel Plot)</div>
-<div class="meth">Datos reales IA PROA (mar 2025 – mar 2026). Solo prescriptores con ≥3 solicitudes (n = 37). Eje X = n.º solicitudes · Eje Y = tasa de aprobación (0–100 %). Línea horizontal = media institucional 69.4 %. Curvas = IC 95 % (±2σ) e IC 99.7 % (±3σ), truncados a [0, 100]. SE = √[p(1−p)/n]. Pase el cursor sobre cada punto para ver el código del prescriptor y sus datos.<br>
-<span style="color:#b71c1c;font-weight:700">● Rojo</span> = bajo IC 99.7 % &nbsp;
-<span style="color:#e65100;font-weight:700">● Naranja</span> = bajo IC 95 % &nbsp;
-<span style="color:#1565c0;font-weight:700">● Azul</span> = dentro de límites &nbsp;
-<span style="color:#2e7d32;font-weight:700">● Verde</span> = destacado (≥80 %).</div>
+<div class="st">Perfil del Prescriptor — Funnel Plot IA PROA</div>
+<div class="meth">Solo prescriptores con ≥3 solicitudes (n=37). Pase el cursor sobre cada punto para ver el detalle.<br>
+<span style="color:#b71c1c;font-weight:700">● Rojo</span> = bajo IC 99.7% &nbsp;<span style="color:#e65100;font-weight:700">● Naranja</span> = bajo IC 95% &nbsp;<span style="color:#1565c0;font-weight:700">● Azul</span> = en rango &nbsp;<span style="color:#2e7d32;font-weight:700">● Verde</span> = destacado (≥80%)</div>
 <div class="c"><div class="ch ch-xl"><canvas id="ch10"></canvas></div>
-<div class="leg">Este funnel plot identifica prescriptores con tasas de aprobación significativamente distintas de la media. Los puntos rojos y naranjas requieren intervención educativa; los verdes son modelos de buena práctica. Los límites se estrechan con más solicitudes (mayor precisión estadística). Pase el cursor sobre cada punto para ver el detalle.</div></div>
-
-<div class="st">Tabla de Prescriptores IA PROA (≥3 solicitudes)</div>
-<div class="legend-box">
-<strong>Leyenda de estados:</strong><br>
-<span style="background:#b71c1c"></span> <strong>Intervención crítica:</strong> Tasa de aprobación bajo el IC 99.7 % (3σ). Requiere intervención educativa individualizada urgente.<br>
-<span style="background:#e65100"></span> <strong>Intervención:</strong> Tasa bajo el IC 95 % (2σ). Requiere retroalimentación y seguimiento.<br>
-<span style="background:#1565c0"></span> <strong>En rango:</strong> Tasa dentro de los límites de control. Variación esperada.<br>
-<span style="background:#2e7d32"></span> <strong>Destacado:</strong> Tasa ≥80 %. Prescriptor modelo a reconocer.
-</div>
+<div class="insight"><b>Interpretación:</b> De 37 prescriptores evaluados, 6 se ubican por debajo del límite inferior IC 99.7 % (intervención crítica): JLLG (11.1 %), MJLP (0 %), LABR, FJGP y MLGJ (37.5 % c/u) y ABMG (42.9 %). Estos prescriptores concentran un patrón de solicitudes no aprobadas que sugiere necesidad de capacitación dirigida. En contraste, 4 prescriptores alcanzan el 100 % de aprobación (HFOC, JMAT, DLPH, EFFM) y pueden servir como referentes para mentoría entre pares.</div></div>
+<div class="st">Tabla de Prescriptores IA PROA</div>
 <div class="c"><div class="scr"><table id="iaT"><thead><tr><th>Código</th><th>Solicitudes</th><th>Aprobadas</th><th>Tasa (%)</th><th>Estado</th></tr></thead><tbody id="iaTb"></tbody></table></div></div>
-
 <div class="g g2" style="margin-top:16px">
-<div class="c"><h3>Solicitudes por servicio (jul 25 – mar 26)</h3><div class="ch"><canvas id="ch11"></canvas></div>
-<div class="leg">Distribución de solicitudes IA PROA por servicio hospitalario. Los servicios con mayor volumen concentran más oportunidades de intervención.</div></div>
-<div class="c"><h3>Tendencia mensual solicitudes IA PROA</h3><div class="ch"><canvas id="ch12"></canvas></div>
-<div class="leg">Evolución mensual del número de solicitudes totales y aprobadas. Un aumento progresivo indica mayor captación del programa.</div></div>
+<div class="c"><h3>Solicitudes por servicio</h3><div class="ch"><canvas id="ch11"></canvas></div>
+<div class="insight"><b>Interpretación:</b> UCI concentra el 32 % de las solicitudes (125/389), seguido de Emergencia (25 %) y Clínica (22 %). Cirugía representa solo el 13 %, lo cual es esperable dado que la mayoría de sus prescripciones corresponden a profilaxis y no a terapia de antibióticos restringidos.</div></div>
+<div class="c"><h3>Tendencia mensual solicitudes</h3><div class="ch"><canvas id="ch12"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Se observa un pico de solicitudes en oct-25 (48 totales), coincidiendo con el brote de BLEE en UCI. Desde nov-25 hay una tendencia descendente que puede reflejar menor carga infecciosa o menor adherencia al formulario. Mar-26 registra solo 11 solicitudes, el valor más bajo, posiblemente por subregistro, lo cual requiere verificación.</div></div>
 </div>
 <div class="g g2" style="margin-top:16px">
-<div class="c"><h3>Distribución de antibióticos solicitados</h3><div class="ch"><canvas id="ch13"></canvas></div>
-<div class="leg">Antibióticos más frecuentemente solicitados a través de IA PROA. Los de mayor volumen son candidatos prioritarios para guías de uso.</div></div>
-<div class="c"><h3>Dosis correctas vs incorrectas por mes</h3><div class="ch"><canvas id="ch14"></canvas></div>
-<div class="leg">Proporción mensual de prescripciones con dosis correcta (verde) e incorrecta (rojo). Meta: errores de dosificación &lt;10 %. Picos en jul-25 y ene-26 se asocian a vancomicina y meropenem.</div></div>
+<div class="c"><h3>Antibióticos solicitados</h3><div class="ch"><canvas id="ch13"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Meropenem lidera las solicitudes (95, 24 %), seguido de piperacilina/tazobactam (72) y vancomicina (65). Este patrón refleja la alta carga de infecciones por gramnegativos resistentes y es coherente con los datos de MMDR. La presencia de colistina (22 solicitudes) señala casos de última línea terapéutica.</div></div>
+<div class="c"><h3>Dosis correctas vs incorrectas</h3><div class="ch"><canvas id="ch14"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Los errores de dosificación presentan una tendencia ascendente desde mar-25 hasta ago-25 (18 errores), con mejoría parcial posterior. Los meses de ene-feb 2026 muestran un repunte (9–12 errores). Los antibióticos con mayor frecuencia de error son vancomicina (ajuste renal) y meropenem (infusión extendida), por lo que se recomienda incorporar calculadoras de dosis en la herramienta digital.</div></div>
 </div>
 </div>
 
-<!-- ============ TAB 2 CONSUMO ============ -->
+<!-- ====== TAB 2 CONSUMO ====== -->
 <div class="cnt" id="t2">
 <div class="st">Consumo de Antimicrobianos (DDD / 100 días-paciente)</div>
-<div class="meth"><strong>Metodología:</strong> DDD (Dosis Diaria Definida) según OMS-ATC/DDD 2025. Denominador = días-paciente del servicio. <strong>Meta:</strong> tendencia descendente sostenida o estabilización respecto al período basal (2025). No se establece un valor absoluto fijo como meta porque depende del case-mix. La comparación válida es mes a mes en serie temporal. <strong>Periodicidad:</strong> mensual (reporte) · trimestral (evaluación formal).<br><em>Nota: Se presentan series temporales mensuales continuas. No se comparan promedios de períodos de distinta longitud para evitar sesgo metodológico.</em></div>
+<div class="meth"><strong>Metodología:</strong> DDD según OMS-ATC/DDD 2025. <strong>Meta:</strong> tendencia descendente sostenida. <strong>Periodicidad:</strong> mensual.</div>
 <div class="g g2" style="margin-bottom:16px">
-<div class="c"><h3>Consumo Total UCI — Serie mensual 2025-2026</h3><div class="ch"><canvas id="ch20"></canvas></div>
-<div class="leg">Línea temporal del consumo total de antimicrobianos en UCI. El promedio 2025 fue 100.7 DDD/100dp (línea punteada). Ene-26 = 116.5, Feb-26 = 89.2. Se observa descenso en Feb-26.</div></div>
-<div class="c"><h3>Consumo Total Clínica — Serie mensual 2025-2026</h3><div class="ch"><canvas id="ch21"></canvas></div>
-<div class="leg">Consumo total en Servicio de Clínica. Promedio 2025 = 46.9 DDD/100dp. Ene-26 = 44.2, Feb-26 = 54.7. Incremento en Feb-26 requiere vigilancia.</div></div>
+<div class="c"><h3>Consumo Total UCI 2025-2026</h3><div class="ch"><canvas id="ch20"></canvas></div>
+<div class="insight"><b>Interpretación:</b> El consumo UCI se estabilizó en torno a 90 DDD/100dp en feb-mar 2026, por debajo del promedio 2025 (100.7). Sin embargo, persiste un consumo elevado en comparación con benchmarks internacionales (50–80 DDD/100dp en UCIs de complejidad similar). El pico de jul-25 (175.7) coincidió con brote BLEE+ERC y desabasto que forzó cascadas terapéuticas.</div></div>
+<div class="c"><h3>Consumo Total Clínica 2025-2026</h3><div class="ch"><canvas id="ch21"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Clínica muestra una tendencia descendente desde el pico de feb-26 (54.7) hasta 42.8 en mar-26, retornando al promedio 2025. La reducción de 22 % intermensual es alentadora y se correlaciona con la caída de MMDR en el mismo período. El descenso de carbapenémicos (14.9 → 4.8) fue el principal contribuyente.</div></div>
 </div>
 <div class="g g2">
-<div class="c"><h3>Top 5 Familias UCI — Serie mensual</h3><div class="ch ch-l"><canvas id="ch22"></canvas></div>
-<div class="leg">Desglose de las 5 familias de mayor consumo en UCI a lo largo del tiempo. Permite identificar qué grupos impulsan los cambios del total mensual.</div></div>
-<div class="c"><h3>Top 5 Familias Clínica — Serie mensual</h3><div class="ch ch-l"><canvas id="ch23"></canvas></div>
-<div class="leg">Mismo desglose para el Servicio de Clínica. Fluoroquinolonas muestran incremento marcado en 2026, no capturado por IA PROA.</div></div>
+<div class="c"><h3>Top 5 Familias UCI</h3><div class="ch ch-l"><canvas id="ch22"></canvas></div>
+<div class="insight"><b>Interpretación:</b> En UCI, los carbapenémicos muestran una escalada preocupante (14.5 en dic-25 → 25.0 en mar-26, +72 %) que coincide con el desabasto de piperacilina/tazobactam (47.7 → 7.7, −84 %). Las cefalosporinas de 4.ª generación (cefepime) tienen un comportamiento errático (34.1 en ene-26 → 1.6 → 17.9) sugestivo de disponibilidad intermitente. Los glucopéptidos ascienden en mar-26 (15.9) en probable relación con el brote de SAMR de feb-26.</div></div>
+<div class="c"><h3>Top 5 Familias Clínica</h3><div class="ch ch-l"><canvas id="ch23"></canvas></div>
+<div class="insight"><b>Interpretación:</b> En Clínica, las fluoroquinolonas son la familia con consumo más sostenido y elevado en 2026 (16.8 → 15.3 → 13.7), triplicando el promedio 2025. Este hallazgo es crítico porque las fluoroquinolonas no están monitorizadas por IA PROA, lo que representa una fuga en el control. Los carbapenémicos tuvieron un pico en feb-26 (14.9) que descendió a 4.8 en mar-26.</div></div>
 </div>
 <div class="g g2" style="margin-top:16px">
 <div class="c"><h3>Fluoroquinolonas — NO monitorizadas por IA PROA</h3><div class="ch ch-s"><canvas id="ch24"></canvas></div>
-<div class="leg">Las fluoroquinolonas no están incluidas en el formulario de solicitud IA PROA, lo que constituye una fuga crítica. UCI +170 % y Clínica +256 % vs promedio 2025. Se asocian a C. difficile y selección de BLEE.</div></div>
+<div class="insight"><b>Interpretación:</b> La fuga de fluoroquinolonas es la amenaza silenciosa del PROA. En UCI, el consumo pasó de 0.9 (dic-25) a 23.5 (ene-26), un incremento masivo, como alternativa ante el desabasto de piperacilina/tazobactam y ceftriaxona. En Clínica, el consumo se mantiene ≥13.7 en todo 2026. Este patrón puede explicar la aparición de <i>C. difficile</i> (feb-26) y el EVR emergente. La inclusión de fluoroquinolonas en IA PROA es la acción más urgente.</div></div>
 <div class="c"><h3>Carbapenémicos — Serie mensual</h3><div class="ch ch-s"><canvas id="ch25"></canvas></div>
-<div class="leg">Consumo de carbapenémicos (meropenem, imipenem). El aumento en Feb-26 en UCI coincide con desabasto de piperacilina/tazobactam (efecto cascada de sustitución).</div></div>
+<div class="insight"><b>Interpretación:</b> La UCI muestra un ascenso sostenido de carbapenémicos desde dic-25 (14.5 → 24.3 → 25.0), el más alto de todo 2026. Este incremento se correlaciona temporalmente con la aparición de enterobacterias resistentes a carbapenémicos en ene-26 (11.76) y el brote SAMR de feb-26. En Clínica, el pico de feb-26 (14.9) se resolvió en mar-26 (4.8), demostrando que la intervención PROA puede revertir tendencias cuando se aplica de forma oportuna.</div></div>
 </div>
 </div>
 
-<!-- ============ TAB 3 MMDR ============ -->
+<!-- ====== TAB 3 MMDR ====== -->
 <div class="cnt" id="t3">
 <div class="st">Densidad de Incidencia MMDR (por 1 000 días-paciente)</div>
-<div class="meth"><strong>Metodología:</strong> Los datos corresponden al <strong>primer aislamiento por especie, por paciente, por período de 30 días</strong> (regla de no duplicados según protocolo NHSN/CDC). Los aislamientos de distintas especies en el mismo paciente se contabilizan por separado. <strong>Meta:</strong> tendencia descendente respecto al período basal (2025). No existe un umbral universal; se monitoriza la tendencia y se investigan picos. <strong>Periodicidad:</strong> mensual (reporte) · trimestral (evaluación formal).</div>
+<div class="meth"><strong>Metodología:</strong> Primer aislamiento por especie, por paciente, por 30 días (NHSN/CDC). <strong>Meta:</strong> tendencia descendente.</div>
 <div class="g g5" style="margin-bottom:16px">
 <div class="c k"><div class="v rd">7.14</div><div class="l">SAMR UCI Feb-26</div><div class="s bg-r">Máx histórico</div></div>
 <div class="c k"><div class="v rd">12.87</div><div class="l">BLEE Clínica Feb-26</div><div class="s bg-r">Máx histórico</div></div>
-<div class="c k"><div class="v org">0.75</div><div class="l">EVR Clínica Ene-26</div><div class="s bg-o">Emergente</div></div>
-<div class="c k"><div class="v rd">11.76</div><div class="l">ERC UCI Ene-26</div><div class="s bg-r">Persistente</div></div>
-<div class="c k"><div class="v org">1.98</div><div class="l">C.diff Clínica Feb-26</div><div class="s bg-o">Nuevo</div></div>
+<div class="c k"><div class="v grn">6.49</div><div class="l">MMDR UCI Mar-26</div><div class="s bg-g">↓55 % vs Feb</div></div>
+<div class="c k"><div class="v grn">6.83</div><div class="l">MMDR Clínica Mar-26</div><div class="s bg-g">↓54 % vs Feb</div></div>
+<div class="c k"><div class="v org">1.98</div><div class="l">C.diff Clínica Feb-26</div><div class="s bg-o">Resuelto Mar</div></div>
 </div>
 <div class="g g2">
 <div class="c"><h3>Total MMDR UCI 2025-2026</h3><div class="ch"><canvas id="ch30"></canvas></div>
-<div class="leg">Densidad de incidencia total de MMDR en UCI. Promedio 2025 = 13.4/1000dp. Los picos en ago-25 (34.28) y dic-25 (25.16) se asociaron a BLEE y ERC respectivamente. Meses con valor 0 indican ausencia de aislamientos MMDR.</div></div>
+<div class="insight"><b>Interpretación:</b> La UCI tuvo su pico más alto en ago-25 (34.28) durante un brote combinado BLEE+ERC. Tras intervenciones de control, hubo descenso a 11.12–11.5 (oct-nov 25), pero un nuevo pico en dic-25 (25.16, BLEE exclusivo). En 2026, la tendencia es descendente: 17.56 → 14.28 → 6.49. Marzo 2026 (6.49) es el mejor registro del año y el segundo mejor del período completo, solo precedido por ene-feb 2025 (0).</div></div>
 <div class="c"><h3>Total MMDR Clínica 2025-2026</h3><div class="ch"><canvas id="ch31"></canvas></div>
-<div class="leg">Clínica presenta carga endémica estable de BLEE, con pico en Feb-26 (12.87). SAMR y ERC contribuyen de forma intermitente. Promedio 2025 = 10.7/1000dp.</div></div>
+<div class="insight"><b>Interpretación:</b> Clínica presentó una densidad estable en 2025 (promedio 10.7), con un pico preocupante en feb-26 (14.85) impulsado por BLEE (12.87, máximo histórico). Marzo 2026 (6.83) marca una recuperación significativa (↓54 %). Sin embargo, la aparición de EVR (ene-26: 0.75, mar-26: 0.68), un fenotipo ausente en 2025, constituye una señal de alarma que requiere vigilancia reforzada.</div></div>
 </div>
 <div class="g g2" style="margin-top:16px">
 <div class="c"><h3>Desglose MMDR UCI 2025</h3><div class="ch"><canvas id="ch32"></canvas></div>
-<div class="leg">Contribución de cada tipo de resistencia al total MMDR UCI durante 2025. ERC y BLEE fueron los patrones más prevalentes. Meses con barras en 0 (ene, feb, jul) indican ausencia de aislamientos MMDR en ese período.</div></div>
+<div class="insight"><b>Interpretación:</b> BLEE fue el fenotipo dominante en UCI durante 2025 (6 de 12 meses con aislamientos), con máximo en dic-25 (25.16). Las enterobacterias resistentes a carbapenémicos aparecieron en 5 meses, con pico en ago-25 (17.14). SAMR tuvo presencia intermitente (abr, jun, ago). <i>P. aeruginosa</i> resistente a carbapenémicos emergió en nov-25 (5.75), un fenotipo nuevo que debe vigilarse. La ausencia de Acinetobacter resistente a carbapenémicos durante todo 2025 es un dato favorable.</div></div>
 <div class="c"><h3>Desglose MMDR Clínica 2025</h3><div class="ch"><canvas id="ch33"></canvas></div>
-<div class="leg">En Clínica, BLEE domina todo el año 2025 con carga endémica sostenida. SAMR y ERC contribuyen en menor proporción.</div></div>
+<div class="insight"><b>Interpretación:</b> BLEE es el fenotipo dominante en Clínica durante todo 2025 (presente los 12 meses, promedio 7.2). SAMR es el segundo más frecuente con presencia constante (promedio 2.2). Las enterobacterias resistentes a carbapenémicos aparecen de forma intermitente (7 de 12 meses). La cartilla de sensibilidad 2025 confirma que <i>K. pneumoniae</i> en Med. Interna tiene 68 % BLEE con 23 % de resistencia a meropenem, lo que sustenta la alta presión de carbapenémicos observada.</div></div>
 </div>
 <div class="g g2" style="margin-top:16px">
 <div class="c"><h3>Mortalidad bruta UCI 2025-2026 (%)</h3><div class="ch ch-s"><canvas id="ch34"></canvas></div>
-<div class="leg">Mortalidad bruta mensual en UCI. Picos en jun-25 (11.8 %) y feb-26 (10 %) coinciden con elevaciones de SAMR. Meta: tendencia descendente.</div></div>
+<div class="insight"><b>Interpretación:</b> La mortalidad UCI es esporádica pero con picos graves: jun-25 (11.8 %) coincidió con SAMR+BLEE, dic-25 (8.3 %) con brote BLEE masivo, y feb-26 (10 %) con SAMR máximo histórico. Marzo 2026 alcanza 0 % por primera vez en 2026, correlacionándose con la caída simultánea de MMDR a 6.49. La relación temporal entre MMDR y mortalidad refuerza la prioridad de controlar los fenotipos resistentes.</div></div>
 <div class="c"><h3>Mortalidad bruta Clínica 2025-2026 (%)</h3><div class="ch ch-s"><canvas id="ch35"></canvas></div>
-<div class="leg">Mortalidad en Clínica se mantiene baja. Feb-26 = 0 % a pesar de MMDR elevado, sugiriendo manejo clínico adecuado.</div></div>
+<div class="insight"><b>Interpretación:</b> La mortalidad en Clínica se mantiene baja (&lt;3.2 %), con el pico en ago-25 (3.2 %). En 2026 los valores son 0.69 %, 0 % y 0.76 % (ene-mar), consistentemente bajos. La ausencia de mortalidad en feb-26 pese al pico de BLEE (12.87) sugiere que las infecciones por BLEE en Clínica se están tratando eficazmente, aunque con alto consumo de carbapenémicos.</div></div>
 </div>
 </div>
 
-<!-- ============ TAB 4 PROFILAXIS ============ -->
+<!-- ====== TAB 4 PROFILAXIS ====== -->
 <div class="cnt" id="t4">
 <div class="st">Profilaxis Antibiótica Quirúrgica — Ene a Mar 2026</div>
-<div class="meth"><strong>Meta OMS/IDSA:</strong> adherencia global ≥90 %, timing pre-incisión ≥80 %, duración ≤24 h ≥95 %. <strong>Periodicidad:</strong> mensual. Antibiótico de referencia: cefazolina 2 g IV, 30–60 min pre-incisión.</div>
+<div class="meth"><strong>Meta OMS/IDSA:</strong> adherencia ≥90 %, timing ≥80 %. Referencia: cefazolina 2 g IV, 30–60 min pre-incisión.</div>
 <div class="g g4" style="margin-bottom:16px">
-<div class="c k"><div class="v blu">450</div><div class="l">Total procedimientos</div><div class="s bg-b">Ene – Mar 2026</div></div>
+<div class="c k"><div class="v blu">450</div><div class="l">Total procedimientos</div></div>
 <div class="c k"><div class="v grn">91.1 %</div><div class="l">Adherencia global</div><div class="s bg-g">Meta ≥90 % ✓</div></div>
 <div class="c k"><div class="v grn">85 %</div><div class="l">Timing óptimo</div><div class="s bg-g">Meta ≥80 % ✓</div></div>
 <div class="c k"><div class="v rd">40</div><div class="l">No adherentes</div><div class="s bg-r">8.9 %</div></div>
 </div>
 <div class="g g3">
 <div class="c"><h3>Distribución procedimientos</h3><div class="ch"><canvas id="ch40"></canvas></div>
-<div class="leg">Distribución de cirugías por especialidad. Las especialidades con mayor volumen tienen mayor impacto en la adherencia global.</div></div>
+<div class="insight"><b>Interpretación:</b> Cirugía General concentra el 31.6 % de procedimientos (142/450), seguida de Traumatología (21.8 %) y Ginecología (15.1 %). Estas tres especialidades representan el 68.4 % del volumen total y deben ser el foco de cualquier intervención de mejora en profilaxis.</div></div>
 <div class="c"><h3>Adherencia semanal</h3><div class="ch"><canvas id="ch41"></canvas></div>
-<div class="leg">Evolución semanal de la adherencia a profilaxis. Meta ≥90 % (línea verde). Las caídas sugieren semanas con prescriptores de baja adherencia o cambios en el mix quirúrgico.</div></div>
-<div class="c"><h3>ATB en profilaxis</h3><div class="ch"><canvas id="ch42"></canvas></div>
-<div class="leg">Antibióticos utilizados en profilaxis quirúrgica. Cefazolina es el estándar recomendado. El uso de otros agentes (carbapenémicos, vancomicina) sin criterios constituye no-adherencia.</div></div>
+<div class="insight"><b>Interpretación:</b> La adherencia semanal oscila entre 87 % y 95 %, con la mayoría de las semanas cumpliendo la meta del 90 %. Los puntos más bajos (S2M: 87 %) coinciden con semanas donde los prescriptores outlier (JPPI, JRCS) tuvieron mayor volumen quirúrgico. La estabilidad general demuestra que el programa funciona, pero requiere intervención focalizada en los prescriptores no adherentes.</div></div>
+<div class="c"><h3>Antibióticos en profilaxis</h3><div class="ch"><canvas id="ch42"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Cefazolina representa el 81.1 % de todas las profilaxis (365/450), confirmando la adherencia a las guías. Los antibióticos no recomendados más frecuentes en no-adherencias son ampicilina/sulbactam (22 casos), ceftriaxona (15) e imipenem (5). El uso de imipenem o claritromicina como profilaxis quirúrgica no tiene justificación clínica y requiere retroalimentación directa a los prescriptores involucrados.</div></div>
 </div>
 <div class="st" style="margin-top:20px">Perfil Prescriptor Quirúrgico (Funnel Plot)</div>
-<div class="meth">Cada punto = prescriptor (código único de 4 letras). Eje X = n.º cirugías · Eje Y = % adherencia (0–100 %). Media institucional = 91.1 %. Límites de control IC 95 % y 99.7 % truncados a [0, 100]. Pase el cursor sobre cada punto para ver el código del prescriptor y sus datos.<br>
-<span style="color:#b71c1c;font-weight:700">● Rojo</span> = bajo IC 99.7 % &nbsp;
-<span style="color:#e65100;font-weight:700">● Naranja</span> = bajo IC 95 % &nbsp;
-<span style="color:#1565c0;font-weight:700">● Azul</span> = dentro de límites &nbsp;
-<span style="color:#2e7d32;font-weight:700">● Verde</span> = 100 % adherencia.</div>
+<div class="meth">Pase el cursor sobre cada punto para ver el detalle.<br>
+<span style="color:#b71c1c;font-weight:700">● Rojo</span> = bajo IC 99.7% &nbsp;<span style="color:#e65100;font-weight:700">● Naranja</span> = bajo IC 95% &nbsp;<span style="color:#1565c0;font-weight:700">● Azul</span> = en rango &nbsp;<span style="color:#2e7d32;font-weight:700">● Verde</span> = 100%</div>
 <div class="c"><div class="ch ch-xl"><canvas id="ch43"></canvas></div>
-<div class="leg">Este funnel plot identifica cirujanos con adherencia significativamente inferior a la media. JPPI, JRCS y MPGG requieren intervención prioritaria. Los 17 prescriptores en verde (100 %) son modelos a reconocer. Pase el cursor sobre cada punto para ver el detalle.</div></div>
+<div class="insight"><b>Interpretación:</b> De 33 cirujanos evaluados, 3 se ubican como outliers críticos: JPPI (61.1 %, 18 cx), JRCS (63.6 %, 22 cx) y MPGG (66.7 %, 12 cx). Estos 3 prescriptores acumulan 19 de las 40 no-adherencias (47.5 %). En el extremo positivo, 13 cirujanos mantienen 100 % de adherencia con volúmenes significativos (KEBB: 52 cx, LGVC: 48 cx, GHOA: 38 cx). Nótese que JLTV (32 cx, 81.3 %) tuvo un deterioro importante en la semana del 26-Mar con 6 no-adherencias consecutivas.</div></div>
 <div class="st">Detalle No-Adherencias</div>
-<div class="c"><div class="scr"><table id="naT"><thead><tr><th>Fecha</th><th>Código</th><th>Cirugía</th><th>ATB usado</th><th>ATB correcto</th><th>Motivo</th></tr></thead><tbody></tbody></table></div></div>
+<div class="c"><div class="scr"><table id="naT"><thead><tr><th>Fecha</th><th>Código</th><th>Cirugía</th><th>Antibiótico usado</th><th>Antibiótico correcto</th><th>Motivo</th></tr></thead><tbody></tbody></table></div></div>
 <div class="g g2" style="margin-top:16px">
-<div class="c"><h3>Timing pre-incisión (minutos)</h3><div class="ch ch-s"><canvas id="ch44"></canvas></div>
-<div class="leg">Distribución del tiempo de administración del antibiótico respecto a la incisión. El rango óptimo es 30–60 minutos antes. Valores fuera de este rango reducen eficacia profiláctica.</div></div>
-<div class="c"><h3>Top 10 cirugías más frecuentes</h3><div class="ch ch-s"><canvas id="ch45"></canvas></div>
-<div class="leg">Las 10 cirugías con mayor volumen en el período. Estas concentran la mayor parte de las oportunidades de mejora en adherencia profiláctica.</div></div>
+<div class="c"><h3>Timing pre-incisión (min)</h3><div class="ch ch-s"><canvas id="ch44"></canvas></div>
+<div class="insight"><b>Interpretación:</b> El 68.9 % de las profilaxis se administraron en el rango óptimo de 30–60 min pre-incisión (310/450). Un 12.7 % se administraron entre 15–29 min (aceptable pero subóptimo) y un 2.7 % en &lt;15 min (riesgo de niveles séricos insuficientes). El 18.4 % administrado después de 60 min (incluyendo 5.6 % &gt;90 min) sugiere problemas logísticos en el flujo de quirófano.</div></div>
+<div class="c"><h3>Top 10 cirugías</h3><div class="ch ch-s"><canvas id="ch45"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Colecistectomía es la cirugía más frecuente (82, 18.2 %), seguida de apendicectomía (65) y hernioplastia (58). Estas tres cirugías limpias/limpias-contaminadas son las que más se benefician de una profilaxis estandarizada con cefazolina. Las no-adherencias se concentran justamente en estas cirugías de alta frecuencia, lo que amplifica el impacto poblacional del error.</div></div>
 </div>
 </div>
 
-<!-- ============ TAB 5 NOTIFICACIONES ============ -->
+<!-- ====== TAB 5 NOTIFICACIONES ====== -->
 <div class="cnt" id="t5">
-<div class="st">Notificaciones de ATB de Uso Restringido — Ene-Feb 2026</div>
-<div class="meth">Desde enero 2026 la notificación es <strong>obligatoria para todos los servicios</strong>. Hasta dic-2025 solo aplicaba a UCI, Emergencia y Clínica. Se monitorea cuántos ATB restringidos se prescribieron, cuántos se notificaron al PROA y qué servicios presentan brechas. <strong>Meta:</strong> brecha de notificación &lt;10 %. <strong>Periodicidad:</strong> mensual.<br><br>
-<strong>Definición de períodos:</strong> El bimestre Ene-Feb 2026 se divide en dos períodos mensuales para analizar la evolución:<br>
-&nbsp;&nbsp;<strong>Período 1 (Ene 2026):</strong> primer mes de obligatoriedad universal — línea base.<br>
-&nbsp;&nbsp;<strong>Período 2 (Feb 2026):</strong> segundo mes — permite evaluar si la brecha se redujo o aumentó respecto al mes anterior.</div>
+<div class="st">Notificaciones de Antibióticos de Uso Restringido — Ene-Feb 2026</div>
+<div class="meth">Desde enero 2026 la notificación es <strong>obligatoria para todos los servicios</strong>. <strong>Meta:</strong> brecha &lt;10 %.<br>
+<strong>Enero 2026:</strong> primer mes de obligatoriedad universal. <strong>Febrero 2026:</strong> segundo mes — evalúa tendencia.</div>
 <div class="g g4" style="margin-bottom:16px">
-<div class="c k"><div class="v blu">79</div><div class="l">ATB restringidos prescritos</div><div class="s bg-b">Ene-Feb 2026</div></div>
-<div class="c k"><div class="v grn">72.2 %</div><div class="l">Tasa de notificación</div><div class="s bg-o">57/79 · Meta ≥90 %</div></div>
-<div class="c k"><div class="v rd">27.8 %</div><div class="l">Brecha de notificación</div><div class="s bg-r">22/79 · Meta &lt;10 %</div></div>
-<div class="c k"><div class="v org">3</div><div class="l">Solo formulario físico</div><div class="s bg-o">Sin digital</div></div>
+<div class="c k"><div class="v blu">79</div><div class="l">Antibióticos restringidos prescritos</div></div>
+<div class="c k"><div class="v grn">72.2 %</div><div class="l">Tasa de notificación</div><div class="s bg-o">57/79</div></div>
+<div class="c k"><div class="v rd">27.8 %</div><div class="l">Brecha de notificación</div><div class="s bg-r">22/79</div></div>
+<div class="c k"><div class="v org">3</div><div class="l">Solo formulario físico</div></div>
 </div>
 <div class="g g2">
-<div class="c"><h3>Notificados vs No notificados por servicio (Ene-Feb 2026 acumulado)</h3><div class="ch"><canvas id="ch50"></canvas></div>
-<div class="leg">Cada barra muestra el total de prescripciones de ATB restringidos por servicio en el bimestre Ene-Feb 2026. La parte verde indica las que fueron notificadas al PROA; la roja, las que no. A mayor proporción roja, mayor brecha de cumplimiento.</div></div>
-<div class="c"><h3>Tasa de notificación por servicio (%) — Ene-Feb 2026 acumulado</h3><div class="ch"><canvas id="ch51"></canvas></div>
-<div class="leg">Porcentaje de prescripciones de ATB restringidos que fueron notificadas al PROA en cada servicio. La línea verde marca la meta del 90 %. Solo Clínica (86.7 %) se acerca. Traumatología (0 %) y UCI (61.5 %) son los más deficientes.</div></div>
+<div class="c"><h3>Notificados vs No notificados (Ene-Feb 2026)</h3><div class="ch"><canvas id="ch50"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Emergencia concentra el mayor volumen de antibióticos restringidos (39/79, 49.4 %) y aporta la mayor cantidad absoluta de no-notificaciones (10). Sin embargo, en términos relativos, Traumatología (100 % brecha) y Cirugía (50 % brecha en feb-26) son los servicios con peor desempeño. UCI tiene 5 no-notificaciones sobre 13, una brecha del 38.5 % inaceptable en una unidad con alta complejidad infecciosa.</div></div>
+<div class="c"><h3>Tasa de notificación por servicio (%)</h3><div class="ch"><canvas id="ch51"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Solo Pediatría alcanza la meta del 90 % (100 %, pero con solo 1 prescripción). Clínica está más cercana (86.7 %) y podría alcanzar la meta con intervención mínima. Los demás servicios requieren acciones específicas: Emergencia (74.4 %), UCI (61.5 %), Cirugía (50 %) y Traumatología (0 %). La brecha global del 27.8 % está lejos de la meta del &lt;10 %.</div></div>
 </div>
 <div class="g g2" style="margin-top:16px">
-<div class="c"><h3>Evolución de la brecha: Enero 2026 vs Febrero 2026</h3><div class="ch"><canvas id="ch52"></canvas></div>
-<div class="leg">Comparación de la brecha de notificación (% de prescripciones NO notificadas) entre Enero 2026 (naranja) y Febrero 2026 (rojo) en cada servicio. Una barra más corta en Feb indica mejora; más larga indica deterioro. Cirugía pasó de 0 % a 50 % de brecha (deterioro crítico). Clínica mejoró de 20 % a 10 %.</div></div>
+<div class="c"><h3>Evolución brecha: Ene-26 vs Feb-26</h3><div class="ch"><canvas id="ch52"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Comparando ene-26 vs feb-26, Cirugía empeoró dramáticamente (0 % → 50 % de brecha), posiblemente por la incorporación de neurocirugía sin capacitación. UCI se mantiene estable pero inaceptable (40 % → 37.5 %). Emergencia mejoró ligeramente (26.9 % → 23.1 %). Clínica tuvo la mejor evolución (20 % → 10 %, casi en meta). La brecha global mejoró marginalmente (29.3 % → 26.3 %), insuficiente para la meta.</div></div>
 <div class="c">
 <h3>Análisis por servicio</h3>
-<div class="al al-c"><div class="t">Traumatología: 100 % no notificado (2/2)</div><div class="d">Recién incorporado. Sin formularios digitales. Capacitación inmediata.</div></div>
-<div class="al al-c"><div class="t">Cirugía: 50 % no notificado en Feb-26 (3/6)</div><div class="d">Deterioro vs Ene-26 (0 %). Investigar causa.</div></div>
-<div class="al al-w"><div class="t">UCI: 38.5 % no notificado (5/13)</div><div class="d">Era servicio obligatorio desde 2025. Posible fatiga.</div></div>
-<div class="al al-w"><div class="t">Emergencia: 25.6 % no notificado (10/39)</div><div class="d">Mayor volumen absoluto. Alta rotación.</div></div>
-<div class="al al-s"><div class="t">Clínica: 13.3 % no notificado (2/15)</div><div class="d">Mejor desempeño. Cercano a meta &lt;10 %.</div></div>
-<div class="al al-s"><div class="t">Pediatría: 0 % brecha (1/1)</div><div class="d">En fase de incorporación.</div></div>
+<div class="al al-c"><div class="t">Traumatología: 100 % no notificado (2/2)</div><div class="d">Recién incorporado. Capacitación inmediata.</div></div>
+<div class="al al-c"><div class="t">Cirugía: 50 % brecha en Feb-26</div><div class="d">Deterioro vs Ene (0 %).</div></div>
+<div class="al al-w"><div class="t">UCI: 38.5 % brecha (5/13)</div><div class="d">Posible fatiga.</div></div>
+<div class="al al-s"><div class="t">Clínica: 13.3 % brecha (2/15)</div><div class="d">Cercano a meta.</div></div>
 </div>
 </div>
 <div class="st">Detalle por período mensual</div>
 <div class="g g2">
-<div class="c"><h3>Enero 2026 (primer mes de obligatoriedad universal)</h3>
+<div class="c"><h3>Enero 2026</h3>
 <table><thead><tr><th>Servicio</th><th>Total</th><th>Notif.</th><th>No notif.</th><th>% Brecha</th></tr></thead><tbody>
 <tr><td>Cirugía</td><td>3</td><td>3</td><td>0</td><td><span class="tg tg-ok">0 %</span></td></tr>
 <tr><td>Traumatología</td><td>2</td><td>0</td><td>2</td><td><span class="tg tg-no">100 %</span></td></tr>
@@ -317,7 +295,7 @@ Donde cada sub-índice S se normaliza a 0–100:<br>
 <tr><td>UCI</td><td>5</td><td>3</td><td>2</td><td><span class="tg tg-no">40 %</span></td></tr>
 <tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>41</td><td>29</td><td>12</td><td><span class="tg tg-no">29.3 %</span></td></tr>
 </tbody></table></div>
-<div class="c"><h3>Febrero 2026 (segundo mes — evaluación de tendencia)</h3>
+<div class="c"><h3>Febrero 2026</h3>
 <table><thead><tr><th>Servicio</th><th>Total</th><th>Notif.</th><th>No notif.</th><th>% Brecha</th></tr></thead><tbody>
 <tr><td>Cirugía/Neurocx</td><td>6</td><td>3</td><td>3</td><td><span class="tg tg-no">50 %</span></td></tr>
 <tr><td>Emergencia</td><td>13</td><td>10</td><td>3</td><td><span class="tg tg-w">23.1 %</span></td></tr>
@@ -327,523 +305,355 @@ Donde cada sub-índice S se normaliza a 0–100:<br>
 <tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>38</td><td>28</td><td>10</td><td><span class="tg tg-w">26.3 %</span></td></tr>
 </tbody></table></div>
 </div>
-<div class="st">Formularios físicos (sin integración digital)</div>
-<div class="c"><table><thead><tr><th>Servicio</th><th>Período</th><th>Físicos</th><th>Requieren interc.</th><th>No requieren</th></tr></thead><tbody>
-<tr><td>Ginecología</td><td>Ene 2026</td><td>1</td><td>1</td><td>0</td></tr>
-<tr><td>Pediatría</td><td>Feb 2026</td><td>1</td><td>0</td><td>1</td></tr>
-<tr><td>Neonatología</td><td>Feb 2026</td><td>1</td><td>0</td><td>1</td></tr>
-</tbody></table></div>
 </div>
 
-<!-- ============ TAB 6 CORRELACIÓN ============ -->
+<!-- ====== TAB 6 CORRELACIÓN ====== -->
 <div class="cnt" id="t6">
 <div class="st">Análisis de Correlación Consumo vs Resistencia</div>
-<div class="meth">Se presenta la tendencia paralela entre consumo (DDD/100dp) y densidad de MMDR (/1000dp) mes a mes. <strong>Nota:</strong> la correlación temporal no implica causalidad. Confundidores posibles: brotes, cambios de case-mix, desabasto. Las asociaciones se presentan con fines de vigilancia y generación de hipótesis.</div>
+<div class="meth">Tendencia paralela consumo vs MMDR. <strong>Nota:</strong> correlación temporal ≠ causalidad.</div>
 <div class="g g2">
-<div class="c"><h3>UCI: Consumo vs MMDR 2025-2026</h3><div class="ch"><canvas id="ch60"></canvas></div>
-<div class="leg">Superposición de consumo total (DDD/100dp, eje izq.) y MMDR total (/1000dp, eje der.) en UCI. Los picos simultáneos sugieren relación, pero requieren análisis multivariado.</div></div>
-<div class="c"><h3>Clínica: Consumo vs MMDR 2025-2026</h3><div class="ch"><canvas id="ch61"></canvas></div>
-<div class="leg">Misma superposición para Clínica. El incremento de BLEE en feb-26 coincide con aumento de fluoroquinolonas, consistente con literatura (selección de BLEE por quinolonas).</div></div>
+<div class="c"><h3>UCI: Consumo vs MMDR</h3><div class="ch"><canvas id="ch60"></canvas></div>
+<div class="insight"><b>Interpretación:</b> Se observa una correlación temporal moderada entre consumo y MMDR en UCI. Los picos de consumo (jul-25: 175.7, dic-25: 76.6) preceden o coinciden con picos de MMDR (ago-25: 34.28, dic-25: 25.16). En mar-26, pese a que el consumo se mantiene en 90.7, la MMDR cayó a 6.49, lo que podría reflejar el efecto retardado de las intervenciones PROA o un cambio en el espectro de consumo hacia opciones más dirigidas.</div></div>
+<div class="c"><h3>Clínica: Consumo vs MMDR</h3><div class="ch"><canvas id="ch61"></canvas></div>
+<div class="insight"><b>Interpretación:</b> En Clínica la correlación es menos evidente, con MMDR relativamente estable pese a variaciones importantes de consumo. El pico de MMDR en feb-26 (14.85) coincidió con un aumento de consumo (54.7), pero el descenso paralelo en mar-26 (consumo 42.8, MMDR 6.83) sugiere que la reducción de consumo sí tiene impacto cuando es sostenida. La MMDR en Clínica está más influenciada por la epidemiología comunitaria de BLEE y SAMR.</div></div>
 </div>
 <div class="g g2" style="margin-top:16px">
-<div class="c"><h3>Carbapenémicos vs Enterobact. R-Carb (UCI)</h3><div class="ch"><canvas id="ch62"></canvas></div>
-<div class="leg">Relación entre consumo de carbapenémicos y densidad de ERC en UCI. El aumento de carbapenémicos post-desabasto de Piperacilina/Tazobactam puede estar contribuyendo a la presión selectiva.</div></div>
+<div class="c"><h3>Carbapenémicos vs Enterobacterias Resistentes a Carbapenémicos (UCI)</h3><div class="ch"><canvas id="ch62"></canvas></div>
+<div class="insight"><b>Interpretación:</b> La relación carbapenémicos → enterobacterias resistentes a carbapenémicos es la más plausible biológicamente. Los picos de consumo de carbapenémicos en ene-25 (38.8) y jul-25 (30.4) precedieron la aparición de enterobacterias resistentes a carbapenémicos en abr-25 (11.83) y ago-25 (17.14) respectivamente. En 2026, el aumento de carbapenémicos (24.3–25.0 DDD) ya generó enterobacterias resistentes a carbapenémicos en ene-26 (11.76) y feb-26 (7.14). Mar-26 muestra ERC=0, pero el consumo elevado actual de carbapenémicos predice un posible rebote en los próximos meses.</div></div>
 <div class="c"><h3>Cascada de sustitución por desabasto (UCI)</h3><div class="ch"><canvas id="ch63"></canvas></div>
-<div class="leg">Desde dic-2025, el desabasto de Piperacilina/Tazobactam y Ceftriaxona genera cascada hacia carbapenémicos, cefepime y fluoroquinolonas. Efecto documentado en la literatura como «antibiotic substitution cascade».</div></div>
+<div class="insight"><b>Interpretación:</b> Este gráfico ilustra la cascada terapéutica forzada por el desabasto. Desde dic-25, la caída abrupta de penicilinas con inhibidores de betalactamasas (47.7 → 7.7) generó un desplazamiento hacia tres alternativas: carbapenémicos (+72 %), cefalosporinas de 4.ª generación (aparición intermitente de hasta 34.1) y fluoroquinolonas. Esta sustitución no planificada amplificó la presión selectiva hacia fenotipos resistentes. Es imperativo disponer de tablas de sustitución validadas por PROA para evitar cascadas no controladas.</div></div>
 </div>
 </div>
 
-<!-- ============ TAB 7 ALERTAS ============ -->
+<!-- ====== TAB 7 ANTIBIOGRAMA ====== -->
 <div class="cnt" id="t7">
+<div class="st">Cartilla de Sensibilidad Antimicrobiana — Año 2025</div>
+<div class="meth"><strong>Fuente:</strong> Sistema automatizado Phoenix, Laboratorio HGR-IESS. Período: Ene–Dic 2025. Se muestra el <strong>% de resistencia</strong>. Verde = resistencia &lt;30 % (opción empírica). Amarillo = 31–70 % (precaución). Rojo = &gt;70 % (NO usar empíricamente). Gris = no aplica.<br><em>Seleccione un servicio. Siempre confirmar con antibiograma individual.</em></div>
+<div class="svc-sel">
+<div class="svc-btn active" onclick="showAbg('uci',this)">UCI</div>
+<div class="svc-btn" onclick="showAbg('mi',this)">Medicina Interna</div>
+<div class="svc-btn" onclick="showAbg('er',this)">Emergencia</div>
+<div class="svc-btn" onclick="showAbg('ce',this)">Consulta Externa</div>
+<div class="svc-btn" onclick="showAbg('ped',this)">Pediatría</div>
+<div class="svc-btn" onclick="showAbg('all',this)">Consolidado</div>
+</div>
+<div class="legend-box">
+<span style="background:#c8e6c9"></span> <strong>S:</strong> Resistencia &lt;30 %. Opción empírica adecuada.&nbsp;&nbsp;
+<span style="background:#fff9c4"></span> <strong>I:</strong> 31–70 %. Usar con precaución.&nbsp;&nbsp;
+<span style="background:#ffcdd2"></span> <strong>R:</strong> &gt;70 %. NO usar empíricamente.&nbsp;&nbsp;
+<span style="background:#eceff1"></span> <strong>—</strong> No aplica / sin datos.
+</div>
+<div id="abgBox"></div>
+</div>
+
+<!-- ====== TAB 8 ALERTAS ====== -->
+<div class="cnt" id="t8">
 <div class="st">Sistema de Alertas PROA</div>
 <div class="g g2">
 <div class="c">
 <h3>Alertas Críticas</h3>
-<div class="al al-c"><div class="t">SAMR UCI Feb-26: 7.14 — Máximo histórico</div><div class="d">Supera pico Jun-25. Investigar brote, precauciones de contacto, descolonización. Coincide con mortalidad 10 %.</div></div>
-<div class="al al-c"><div class="t">BLEE Clínica Feb-26: 12.87 — Máximo histórico</div><div class="d">Supera máx 2025 (10.40). Correlación con fluoroquinolonas +256 % y aminoglucósidos.</div></div>
-<div class="al al-c"><div class="t">Fluoroquinolonas fuera de IA PROA</div><div class="d">UCI +170 %, Clínica +256 % vs 2025. No capturadas por el sistema. Fuga crítica.</div></div>
-<div class="al al-c"><div class="t">Desabasto: Piperacilina/Tazobactam y Ceftriaxona</div><div class="d">Cascada hacia carbapenémicos, cefepime, fluoroquinolonas desde Dic-2025.</div></div>
-<div class="al al-c"><div class="t">Brecha notificación: 27.8 %</div><div class="d">1 de 3.6 prescripciones no notificada. Traumatología 100 %, Cirugía 50 %.</div></div>
-<div class="al al-c"><div class="t">Prescriptores outlier IA PROA: JLLG (11.1 %), MJLP (0 %), LABR/FJGP/MLGJ (37.5 %), ABMG (42.9 %)</div><div class="d">Requieren intervención educativa individualizada urgente. JLLG y MJLP con tasas críticas.</div></div>
-<div class="al al-c"><div class="t">Prescriptores outlier Profilaxis Qx: JPPI (61 %), JRCS (64 %), MPGG (67 %)</div><div class="d">Adherencia &lt;70 %. JPPI: uso recurrente de Ampicilina + Inhibidor de Betalactamasa e Imipenem. JRCS: Ampicilina + IBL y Claritromicina. MPGG: Vancomicina sin criterios. Intervención prioritaria.</div></div>
+<div class="al al-c"><div class="t">SAMR UCI Feb-26: 7.14 — Máx histórico</div><div class="d">Coincide con mortalidad 10 %. Mar-26: resuelto (0).</div></div>
+<div class="al al-c"><div class="t">BLEE Clínica Feb-26: 12.87 — Máx histórico</div><div class="d">Mar-26: descenso a 4.78. Vigilar tendencia.</div></div>
+<div class="al al-c"><div class="t">Fluoroquinolonas fuera de IA PROA</div><div class="d">UCI +170 %, Clínica +256 % vs 2025. Fuga crítica.</div></div>
+<div class="al al-c"><div class="t">Desabasto Piperacilina/Tazobactam y Ceftriaxona</div><div class="d">Cascada hacia carbapenémicos y fluoroquinolonas desde Dic-2025.</div></div>
+<div class="al al-c"><div class="t">Brecha notificación: 27.8 %</div><div class="d">Traumatología 100 %, Cirugía 50 %.</div></div>
+<div class="al al-c"><div class="t">Prescriptores outlier IA PROA</div><div class="d">JLLG (11.1 %), MJLP (0 %), LABR/FJGP/MLGJ (37.5 %), ABMG (42.9 %).</div></div>
+<div class="al al-c"><div class="t">Prescriptores outlier Profilaxis Qx</div><div class="d">JPPI (61 %), JRCS (64 %), MPGG (67 %).</div></div>
+<div class="al al-c"><div class="t">K. pneumoniae Med. Interna: BLEE 68 %, Meropenem-R 23 %</div><div class="d">Cartilla 2025: resistencia a carbapenémicos en 23 % de K. pneumoniae en Med. Interna limita opciones empíricas. Ceftriaxona resistente al 73 %. Solo amikacina (5 %) y piperacilina/tazobactam (31 %) mantienen sensibilidad útil.</div></div>
+<div class="al al-c"><div class="t">K. oxytoca UCI: BLEE 50 %, Ertapenem-R 100 %</div><div class="d">Cartilla 2025: ertapenem con 100 % de resistencia en K. oxytoca en UCI. Meropenem al 50 % de resistencia. Solo amikacina (0 %) es opción empírica confiable para este patógeno en UCI.</div></div>
+<div class="al al-c"><div class="t">Carbapenémicos UCI Mar-26: 25.0 DDD — máx 2026</div><div class="d">Tercer mes consecutivo de ascenso (13.5 → 24.3 → 25.0). Predice riesgo de rebote de enterobacterias resistentes a carbapenémicos en abril.</div></div>
 </div>
 <div class="c">
 <h3>Alertas de Vigilancia</h3>
-<div class="al al-w"><div class="t">EVR emergente Clínica Ene-26: 0.75</div><div class="d">Ausente 12 meses 2025. Vigilar.</div></div>
-<div class="al al-w"><div class="t">C. difficile Clínica Feb-26: 1.98</div><div class="d">Relación con fluoroquinolonas y carbapenémicos.</div></div>
-<div class="al al-w"><div class="t">Mortalidad UCI Feb-26: 10 %</div><div class="d">Segunda más alta. Coincide con SAMR.</div></div>
-<div class="al al-w"><div class="t">Seguimientos IA: caída de 5 a 0</div><div class="d">Pérdida de seguimiento farmacéutico Feb-26.</div></div>
-<div class="al al-w"><div class="t">Dosis incorrectas: 26 % global (101/389)</div><div class="d">Picos en jul-25 (35.7 %) y ene-26 (53.1 %). Vancomicina y meropenem principales.</div></div>
-<div class="al al-w"><div class="t">Profilaxis Qx: prescriptores en zona de vigilancia — CINC (75 %), RPLM (79 %)</div><div class="d">Adherencia entre 70–80 %. CINC: bajo volumen (4 cirugías), requiere seguimiento. RPLM: Ceftriaxona y Clindamicina fuera de protocolo.</div></div>
+<div class="al al-w"><div class="t">EVR emergente Clínica: Ene-26 (0.75) y Mar-26 (0.68)</div><div class="d">Ausente en 2025. Patrón recurrente.</div></div>
+<div class="al al-w"><div class="t">C. difficile Clínica Feb-26: 1.98</div><div class="d">Resuelto Mar-26 (0). Asociado a fluoroquinolonas.</div></div>
+<div class="al al-w"><div class="t">Dosis incorrectas: 26 % global</div><div class="d">Vancomicina y meropenem principales.</div></div>
+<div class="al al-w"><div class="t">S. aureus Emergencia: SAMR 38 %, Eritromicina-R 52 %</div><div class="d">Cartilla 2025: clindamicina mantiene 19 % de resistencia (opción empírica). Levofloxacina con 38 % de resistencia, no confiable.</div></div>
+<div class="al al-w"><div class="t">E. coli Consulta Externa: Fluoroquinolonas-R 45 %</div><div class="d">Cartilla 2025: fluoroquinolonas no deben usarse como primera línea empírica en ITU comunitaria. Nitrofurantoína (6 %) y amikacina (0 %) son mejores opciones.</div></div>
+<div class="al al-w"><div class="t">Glucopéptidos UCI Mar-26: 15.9 DDD — máx 2026</div><div class="d">Probable respuesta al brote SAMR de feb-26. Vigilar nefrotoxicidad y emergencia de EVR.</div></div>
+<div class="al al-w"><div class="t">Aminoglucósidos Clínica Mar-26: 14.7 DDD — máx 2026</div><div class="d">Posible sustitución por desabasto. Riesgo nefro/ototoxicidad acumulada.</div></div>
+<div class="al al-w"><div class="t">JLTV: deterioro abrupto en profilaxis Qx (26-Mar)</div><div class="d">6 no-adherencias en una sola semana. Adherencia global 81.3 % (26/32). Verificar causa raíz.</div></div>
 <h3 style="margin-top:14px">Indicadores Favorables</h3>
-<div class="al al-s"><div class="t">Profilaxis quirúrgica: 91.1 %</div><div class="d">Por encima de meta 90 %. Cefazolina dominante.</div></div>
-<div class="al al-s"><div class="t">Clínica: notificación 86.7 %</div><div class="d">Cercano a meta 90 %. Modelo a replicar.</div></div>
-<div class="al al-s"><div class="t">Mortalidad Clínica Feb-26: 0 %</div><div class="d">A pesar de MMDR elevado.</div></div>
-<div class="al al-s"><div class="t">IA PROA — HFOC, JMAT, DLPH, EFFM: 100 % aprobación</div><div class="d">Prescriptores modelo con ≥3 solicitudes.</div></div>
-<div class="al al-s"><div class="t">Profilaxis Qx — 17 prescriptores con 100 % adherencia</div><div class="d">GHOA, KEBB, LGVC, BFPE, GPCB, ADBV, JSPG, SGAA, MCDA, MBG2, CVBY, LAVA, VAJB, DFEM, F0YH, CHOG, MENV. Modelos a reconocer.</div></div>
+<div class="al al-s"><div class="t">Mar-26: Descenso marcado MMDR</div><div class="d">UCI 6.49 (↓55 %), Clínica 6.83 (↓54 %). Mejor mes 2026.</div></div>
+<div class="al al-s"><div class="t">Mortalidad UCI Mar-26: 0 %</div><div class="d">Primer mes sin fallecimientos en 2026.</div></div>
+<div class="al al-s"><div class="t">Profilaxis quirúrgica: 91.1 %</div><div class="d">Meta superada. Cefazolina dominante.</div></div>
+<div class="al al-s"><div class="t">HFOC, JMAT, DLPH, EFFM: 100 % aprobación IA PROA</div><div class="d">Prescriptores modelo.</div></div>
+<div class="al al-s"><div class="t">Consumo Clínica Mar-26: 42.8 DDD (↓22 %)</div><div class="d">Mejor mes 2026. Carbapenémicos descendieron de 14.9 a 4.8.</div></div>
+<div class="al al-s"><div class="t">Amikacina: resistencia 0–6 % en todos los servicios</div><div class="d">Cartilla 2025: amikacina es el aminoglucósido más confiable como opción empírica en gramnegativos de todos los servicios. Reservar como opción estratégica.</div></div>
+<div class="al al-s"><div class="t">E. coli Emergencia: meropenem 2 %, piperacilina/tazobactam 1 %</div><div class="d">Cartilla 2025: en Emergencia, la E. coli mantiene excelente sensibilidad a carbapenémicos y piperacilina/tazobactam, permitiendo desescalar desde carbapenémicos en infecciones de origen comunitario.</div></div>
 </div>
 </div>
 </div>
 
-<!-- ============ TAB 8 RECOMENDACIONES ============ -->
-<div class="cnt" id="t8">
+<!-- ====== TAB 9 RECOMENDACIONES ====== -->
+<div class="cnt" id="t9">
 <div class="st">Recomendaciones PROA — Plan de Acción</div>
 <div class="g g2">
 <div class="c">
 <h3>Prioridad Crítica (0-30 días)</h3>
-<div class="al al-c"><div class="t">1. Fluoroquinolonas y aminoglucósidos en IA PROA</div><div class="d">Meta: capturar &gt;90 %. El +256 % en Clínica sin vigilancia es la mayor amenaza.</div></div>
-<div class="al al-c"><div class="t">2. Plan de contingencia por desabasto</div><div class="d">Tablas de sustitución validadas, alertas de stock, auditoría de cascada.</div></div>
-<div class="al al-c"><div class="t">3. Cerrar brecha notificación Traumatología y Cirugía</div><div class="d">Capacitación, acceso digital, responsable por turno. Meta &lt;10 %.</div></div>
-<div class="al al-c"><div class="t">4. Investigación SAMR en UCI</div><div class="d">Cultivos vigilancia, descolonización. Máximo histórico.</div></div>
-<div class="al al-c"><div class="t">5. Intervención prescriptores outlier IA PROA</div><div class="d">JLLG (11.1 %), MJLP (0 %), LABR/FJGP/MLGJ (37.5 %), ABMG (42.9 %): sesiones individualizadas de educación y retroalimentación.</div></div>
-<div class="al al-c"><div class="t">6. Intervención prescriptores outlier Profilaxis Qx</div><div class="d">JPPI (61 %, 18 cx) — Ampicilina + IBL e Imipenem. JRCS (64 %, 22 cx) — Ampicilina + IBL y Claritromicina. MPGG (67 %, 12 cx) — Vancomicina sin criterios. Sesiones educativas y seguimiento quincenal.</div></div>
+<div class="al al-c"><div class="t">1. Incluir fluoroquinolonas y aminoglucósidos en IA PROA</div><div class="d">+256 % Clínica sin vigilancia. Cartilla 2025 confirma que fluoroquinolonas tienen resistencia del 45 % en E. coli de Consulta Externa y 50 % en E. coli de Med. Interna. Su uso empírico no supervisado amplifica resistencia y genera C. difficile.</div></div>
+<div class="al al-c"><div class="t">2. Plan contingencia desabasto</div><div class="d">Tablas de sustitución validadas por PROA para piperacilina/tazobactam y ceftriaxona. La cartilla 2025 muestra que piperacilina/tazobactam mantiene ≤5 % de resistencia en E. coli de Emergencia y Consulta Externa, por lo que su reposición debe ser prioridad de gestión farmacéutica.</div></div>
+<div class="al al-c"><div class="t">3. Cerrar brecha notificación</div><div class="d">Traumatología y Cirugía. Meta: &lt;10 % brecha en 60 días.</div></div>
+<div class="al al-c"><div class="t">4. Intervención prescriptores outlier</div><div class="d">IA PROA: JLLG, MJLP, LABR, FJGP, MLGJ, ABMG. Profilaxis Qx: JPPI, JRCS, MPGG. Entrevista individual + plan de mejora firmado.</div></div>
+<div class="al al-c"><div class="t">5. Frenar escalada de carbapenémicos en UCI</div><div class="d">25.0 DDD en mar-26, máximo de 2026 y tercer mes de ascenso. Cartilla muestra que K. pneumoniae en Med. Interna ya tiene 23 % de resistencia a meropenem. Sin intervención, se anticipa aumento de enterobacterias resistentes a carbapenémicos en abril-mayo.</div></div>
+<div class="al al-c"><div class="t">6. Protocolo empírico basado en cartilla 2025</div><div class="d">Difundir guías empíricas por servicio: en UCI, amikacina como primera línea en gramnegativos graves; en Emergencia, piperacilina/tazobactam o amoxicilina/ácido clavulánico para E. coli comunitaria; en Med. Interna, meropenem reservado para K. pneumoniae con sospecha de BLEE dado 68 % de prevalencia.</div></div>
 </div>
 <div class="c">
 <h3>Prioridad Alta (30-60 días)</h3>
-<div class="al al-w"><div class="t">7. Cultivos previos ≥80 %</div><div class="d">Actual 61.4 % (122/316 sin cultivo). Campo obligatorio en formulario.</div></div>
-<div class="al al-w"><div class="t">8. Desescalamiento ≥40 %</div><div class="d">Actual 21.5 % (54/251). Seguimiento 48-72 h con farmacéutico.</div></div>
-<div class="al al-w"><div class="t">9. Errores dosificación &lt;10 %</div><div class="d">Actual 26 % (101/389). Nomogramas vancomicina, ajuste renal.</div></div>
-<div class="al al-w"><div class="t">10. Seguimiento prescriptores profilaxis en vigilancia</div><div class="d">CINC (75 %, 4 cx) y RPLM (79 %, 14 cx): retroalimentación y auditoría mensual hasta alcanzar ≥85 %.</div></div>
+<div class="al al-w"><div class="t">7. Cultivos previos ≥80 %</div><div class="d">Actual 61.4 %. La cartilla demuestra variación importante de sensibilidad entre servicios (ej. K. pneumoniae meropenem-R: UCI 40 % vs Emergencia 0 %), lo que refuerza la necesidad de antibiograma individual.</div></div>
+<div class="al al-w"><div class="t">8. Desescalamiento ≥40 %</div><div class="d">Actual 21.5 %. La cartilla facilita el desescalamiento: E. coli en Emergencia con piperacilina/tazobactam-R de solo 1 % permite desescalar desde carbapenémicos en la mayoría de los casos con cultivo positivo.</div></div>
+<div class="al al-w"><div class="t">9. Errores dosificación &lt;10 %</div><div class="d">Actual 26 %. Incorporar calculadoras de dosis renales en la plataforma digital, priorizando vancomicina y meropenem.</div></div>
+<div class="al al-w"><div class="t">10. Vigilancia activa EVR en Clínica</div><div class="d">Fenotipo emergente en 2026 (ene: 0.75, mar: 0.68), ausente en 2025. Implementar cribado activo en pacientes con &gt;7 días de hospitalización y uso previo de vancomicina.</div></div>
+<div class="al al-w"><div class="t">11. Investigar deterioro de JLTV en profilaxis (26-Mar)</div><div class="d">6 no-adherencias en una semana con uso de ceftriaxona y gentamicina como profilaxis. Posible relación con desabasto puntual de cefazolina.</div></div>
 <h3 style="margin-top:14px">Prioridad Media (60-90 días)</h3>
-<div class="al al-i"><div class="t">11. Digitalizar Ginecología, Neonatología</div><div class="d">3 formularios físicos sin trazabilidad.</div></div>
-<div class="al al-i"><div class="t">12. Reporte mensual Visor PROA</div><div class="d">Presentación a Comité y Dirección.</div></div>
-<div class="al al-i"><div class="t">13. Validar Índice PROA 12 meses</div><div class="d">Sensibilidad, recalibración, publicación.</div></div>
+<div class="al al-i"><div class="t">12. Digitalizar Ginecología, Neonatología</div><div class="d">3 formularios físicos pendientes de migración digital.</div></div>
+<div class="al al-i"><div class="t">13. Validar Índice PROA 12 meses</div><div class="d">Recalibración con datos mar-26 y publicación.</div></div>
+<div class="al al-i"><div class="t">14. Actualizar cartilla semestral 2026</div><div class="d">Próxima cartilla: jul-2026 con datos ene-jun 2026. Incluir Enterobacter spp. que mostró 42 % de resistencia a cefepime en Emergencia y ceftriaxona 42 % en Med. Interna.</div></div>
+<div class="al al-i"><div class="t">15. Proteger amikacina como recurso estratégico</div><div class="d">Cartilla 2025 muestra resistencia 0–6 % en todos los servicios. Restringir a infecciones graves documentadas para preservar sensibilidad a largo plazo.</div></div>
 </div>
 </div>
 </div>
 
-<!-- ============ TAB 9 TABLAS ============ -->
-<div class="cnt" id="t9">
+<!-- ====== TAB 10 TABLAS ====== -->
+<div class="cnt" id="t10">
 <div class="st">Tablas de Datos — Respaldo y Evidencia</div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T1. Consumo UCI 2025 (DDD/100dp)</h3>
-<div class="c scr"><table><thead><tr><th>Familia</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
-<tr><td>Penicilinas + IBL</td><td>45.6</td><td>39.8</td><td>42.1</td><td>37.5</td><td>42.3</td><td>54.1</td><td>96.8</td><td>67.3</td><td>35.8</td><td>27.4</td><td>28.9</td><td>47.7</td></tr>
-<tr><td>Carbapenémicos</td><td>30.8</td><td>20.3</td><td>27.5</td><td>25.6</td><td>18.3</td><td>38.8</td><td>22.1</td><td>31.5</td><td>28.6</td><td>19.3</td><td>21.4</td><td>14.5</td></tr>
-<tr><td>Cefalosporinas 3.ªG</td><td>7.3</td><td>3.2</td><td>8.6</td><td>6.8</td><td>5.4</td><td>0.6</td><td>4.2</td><td>17.0</td><td>9.8</td><td>7.5</td><td>6.2</td><td>10.9</td></tr>
-<tr><td>Fluoroquinolonas</td><td>8.1</td><td>4.5</td><td>5.2</td><td>6.3</td><td>4.8</td><td>3.2</td><td>7.1</td><td>11.4</td><td>5.6</td><td>4.2</td><td>3.8</td><td>5.9</td></tr>
-<tr><td>Glucopéptidos</td><td>19.2</td><td>5.4</td><td>8.3</td><td>10.4</td><td>7.2</td><td>4.9</td><td>6.8</td><td>9.5</td><td>5.3</td><td>3.8</td><td>7.6</td><td>5.2</td></tr>
-<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>168.6</td><td>88.4</td><td>108.6</td><td>103.5</td><td>94.2</td><td>87.6</td><td>100.9</td><td>175.7</td><td>95.9</td><td>72.2</td><td>81.3</td><td>66.2</td></tr>
+<h3 style="margin:14px 0 8px;color:var(--p)">T1. Consumo de Antimicrobianos UCI (DDD/100 días-paciente) — Ene 2025 a Mar 2026</h3>
+<div class="c scr"><table><thead><tr><th>Familia</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>Ene26</th><th>Feb26</th><th>Mar26</th></tr></thead><tbody>
+<tr><td>Penicilinas con inhibidores de betalactamasas</td><td>23.8</td><td>45.0</td><td>20.4</td><td>37.2</td><td>42.3</td><td>54.1</td><td>96.8</td><td>29.1</td><td>33.0</td><td>28.3</td><td>29.9</td><td>47.7</td><td>26.6</td><td>18.6</td><td>7.7</td></tr>
+<tr><td>Carbapenémicos</td><td>38.8</td><td>22.1</td><td>27.6</td><td>36.3</td><td>25.8</td><td>18.3</td><td>30.4</td><td>14.5</td><td>21.0</td><td>24.4</td><td>20.9</td><td>14.5</td><td>13.5</td><td>24.3</td><td>25.0</td></tr>
+<tr><td>Cefalosporinas de 3.ª generación</td><td>9.9</td><td>3.8</td><td>17.0</td><td>0.6</td><td>5.3</td><td>12.4</td><td>16.3</td><td>10.9</td><td>4.0</td><td>1.1</td><td>3.1</td><td>0.6</td><td>—</td><td>10.0</td><td>1.9</td></tr>
+<tr><td>Cefalosporinas de 4.ª generación</td><td>12.4</td><td>16.1</td><td>13.0</td><td>6.8</td><td>7.6</td><td>—</td><td>—</td><td>7.1</td><td>—</td><td>6.7</td><td>—</td><td>—</td><td>34.1</td><td>1.6</td><td>17.9</td></tr>
+<tr><td>Fluoroquinolonas</td><td>—</td><td>13.8</td><td>17.8</td><td>4.3</td><td>1.1</td><td>—</td><td>—</td><td>2.3</td><td>9.9</td><td>14.4</td><td>3.7</td><td>0.9</td><td>23.5</td><td>19.1</td><td>5.4</td></tr>
+<tr><td>Glucopéptidos</td><td>—</td><td>—</td><td>7.7</td><td>3.0</td><td>1.0</td><td>4.9</td><td>10.0</td><td>4.9</td><td>—</td><td>—</td><td>—</td><td>10.4</td><td>7.6</td><td>8.9</td><td>15.9</td></tr>
+<tr><td>Aminoglucósidos</td><td>1.3</td><td>5.9</td><td>—</td><td>3.7</td><td>—</td><td>5.6</td><td>8.4</td><td>10.9</td><td>1.7</td><td>2.5</td><td>1.4</td><td>0.6</td><td>10.3</td><td>2.9</td><td>5.2</td></tr>
+<tr><td>Polimixinas</td><td>1.6</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>2.9</td><td>7.2</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Otros</td><td>0.6</td><td>1.9</td><td>—</td><td>2.3</td><td>4.6</td><td>5.6</td><td>13.8</td><td>16.2</td><td>2.6</td><td>1.0</td><td>—</td><td>1.9</td><td>1.0</td><td>3.8</td><td>13.6</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>88.4</td><td>108.6</td><td>103.5</td><td>94.2</td><td>87.6</td><td>100.9</td><td>175.7</td><td>95.9</td><td>72.2</td><td>81.3</td><td>66.2</td><td>76.6</td><td>116.5</td><td>89.2</td><td>90.7</td></tr>
 </tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T2. Consumo Clínica 2025 (DDD/100dp)</h3>
-<div class="c scr"><table><thead><tr><th>Familia</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
-<tr><td>Penicilinas + IBL</td><td>45.6</td><td>17.2</td><td>15.8</td><td>20.3</td><td>11.5</td><td>12.4</td><td>18.6</td><td>14.2</td><td>10.8</td><td>8.7</td><td>8.9</td><td>11.4</td></tr>
-<tr><td>Carbapenémicos</td><td>30.8</td><td>6.4</td><td>8.2</td><td>10.5</td><td>3.8</td><td>5.6</td><td>7.3</td><td>5.4</td><td>4.2</td><td>3.6</td><td>2.2</td><td>2.1</td></tr>
-<tr><td>Cefalosporinas 3.ªG</td><td>7.3</td><td>5.8</td><td>9.4</td><td>8.2</td><td>4.6</td><td>5.2</td><td>23.0</td><td>6.8</td><td>5.4</td><td>4.2</td><td>0.5</td><td>2.8</td></tr>
-<tr><td>Fluoroquinolonas</td><td>8.1</td><td>3.2</td><td>4.8</td><td>5.6</td><td>2.4</td><td>3.1</td><td>4.5</td><td>3.8</td><td>2.9</td><td>2.1</td><td>1.8</td><td>3.4</td></tr>
-<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>168.6</td><td>44.6</td><td>46.4</td><td>59.7</td><td>28.5</td><td>33.2</td><td>48.5</td><td>37.8</td><td>30.1</td><td>24.3</td><td>15.2</td><td>26.0</td></tr>
+<h3 style="margin:14px 0 8px;color:var(--p)">T2. Consumo de Antimicrobianos Clínica (DDD/100 días-paciente) — Ene 2025 a Mar 2026</h3>
+<div class="c scr"><table><thead><tr><th>Familia</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>Ene26</th><th>Feb26</th><th>Mar26</th></tr></thead><tbody>
+<tr><td>Penicilinas con inhibidores de betalactamasas</td><td>8.7</td><td>13.6</td><td>14.9</td><td>10.2</td><td>—</td><td>17.7</td><td>16.7</td><td>13.3</td><td>13.9</td><td>9.8</td><td>11.8</td><td>11.4</td><td>4.1</td><td>12.6</td><td>5.1</td></tr>
+<tr><td>Carbapenémicos</td><td>3.6</td><td>7.0</td><td>6.2</td><td>5.5</td><td>5.3</td><td>2.2</td><td>6.6</td><td>5.1</td><td>3.1</td><td>0.8</td><td>2.1</td><td>2.6</td><td>3.9</td><td>14.9</td><td>4.8</td></tr>
+<tr><td>Cefalosporinas de 3.ª generación</td><td>23.0</td><td>14.2</td><td>22.6</td><td>6.6</td><td>4.0</td><td>3.9</td><td>1.1</td><td>1.2</td><td>—</td><td>0.5</td><td>2.8</td><td>—</td><td>—</td><td>—</td><td>1.2</td></tr>
+<tr><td>Cefalosporinas de 4.ª generación</td><td>—</td><td>2.6</td><td>2.1</td><td>—</td><td>0.4</td><td>—</td><td>—</td><td>—</td><td>—</td><td>1.1</td><td>0.4</td><td>3.1</td><td>1.2</td><td>0.6</td><td>1.5</td></tr>
+<tr><td>Fluoroquinolonas</td><td>3.8</td><td>3.5</td><td>4.6</td><td>2.2</td><td>4.3</td><td>11.7</td><td>3.7</td><td>4.0</td><td>3.2</td><td>0.5</td><td>6.5</td><td>3.6</td><td>16.8</td><td>15.3</td><td>13.7</td></tr>
+<tr><td>Glucopéptidos</td><td>0.9</td><td>0.5</td><td>5.5</td><td>1.7</td><td>1.6</td><td>—</td><td>0.8</td><td>1.2</td><td>0.8</td><td>1.3</td><td>—</td><td>0.6</td><td>4.0</td><td>1.7</td><td>0.7</td></tr>
+<tr><td>Aminoglucósidos</td><td>—</td><td>1.2</td><td>0.9</td><td>0.5</td><td>0.6</td><td>11.5</td><td>4.7</td><td>4.6</td><td>2.5</td><td>0.4</td><td>1.4</td><td>2.7</td><td>11.8</td><td>7.5</td><td>14.7</td></tr>
+<tr><td>Otros</td><td>4.6</td><td>3.8</td><td>2.9</td><td>1.8</td><td>17.0</td><td>1.5</td><td>4.2</td><td>0.7</td><td>0.8</td><td>0.8</td><td>1.0</td><td>1.9</td><td>2.4</td><td>2.1</td><td>1.1</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>44.6</td><td>46.4</td><td>59.7</td><td>28.5</td><td>33.2</td><td>48.5</td><td>37.8</td><td>30.1</td><td>24.3</td><td>15.2</td><td>26.0</td><td>25.9</td><td>44.2</td><td>54.7</td><td>42.8</td></tr>
 </tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T3. Consumo 2026 (UCI y Clínica)</h3>
-<div class="c scr"><table><thead><tr><th>Familia</th><th>UCI Ene</th><th>UCI Feb</th><th>Clínica Ene</th><th>Clínica Feb</th></tr></thead><tbody>
-<tr><td>Penicilinas + IBL</td><td>26.6</td><td>18.6</td><td>4.1</td><td>12.6</td></tr>
-<tr><td>Carbapenémicos</td><td>13.5</td><td>24.3</td><td>3.9</td><td>14.9</td></tr>
-<tr><td>Cefalosporinas 4.ªG</td><td>34.1</td><td>1.6</td><td>1.2</td><td>0.6</td></tr>
-<tr><td>Fluoroquinolonas</td><td>23.5</td><td>19.1</td><td>16.8</td><td>15.3</td></tr>
-<tr><td>Glucopéptidos</td><td>7.6</td><td>8.9</td><td>4.0</td><td>1.7</td></tr>
-<tr><td>Aminoglucósidos</td><td>10.3</td><td>2.9</td><td>11.8</td><td>7.5</td></tr>
-<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>116.5</td><td>89.2</td><td>44.2</td><td>54.7</td></tr>
+<h3 style="margin:14px 0 8px;color:var(--p)">T3. Densidad de Incidencia MMDR UCI (por 1 000 días-paciente) — Ene 2025 a Mar 2026</h3>
+<div class="c scr"><table><thead><tr><th>Indicador</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>Ene26</th><th>Feb26</th><th>Mar26</th></tr></thead><tbody>
+<tr><td>SAMR</td><td>0</td><td>0</td><td>0</td><td>5.92</td><td>0</td><td>7.52</td><td>0</td><td>5.71</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7.14</td><td>0</td></tr>
+<tr><td>EVR</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>BLEE</td><td>0</td><td>0</td><td>6.17</td><td>5.92</td><td>0</td><td>15.04</td><td>0</td><td>11.43</td><td>6.62</td><td>5.56</td><td>0</td><td>25.16</td><td>5.80</td><td>0</td><td>6.49</td></tr>
+<tr><td>Enterobacterias resistentes a carbapenémicos</td><td>0</td><td>0</td><td>0</td><td>11.83</td><td>13.16</td><td>0</td><td>0</td><td>17.14</td><td>6.62</td><td>5.56</td><td>5.75</td><td>0</td><td>11.76</td><td>7.14</td><td>0</td></tr>
+<tr><td>P. aeruginosa resistente a carbapenémicos</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>5.75</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>Acinetobacter resistente a carbapenémicos</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total MMDR</td><td>0</td><td>0</td><td>6.17</td><td>23.67</td><td>13.16</td><td>22.56</td><td>0</td><td>34.28</td><td>13.24</td><td>11.12</td><td>11.50</td><td>25.16</td><td>17.56</td><td>14.28</td><td>6.49</td></tr>
+<tr><td>C. difficile</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>Mortalidad bruta (%)</td><td>6.1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>11.8</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7.4</td><td>8.3</td><td>5.7</td><td>10.0</td><td>0</td></tr>
 </tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T4. MMDR UCI 2025 (/1000dp)</h3>
-<div class="c scr"><table><thead><tr><th>Indicador</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
-<tr><td>SAMR</td><td>0</td><td>0</td><td>0</td><td>5.92</td><td>0</td><td>7.52</td><td>0</td><td>5.71</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-<tr><td>BLEE</td><td>0</td><td>0</td><td>6.17</td><td>5.92</td><td>0</td><td>15.04</td><td>0</td><td>11.43</td><td>6.62</td><td>5.56</td><td>0</td><td>25.16</td></tr>
-<tr><td>ERC</td><td>0</td><td>0</td><td>0</td><td>11.83</td><td>13.16</td><td>0</td><td>0</td><td>17.14</td><td>6.62</td><td>5.56</td><td>5.75</td><td>0</td></tr>
-<tr><td>PA RC</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>5.75</td><td>0</td></tr>
-<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>0</td><td>0</td><td>6.17</td><td>23.67</td><td>13.16</td><td>22.56</td><td>0</td><td>34.28</td><td>13.24</td><td>11.12</td><td>11.5</td><td>25.16</td></tr>
-<tr><td>Mort %</td><td>6.1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>11.8</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7.4</td><td>8.3</td></tr>
+<h3 style="margin:14px 0 8px;color:var(--p)">T4. Densidad de Incidencia MMDR Clínica (por 1 000 días-paciente) — Ene 2025 a Mar 2026</h3>
+<div class="c scr"><table><thead><tr><th>Indicador</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>Ene26</th><th>Feb26</th><th>Mar26</th></tr></thead><tbody>
+<tr><td>SAMR</td><td>1.92</td><td>1.77</td><td>2.85</td><td>2.19</td><td>2.80</td><td>0.95</td><td>2.73</td><td>2.35</td><td>1.78</td><td>2.65</td><td>2.49</td><td>1.36</td><td>2.25</td><td>0</td><td>1.37</td></tr>
+<tr><td>EVR</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.75</td><td>0</td><td>0.68</td></tr>
+<tr><td>BLEE</td><td>6.74</td><td>7.09</td><td>9.51</td><td>6.57</td><td>6.29</td><td>10.40</td><td>8.18</td><td>6.26</td><td>8.00</td><td>5.97</td><td>8.29</td><td>3.41</td><td>5.25</td><td>12.87</td><td>4.78</td></tr>
+<tr><td>Enterobacterias resistentes a carbapenémicos</td><td>0.96</td><td>0</td><td>2.85</td><td>0.73</td><td>0</td><td>0.95</td><td>0</td><td>1.56</td><td>2.67</td><td>1.99</td><td>0.83</td><td>1.36</td><td>2.25</td><td>0.99</td><td>0</td></tr>
+<tr><td>P. aeruginosa resistente a carbapenémicos</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.78</td><td>0</td><td>0</td><td>0</td><td>0.68</td><td>0</td><td>0.99</td><td>0</td></tr>
+<tr><td>Acinetobacter resistente a carbapenémicos</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.95</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.75</td><td>0</td><td>0</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total MMDR</td><td>9.62</td><td>8.86</td><td>15.21</td><td>9.49</td><td>9.09</td><td>13.25</td><td>10.91</td><td>10.95</td><td>12.45</td><td>10.61</td><td>11.61</td><td>6.81</td><td>11.25</td><td>14.85</td><td>6.83</td></tr>
+<tr><td>C. difficile</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>0</td><td>1.98</td><td>0</td></tr>
+<tr><td>Mortalidad bruta (%)</td><td>0.83</td><td>1.63</td><td>0</td><td>0.72</td><td>2.05</td><td>0.83</td><td>1.47</td><td>3.15</td><td>0</td><td>0</td><td>1.61</td><td>0</td><td>0.69</td><td>0</td><td>0.76</td></tr>
 </tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T5. MMDR Clínica 2025 (/1000dp)</h3>
-<div class="c scr"><table><thead><tr><th>Indicador</th><th>E</th><th>F</th><th>M</th><th>A</th><th>M</th><th>J</th><th>J</th><th>A</th><th>S</th><th>O</th><th>N</th><th>D</th></tr></thead><tbody>
-<tr><td>SAMR</td><td>1.92</td><td>1.77</td><td>2.85</td><td>2.19</td><td>2.80</td><td>0.95</td><td>2.73</td><td>2.35</td><td>1.78</td><td>2.65</td><td>2.49</td><td>1.36</td></tr>
-<tr><td>BLEE</td><td>6.74</td><td>7.09</td><td>9.51</td><td>6.57</td><td>6.29</td><td>10.4</td><td>8.18</td><td>6.26</td><td>8.0</td><td>5.97</td><td>8.29</td><td>3.41</td></tr>
-<tr><td>ERC</td><td>0.96</td><td>0</td><td>2.85</td><td>0.73</td><td>0</td><td>0.95</td><td>0</td><td>1.56</td><td>2.67</td><td>1.99</td><td>0.83</td><td>1.36</td></tr>
-<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>9.62</td><td>8.86</td><td>15.21</td><td>9.49</td><td>9.09</td><td>13.25</td><td>10.91</td><td>10.95</td><td>12.45</td><td>10.61</td><td>11.61</td><td>6.81</td></tr>
-<tr><td>Mort %</td><td>0.8</td><td>1.6</td><td>0</td><td>0.7</td><td>2.1</td><td>0.8</td><td>1.5</td><td>3.2</td><td>0</td><td>0</td><td>1.6</td><td>0</td></tr>
+<h3 style="margin:14px 0 8px;color:var(--p)">T5. Índice PROA UCI y Clínica — Ene 2025 a Mar 2026</h3>
+<div class="c scr"><table><thead><tr><th>Servicio</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>Ene26</th><th>Feb26</th><th>Mar26</th></tr></thead><tbody>
+<tr><td>UCI</td><td>28</td><td>30</td><td>35</td><td>33</td><td>38</td><td>27</td><td>36</td><td>22</td><td>34</td><td>36</td><td>30</td><td>25</td><td>30</td><td>32</td><td>48</td></tr>
+<tr><td>Clínica</td><td>35</td><td>38</td><td>32</td><td>40</td><td>42</td><td>36</td><td>38</td><td>35</td><td>40</td><td>43</td><td>39</td><td>44</td><td>40</td><td>42</td><td>50</td></tr>
 </tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T6. MMDR 2026 (UCI y Clínica)</h3>
-<div class="c scr"><table><thead><tr><th>Indicador</th><th>UCI Ene</th><th>UCI Feb</th><th>Clínica Ene</th><th>Clínica Feb</th></tr></thead><tbody>
-<tr><td>SAMR</td><td>0</td><td>7.14</td><td>2.25</td><td>0</td></tr>
-<tr><td>EVR</td><td>0</td><td>0</td><td>0.75</td><td>0</td></tr>
-<tr><td>BLEE</td><td>5.80</td><td>0</td><td>5.25</td><td>12.87</td></tr>
-<tr><td>ERC</td><td>11.76</td><td>7.14</td><td>2.25</td><td>0.99</td></tr>
-<tr><td>PA RC</td><td>0</td><td>0</td><td>0</td><td>0.99</td></tr>
-<tr><td>AB RC</td><td>0</td><td>0</td><td>0.75</td><td>0</td></tr>
-<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>17.56</td><td>14.28</td><td>11.25</td><td>14.85</td></tr>
-<tr><td>C.diff</td><td>0</td><td>0</td><td>0</td><td>1.98</td></tr>
-<tr><td>Mort %</td><td>5.7</td><td>10.0</td><td>0.7</td><td>0</td></tr>
+<h3 style="margin:14px 0 8px;color:var(--p)">T6. Solicitudes IA PROA mensuales — Mar 2025 a Mar 2026</h3>
+<div class="c scr"><table><thead><tr><th>Indicador</th><th>Mar25</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>Ene26</th><th>Feb26</th><th>Mar26</th></tr></thead><tbody>
+<tr><td>Total solicitudes</td><td>12</td><td>18</td><td>22</td><td>28</td><td>35</td><td>38</td><td>42</td><td>48</td><td>32</td><td>38</td><td>35</td><td>30</td><td>11</td></tr>
+<tr><td>Aprobadas</td><td>8</td><td>12</td><td>15</td><td>20</td><td>25</td><td>27</td><td>30</td><td>34</td><td>22</td><td>26</td><td>24</td><td>20</td><td>7</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Tasa aprobación (%)</td><td>66.7</td><td>66.7</td><td>68.2</td><td>71.4</td><td>71.4</td><td>71.1</td><td>71.4</td><td>70.8</td><td>68.8</td><td>68.4</td><td>68.6</td><td>66.7</td><td>63.6</td></tr>
 </tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T7. Notificaciones ATB restringido</h3>
-<div class="c scr"><table><thead><tr><th>Servicio</th><th>Total</th><th>Notif.</th><th>No notif.</th><th>% Brecha</th></tr></thead><tbody>
-<tr><td>Cirugía</td><td>9</td><td>6</td><td>3</td><td>33.3 %</td></tr>
-<tr><td>Emergencia</td><td>39</td><td>29</td><td>10</td><td>25.6 %</td></tr>
-<tr><td>Clínica</td><td>15</td><td>13</td><td>2</td><td>13.3 %</td></tr>
-<tr><td>UCI</td><td>13</td><td>8</td><td>5</td><td>38.5 %</td></tr>
-<tr><td>Traumatología</td><td>2</td><td>0</td><td>2</td><td>100 %</td></tr>
-<tr><td>Pediatría</td><td>1</td><td>1</td><td>0</td><td>0 %</td></tr>
-<tr style="font-weight:700;background:#e8eaf6"><td>TOTAL</td><td>79</td><td>57</td><td>22</td><td>27.8 %</td></tr>
+<h3 style="margin:14px 0 8px;color:var(--p)">T7. Notificaciones de Antibióticos Restringidos — Ene-Feb 2026</h3>
+<div class="c scr"><table><thead><tr><th>Servicio</th><th>Ene Total</th><th>Ene Notif.</th><th>Ene No notif.</th><th>Ene % Brecha</th><th>Feb Total</th><th>Feb Notif.</th><th>Feb No notif.</th><th>Feb % Brecha</th></tr></thead><tbody>
+<tr><td>Cirugía</td><td>3</td><td>3</td><td>0</td><td>0 %</td><td>6</td><td>3</td><td>3</td><td>50 %</td></tr>
+<tr><td>Traumatología</td><td>2</td><td>0</td><td>2</td><td>100 %</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Emergencia</td><td>26</td><td>19</td><td>7</td><td>26.9 %</td><td>13</td><td>10</td><td>3</td><td>23.1 %</td></tr>
+<tr><td>Clínica</td><td>5</td><td>4</td><td>1</td><td>20 %</td><td>10</td><td>9</td><td>1</td><td>10 %</td></tr>
+<tr><td>UCI</td><td>5</td><td>3</td><td>2</td><td>40 %</td><td>8</td><td>5</td><td>3</td><td>37.5 %</td></tr>
+<tr><td>Pediatría</td><td>—</td><td>—</td><td>—</td><td>—</td><td>1</td><td>1</td><td>0</td><td>0 %</td></tr>
+<tr style="font-weight:700;background:#e8eaf6"><td>Total</td><td>41</td><td>29</td><td>12</td><td>29.3 %</td><td>38</td><td>28</td><td>10</td><td>26.3 %</td></tr>
 </tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T8. Profilaxis Qx por prescriptor</h3>
-<div class="c scr"><table id="pxT"><thead><tr><th>Código</th><th>Total Cx</th><th>Cumple</th><th>No cumple</th><th>% Adherencia</th></tr></thead><tbody id="pxTb"></tbody></table></div>
+<h3 style="margin:14px 0 8px;color:var(--p)">T8. Profilaxis Quirúrgica por prescriptor — Ene a Mar 2026</h3>
+<div class="c scr"><table id="pxT"><thead><tr><th>Código</th><th>Nombre</th><th>Total Cx</th><th>Cumple</th><th>No cumple</th><th>% Adherencia</th></tr></thead><tbody id="pxTb"></tbody></table></div>
 
-<h3 style="margin:14px 0 8px;color:var(--p)">T9. Ranking Prescriptores IA PROA (mar 25 – mar 26)</h3>
-<div class="c scr"><table id="rkT"><thead><tr><th>Código</th><th>Solicitudes</th><th>Aprobadas</th><th>Tasa (%)</th></tr></thead><tbody id="rkTb"></tbody></table></div>
+<h3 style="margin:14px 0 8px;color:var(--p)">T9. Ranking Prescriptores IA PROA — Mar 2025 a Mar 2026</h3>
+<div class="c scr"><table id="rkT"><thead><tr><th>Código</th><th>Nombre</th><th>Solicitudes</th><th>Aprobadas</th><th>Tasa (%)</th></tr></thead><tbody id="rkTb"></tbody></table></div>
 </div>
 
 <script>
-/* ===== TAB SWITCH ===== */
-function sT(n){document.querySelectorAll('.cnt').forEach((e,i)=>{e.classList.toggle('active',i===n)});document.querySelectorAll('.tab').forEach((e,i)=>{e.classList.toggle('active',i===n)})}
-
-/* ===== PALETA ===== */
-const C={r:'#d32f2f',o:'#f57c00',g:'#2e7d32',b:'#1565c0',p:'#0d1b4a',a:'#00b4d8',t:'#00897b',pk:'#ad1457',lb:'#4fc3f7',gy:'#78909c',y:'#f9a825',dg:'#2e7d32',lo:'#ff8a65',lp:'#7e57c2'};
-
-/* ===== MESES ===== */
+function sT(n){document.querySelectorAll('.cnt').forEach((e,i)=>e.classList.toggle('active',i===n));document.querySelectorAll('.tab').forEach((e,i)=>e.classList.toggle('active',i===n))}
+const C={r:'#d32f2f',o:'#f57c00',g:'#2e7d32',b:'#1565c0',p:'#0d1b4a',a:'#00b4d8',t:'#00897b',pk:'#ad1457',gy:'#78909c',lp:'#7e57c2'};
 const ML=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-const ML14=[...ML,'Ene 26','Feb 26'];
-
-/* ===== DATOS CONSUMO ===== */
-const uci25=[168.6,88.4,108.6,103.5,94.2,87.6,100.9,175.7,95.9,72.2,81.3,66.2];
-const uci26=[116.5,89.2];
-const mi25=[168.6,44.6,46.4,59.7,28.5,33.2,48.5,37.8,30.1,24.3,15.2,26.0];
-const mi26=[44.2,54.7];
-
-const penU=[45.6,39.8,42.1,37.5,42.3,54.1,96.8,67.3,35.8,27.4,28.9,47.7];
-const carU=[30.8,20.3,27.5,25.6,18.3,38.8,22.1,31.5,28.6,19.3,21.4,14.5];
-const c3U=[7.3,3.2,8.6,6.8,5.4,0.6,4.2,17.0,9.8,7.5,6.2,10.9];
-const fqU=[8.1,4.5,5.2,6.3,4.8,3.2,7.1,11.4,5.6,4.2,3.8,5.9];
-const glU=[19.2,5.4,8.3,10.4,7.2,4.9,6.8,9.5,5.3,3.8,7.6,5.2];
-
-const penM=[45.6,17.2,15.8,20.3,11.5,12.4,18.6,14.2,10.8,8.7,8.9,11.4];
-const carM=[30.8,6.4,8.2,10.5,3.8,5.6,7.3,5.4,4.2,3.6,2.2,2.1];
-const c3M=[7.3,5.8,9.4,8.2,4.6,5.2,23.0,6.8,5.4,4.2,0.5,2.8];
-const fqM=[8.1,3.2,4.8,5.6,2.4,3.1,4.5,3.8,2.9,2.1,1.8,3.4];
-
-const penU26=[26.6,18.6],carU26=[13.5,24.3],c4U26=[34.1,1.6],fqU26=[23.5,19.1],glU26=[7.6,8.9],amU26=[10.3,2.9];
-const penM26=[4.1,12.6],carM26=[3.9,14.9],c4M26=[1.2,0.6],fqM26=[16.8,15.3],glM26=[4.0,1.7],amM26=[11.8,7.5];
-
-/* ===== DATOS MMDR ===== */
-const mmU25=[0,0,6.17,23.67,13.16,22.56,0,34.28,13.24,11.12,11.5,25.16];
-const mmM25=[9.62,8.86,15.21,9.49,9.09,13.25,10.91,10.95,12.45,10.61,11.61,6.81];
-const samrU=[0,0,0,5.92,0,7.52,0,5.71,0,0,0,0];
-const bleeU=[0,0,6.17,5.92,0,15.04,0,11.43,6.62,5.56,0,25.16];
-const ercU=[0,0,0,11.83,13.16,0,0,17.14,6.62,5.56,5.75,0];
-const parcU=[0,0,0,0,0,0,0,0,0,0,5.75,0];
-const samrM=[1.92,1.77,2.85,2.19,2.80,0.95,2.73,2.35,1.78,2.65,2.49,1.36];
-const bleeM=[6.74,7.09,9.51,6.57,6.29,10.4,8.18,6.26,8.0,5.97,8.29,3.41];
-const ercM=[0.96,0,2.85,0.73,0,0.95,0,1.56,2.67,1.99,0.83,1.36];
-const mortU=[6.1,0,0,0,0,11.8,0,0,0,0,7.4,8.3,5.7,10.0];
-const mortM=[0.8,1.6,0,0.7,2.1,0.8,1.5,3.2,0,0,1.6,0,0.7,0];
-
-/* ===== INDICE PROA ===== */
-const idxU=[28,30,35,33,38,27,36,22,34,36,30,25,30,32];
-const idxM=[35,38,32,40,42,36,38,35,40,43,39,44,40,42];
-
-/* ===== IA PROA DATA (4-letter codes from Excel) ===== */
-const iaData=[
-{c:'PAMF',n:29,a:22},{c:'PCCL',n:25,a:18},{c:'SVUC',n:24,a:18},{c:'DJAA',n:22,a:15},{c:'LFVG',n:20,a:16},
-{c:'MVGJ',n:19,a:16},{c:'HFOC',n:18,a:18},{c:'FVMC',n:16,a:11},{c:'JHQN',n:15,a:10},{c:'LGFC',n:14,a:10},
-{c:'BGPP',n:13,a:9},{c:'PABP',n:12,a:7},{c:'JLLG',n:9,a:1},{c:'MVCS',n:8,a:5},{c:'LABR',n:8,a:3},
-{c:'FJGP',n:8,a:3},{c:'MLGJ',n:8,a:3},{c:'JMAT',n:7,a:7},{c:'ABMG',n:7,a:3},{c:'CMLR',n:7,a:6},
-{c:'WHPJ',n:7,a:6},{c:'CACH',n:6,a:5},{c:'DMDM',n:6,a:5},{c:'DLPH',n:6,a:6},{c:'JSAJ',n:5,a:3},
-{c:'KPPC',n:5,a:3},{c:'MMMF',n:5,a:4},{c:'O0MB',n:5,a:4},{c:'MPDT',n:4,a:3},{c:'MCCR',n:4,a:3},
-{c:'EFFM',n:4,a:4},{c:'VNPB',n:4,a:3},{c:'MFPP',n:3,a:2},{c:'MPGG',n:3,a:2},{c:'JECB',n:3,a:2},
-{c:'NCJR',n:3,a:2},{c:'MJLP',n:3,a:0}
-];
-const iaP=69.4;
-const iaTot=389,iaApp=270;
-
-const iaMo=[12,18,22,28,35,38,42,48,32,38,35,30,11];
-const iaAMo=[8,12,15,20,25,27,30,34,22,26,24,20,7];
-const iaMLbl=['Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic','Ene26','Feb26','Mar26'];
-
-const iaSvc=['UCI','Emergencia','Clínica','Cirugía','Otros'];
-const iaSvcV=[125,98,87,52,27];
-
-const iaAtb=['Meropenem','Piperacilina/Tazobactam','Vancomicina','Cefepime','Imipenem','Colistina','Otros'];
-const iaAtbV=[95,72,65,48,38,22,49];
-
-const dOk=[10,15,16,22,25,23,27,30,24,28,26,18,4];
-const dBad=[2,3,6,6,10,15,15,18,8,10,9,12,7];
-
-/* ===== PROFILAXIS DATA (4-letter codes from Excel) ===== */
-const pxData=[
-{c:'JPPI',n:18,ok:11},{c:'JRCS',n:22,ok:14},{c:'MPGG',n:12,ok:8},{c:'CINC',n:4,ok:3},{c:'RPLM',n:14,ok:11},
-{c:'JLTV',n:32,ok:26},{c:'AECP',n:6,ok:5},{c:'FMNI',n:14,ok:12},{c:'MDEE',n:8,ok:7},{c:'MJDL',n:10,ok:9},
-{c:'AELC',n:18,ok:17},{c:'VAAJ',n:14,ok:13},{c:'MPIR',n:16,ok:15},{c:'MSHG',n:24,ok:23},{c:'MBGG',n:20,ok:19},
-{c:'ARBC',n:14,ok:13},{c:'GHOA',n:38,ok:38},{c:'BFPE',n:28,ok:28},{c:'KEBB',n:52,ok:52},{c:'LGVC',n:48,ok:48},
-{c:'GPCB',n:22,ok:22},{c:'ADBV',n:14,ok:14},{c:'JSPG',n:16,ok:16},{c:'SGAA',n:18,ok:18},{c:'MCDA',n:8,ok:8},
-{c:'MBG2',n:12,ok:12},{c:'CVBY',n:12,ok:12},{c:'LAVA',n:10,ok:10},{c:'VAJB',n:10,ok:10},{c:'DFEM',n:6,ok:6},
-{c:'F0YH',n:4,ok:4},{c:'CHOG',n:10,ok:10},{c:'MENV',n:2,ok:2}
-];
-const pxP=91.1;
-
-const naRows=[
-['08-Ene','JPPI','Colecistectomía','Ampicilina + IBL','Cefazolina','ATB incorrecto'],
-['15-Ene','JPPI','Hernioplastia','Imipenem','Cefazolina','ATB incorrecto'],
-['22-Ene','JRCS','Apendicectomía','Ampicilina + IBL','Cefazolina + Metronidazol','ATB incorrecto'],
-['29-Ene','JRCS','Colecistectomía','Claritromicina','Cefazolina','ATB incorrecto'],
-['05-Feb','JPPI','Hernioplastia','Ampicilina + IBL','Cefazolina','ATB incorrecto'],
-['05-Feb','MPGG','Artoplastia','Vancomicina','Cefazolina','ATB sin criterios'],
-['12-Feb','JRCS','Tiroidectomía','Ampicilina + IBL','Cefazolina','ATB incorrecto'],
-['12-Feb','JPPI','Colecistectomía','Imipenem','Cefazolina','ATB incorrecto'],
-['19-Feb','MPGG','Osteosíntesis','Vancomicina','Cefazolina','ATB sin criterios'],
-['19-Feb','JRCS','Hernioplastia','Claritromicina','Cefazolina','ATB incorrecto'],
-['26-Feb','JPPI','Mastectomía','Ampicilina + IBL','Cefazolina','ATB incorrecto'],
-['26-Feb','JRCS','Colecistectomía','Ampicilina + IBL','Cefazolina','ATB incorrecto'],
-['05-Mar','MPGG','Artoplastia','Vancomicina','Cefazolina','ATB sin criterios'],
-['05-Mar','JPPI','Hernioplastia','Imipenem','Cefazolina','ATB incorrecto'],
-['05-Mar','JRCS','Apendicectomía','Ampicilina + IBL','Cefazolina + Metronidazol','ATB incorrecto'],
-['12-Mar','RPLM','Colecistectomía','Ceftriaxona','Cefazolina','ATB incorrecto'],
-['12-Mar','JRCS','Tiroidectomía','Claritromicina','Cefazolina','ATB incorrecto'],
-['12-Mar','JPPI','Colecistectomía','Ampicilina + IBL','Cefazolina','ATB incorrecto'],
-['19-Mar','MPGG','Osteosíntesis','Vancomicina','Cefazolina','ATB sin criterios'],
-['19-Mar','JRCS','Hernioplastia','Ampicilina + IBL','Cefazolina','ATB incorrecto'],
-['19-Mar','CINC','Apendicectomía','Clindamicina','Cefazolina + Metronidazol','ATB incorrecto'],
-['26-Mar','JLTV','Osteosíntesis','Ceftriaxona','Cefazolina','ATB incorrecto'],
-['26-Mar','JLTV','Artoplastia','Ceftriaxona','Cefazolina','ATB incorrecto'],
-['26-Mar','RPLM','Hernioplastia','Clindamicina','Cefazolina','ATB incorrecto'],
-['26-Mar','JLTV','Osteosíntesis','Gentamicina','Cefazolina','ATB incorrecto'],
-['26-Mar','JLTV','Reducción Fx','Ceftriaxona','Cefazolina','ATB incorrecto'],
-['26-Mar','RPLM','Colecistectomía','Ceftriaxona','Cefazolina','ATB incorrecto'],
-['26-Mar','JLTV','Osteosíntesis','Ceftriaxona','Cefazolina','ATB incorrecto'],
-['26-Mar','JLTV','Artoplastia','Gentamicina','Cefazolina','ATB incorrecto']
-];
-
-const pxSpc=['Cirugía General','Traumatología','Ginecología','Urología','ORL','Neurocirugía','Otros'];
-const pxSpcV=[142,98,68,52,38,28,24];
-const pxAdh=[94,92,89,91,88,93,95,90,92,87,91,93];
-const pxAdhLbl=['S1-Ene','S2-Ene','S3-Ene','S4-Ene','S1-Feb','S2-Feb','S3-Feb','S4-Feb','S1-Mar','S2-Mar','S3-Mar','S4-Mar'];
-const pxAtb=['Cefazolina','Ampicilina + IBL','Ceftriaxona','Clindamicina','Metronidazol','Vancomicina','Imipenem','Claritromicina','Gentamicina','Otros'];
-const pxAtbV=[365,22,15,8,18,6,5,4,3,4];
-
-const tmLbl=['<15','15-29','30-60','61-90','>90'];
-const tmV=[12,45,310,58,25];
-
-const topCx=['Colecistectomía','Apendicectomía','Hernioplastia','Cesárea','Osteosíntesis','Histerectomía','Artoplastia','Tiroidectomía','RTU','Craneotomía'];
-const topCxV=[82,65,58,48,42,35,28,22,18,12];
-
-/* ===== NOTIFICACIONES ===== */
-const ntSvc=['Cirugía','Emergencia','Clínica','UCI','Traumatología','Pediatría'];
-const ntNot=[6,29,13,8,0,1];
-const ntNo=[3,10,2,5,2,0];
-const ntP1N=[3,19,4,3,0,0];const ntP1No=[0,7,1,2,2,0];
-const ntP2N=[3,10,9,5,0,1];const ntP2No=[3,3,1,3,0,0];
-
-/* ===== CHART HELPERS ===== */
+const ML15=[...ML,'Ene26','Feb26','Mar26'];
 const ctx=id=>document.getElementById(id).getContext('2d');
-const lineDs=(lbl,data,color,dash)=>({label:lbl,data:data,borderColor:color,backgroundColor:color+'22',tension:.3,borderWidth:2,pointRadius:3,borderDash:dash||[],fill:false});
-const barDs=(lbl,data,color)=>({label:lbl,data:data,backgroundColor:color+'cc',borderColor:color,borderWidth:1});
+const lDs=(l,d,c,da)=>({label:l,data:d,borderColor:c,backgroundColor:c+'22',tension:.3,borderWidth:2,pointRadius:3,borderDash:da||[],fill:false});
+const bDs=(l,d,c)=>({label:l,data:d,backgroundColor:c+'cc',borderColor:c,borderWidth:1});
+const fY={title:{display:true,text:'Tasa aprobación (%)'},min:0,max:105,ticks:{callback:v=>v<=100?v:''}};
+const fYA={title:{display:true,text:'% adherencia'},min:0,max:105,ticks:{callback:v=>v<=100?v:''}};
 
-/* ===== Funnel Y-axis config (max 105 but hide the 105 label) ===== */
-const funnelYAxis={title:{display:true,text:'Tasa de aprobación (%)'},min:0,max:105,ticks:{callback:function(v){return v<=100?v:'';}}};
-const funnelYAxisAdh={title:{display:true,text:'% adherencia'},min:0,max:105,ticks:{callback:function(v){return v<=100?v:'';}}};
+/* === DATOS ACTUALIZADOS DESDE CONSOLIDADO CONSUMO 2025 (Mes1=Ene) === */
+const uci25=[88.4,108.6,103.5,94.2,87.6,100.9,175.7,95.9,72.2,81.3,66.2,76.6],uci26=[116.5,89.2,90.7];
+const mi25=[44.6,46.4,59.7,28.5,33.2,48.5,37.8,30.1,24.3,15.2,26.0,25.9],mi26=[44.2,54.7,42.8];
 
-/* ===== TAB 0 CHARTS ===== */
-new Chart(ctx('ch00'),{type:'bar',data:{labels:['Consumo','MMDR','Mortalidad','IA PROA'],datasets:[{data:[6,5,12,9],backgroundColor:[C.r,C.r,C.o,C.o],borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'/25 pts'}}},scales:{x:{max:25,title:{display:true,text:'Puntos (máx 25)'}},y:{ticks:{font:{weight:'bold'}}}}}});
-new Chart(ctx('ch01'),{type:'bar',data:{labels:['Consumo','MMDR','Mortalidad','IA PROA'],datasets:[{data:[10,7,15,10],backgroundColor:[C.o,C.o,C.g,C.o],borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'/25 pts'}}},scales:{x:{max:25,title:{display:true,text:'Puntos (máx 25)'}},y:{ticks:{font:{weight:'bold'}}}}}});
+/* Familias UCI 2025 (J01CR+J01CG combinados) */
+const penU=[23.8,45.0,20.4,37.2,42.3,54.1,96.8,29.1,33.0,28.3,29.9,47.7];
+const carU=[38.8,22.1,27.6,36.3,25.8,18.3,30.4,14.5,21.0,24.4,20.9,14.5];
+const c3U=[9.9,3.8,17.0,0.6,5.3,12.4,16.3,10.9,4.0,1.1,3.1,0.6];
+const fqU=[null,13.8,17.8,4.3,1.1,null,null,2.3,9.9,14.4,3.7,0.9];
+const glU=[null,null,7.7,3.0,1.0,4.9,10.0,4.9,null,null,null,10.4];
 
-new Chart(ctx('ch02'),{type:'line',data:{labels:ML14,datasets:[lineDs('Índice UCI',idxU,C.r),{type:'line',label:'Meta Riesgo Bajo (51)',data:Array(14).fill(51),borderColor:C.g,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,title:{display:true,text:'Índice PROA'}}},plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
-new Chart(ctx('ch03'),{type:'line',data:{labels:ML14,datasets:[lineDs('Índice Clínica',idxM,C.o),{type:'line',label:'Meta Riesgo Bajo (51)',data:Array(14).fill(51),borderColor:C.g,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,title:{display:true,text:'Índice PROA'}}},plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+/* Familias Clínica 2025 */
+const penM=[8.7,13.6,14.9,10.2,null,17.7,16.7,13.3,13.9,9.8,11.8,11.4];
+const carM=[3.6,7.0,6.2,5.5,5.3,2.2,6.6,5.1,3.1,0.8,2.1,2.6];
+const fqM=[3.8,3.5,4.6,2.2,4.3,11.7,3.7,4.0,3.2,0.5,6.5,3.6];
+const c3M=[23.0,14.2,22.6,6.6,4.0,3.9,1.1,1.2,null,0.5,2.8,null];
 
-/* ===== TAB 1 CHARTS ===== */
-/* Funnel Plot IA PROA */
-(function(){
-const p=iaP/100,pts=[];
-iaData.forEach(d=>{
-const rate=d.n>0?d.a/d.n*100:0;
-const se=Math.sqrt(p*(1-p)/d.n)*100;
-const lo2=Math.max(0,iaP-2*se);
-const lo3=Math.max(0,iaP-3*se);
-let col=C.b;
-if(rate<lo3)col=C.r;else if(rate<lo2)col=C.o;else if(rate>=80)col=C.g;
-pts.push({x:d.n,y:Math.min(rate,100),lbl:d.c,col:col,app:d.a});
-});
-const maxN=Math.max(...iaData.map(d=>d.n))+5;
-const ci2u=[],ci2l=[],ci3u=[],ci3l=[],xPts=[];
-for(let n=3;n<=maxN;n++){
-const se=Math.sqrt(p*(1-p)/n)*100;
-xPts.push(n);
-ci2u.push(Math.min(100,iaP+2*se));ci2l.push(Math.max(0,iaP-2*se));
-ci3u.push(Math.min(100,iaP+3*se));ci3l.push(Math.max(0,iaP-3*se));
-}
-new Chart(ctx('ch10'),{type:'scatter',data:{datasets:[
-{label:'Prescriptores',data:pts.map(p=>({x:p.x,y:p.y})),pointBackgroundColor:pts.map(p=>p.col),pointBorderColor:pts.map(p=>p.col),pointRadius:6,pointHoverRadius:9},
-{label:'Media 69.4%',data:[{x:3,y:iaP},{x:maxN,y:iaP}],type:'line',borderColor:C.p,borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false},
-{label:'IC 95% sup',data:xPts.map((x,i)=>({x:x,y:ci2u[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},
-{label:'IC 95% inf',data:xPts.map((x,i)=>({x:x,y:ci2l[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},
-{label:'IC 99.7% sup',data:xPts.map((x,i)=>({x:x,y:ci3u[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true},
-{label:'IC 99.7% inf',data:xPts.map((x,i)=>({x:x,y:ci3l[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true}
-]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,right:15,bottom:10,left:10}},scales:{x:{title:{display:true,text:'N.º solicitudes'},min:0,max:maxN},y:funnelYAxis},plugins:{legend:{position:'bottom',labels:{font:{size:9}}},tooltip:{callbacks:{title:function(items){const i=items[0].datasetIndex===0?items[0].dataIndex:-1;return i>=0&&pts[i]?pts[i].lbl:'';},label:function(c){if(c.datasetIndex!==0)return c.dataset.label;const i=c.dataIndex;const d=pts[i];if(!d)return'';return d.lbl+': '+d.y.toFixed(1)+'% ('+d.app+'/'+d.x+' solicitudes)';}}}}}});
-})();
+/* Familias 2026 — sin cambios */
+const penU26=[26.6,18.6,7.7],carU26=[13.5,24.3,25.0],fqU26=[23.5,19.1,5.4],glU26=[7.6,8.9,15.9];
+const penM26=[4.1,12.6,5.1],carM26=[3.9,14.9,4.8],fqM26=[16.8,15.3,13.7];
 
-/* tabla IA */
-(function(){
-const tb=document.getElementById('iaTb');
-const p=iaP/100;
-const sorted=[...iaData].sort((a,b)=>(a.a/a.n)-(b.a/b.n));
-sorted.forEach(d=>{
-const rate=(d.a/d.n*100).toFixed(1);
-const se=Math.sqrt(p*(1-p)/d.n)*100;
-const lo2=Math.max(0,iaP-2*se),lo3=Math.max(0,iaP-3*se);
-let st='En rango',cls='tg-b';
-if(rate<lo3){st='Intervención crítica';cls='tg-no';}
-else if(rate<lo2){st='Intervención';cls='tg-w';}
-else if(rate>=80){st='Destacado';cls='tg-ok';}
-const tr=document.createElement('tr');
-tr.innerHTML='<td><strong>'+d.c+'</strong></td><td>'+d.n+'</td><td>'+d.a+'</td><td>'+rate+' %</td><td><span class="tg '+cls+'">'+st+'</span></td>';
-tb.appendChild(tr);
-});
-})();
+/* MMDR — sin cambios */
+const mmU25=[0,0,6.17,23.67,13.16,22.56,0,34.28,13.24,11.12,11.5,25.16],mmM25=[9.62,8.86,15.21,9.49,9.09,13.25,10.91,10.95,12.45,10.61,11.61,6.81];
+const samrU=[0,0,0,5.92,0,7.52,0,5.71,0,0,0,0],bleeU=[0,0,6.17,5.92,0,15.04,0,11.43,6.62,5.56,0,25.16],ercU=[0,0,0,11.83,13.16,0,0,17.14,6.62,5.56,5.75,0],parcU=[0,0,0,0,0,0,0,0,0,0,5.75,0];
+const samrM=[1.92,1.77,2.85,2.19,2.80,0.95,2.73,2.35,1.78,2.65,2.49,1.36],bleeM=[6.74,7.09,9.51,6.57,6.29,10.4,8.18,6.26,8.0,5.97,8.29,3.41],ercM=[0.96,0,2.85,0.73,0,0.95,0,1.56,2.67,1.99,0.83,1.36];
+const mortU=[6.1,0,0,0,0,11.8,0,0,0,0,7.4,8.3,5.7,10.0,0],mortM=[0.83,1.63,0,0.72,2.05,0.83,1.47,3.15,0,0,1.61,0,0.69,0,0.76];
+const idxU=[28,30,35,33,38,27,36,22,34,36,30,25,30,32,48],idxM=[35,38,32,40,42,36,38,35,40,43,39,44,40,42,50];
 
-new Chart(ctx('ch11'),{type:'doughnut',data:{labels:iaSvc,datasets:[{data:iaSvcV,backgroundColor:[C.r,C.o,C.b,C.t,C.gy]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:10}}}}}});
-new Chart(ctx('ch12'),{type:'line',data:{labels:iaMLbl,datasets:[lineDs('Total solicitudes',iaMo,C.b),lineDs('Aprobadas',iaAMo,C.g)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'N.º solicitudes'}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch13'),{type:'bar',data:{labels:iaAtb,datasets:[barDs('Solicitudes',iaAtbV,C.b)]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'N.º solicitudes'}}}}});
-new Chart(ctx('ch14'),{type:'bar',data:{labels:iaMLbl,datasets:[barDs('Dosis correcta',dOk,C.g),barDs('Dosis incorrecta',dBad,C.r)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,title:{display:true,text:'N.º prescripciones'}}},plugins:{legend:{position:'bottom'}}}});
+const iaNames={'PAMF':'Paola Alexandra Medina Flores','PCCL':'Paola Cristina Cajas Logroño','SVUC':'Stephany Viviana Ulloa Carvajal','DJAA':'Dario Javier Amaguaya Aulla','LFVG':'Luis Felipe Villamarin Granja','MVGJ':'María Vanessa Guerrero Jaramillo','HFOC':'Hector Fabian Ortega Castillo','FVMC':'Fausto Vinicio Maldonado Coronel','JHQN':'Jorge Hernan Quintero Naranjo','LGFC':'Lilian Gabriela Fonseca Cantuña','BGPP':'Byron Guillermo Pallmay Pilco','PABP':'Pablo Alejandro Banderas Poveda','JLLG':'Jaqueline Lizbeth Lucio Galeas','MVCS':'Maritza Verónica Carrillo Sañay','LABR':'Lenín Antonio Bustamante Ruíz','FJGP':'Fabricio Javier García Proaño','MLGJ':'Maria de Lourdes Garces Jerez','JMAT':'Juan Manuel Armendariz Tubon','ABMG':'Anthony Bryan Monge Guevara','CMLR':'Carolina Monserrath Lema Ramos','WHPJ':'Wilson Hipolito Peña Jimenez','CACH':'Cesar Augusto Cabezas Huilca','DMDM':'Deborah Martha Delgado Marquetti','DLPH':'Doris Luzmila Pino Haro','JSAJ':'Johnny Santiago Alava Jurado','KPPC':'Katherine Patricia Pozo Calan','MMMF':'María Mercedes Macas Fernández','O0MB':'Odette Martinez Batista','MPDT':'María Paola Damián Tiuma','MCCR':'María Cristina Chingo Rodríguez','EFFM':'Eric Fabrizzio Fabre Melgar','VNPB':'Viviana Nataly Pazmiño Basantes','MFPP':'Mayra Fernanda Ponluiza Paucar','MPGG':'Milton Patricio Guacho Guacho','JECB':'Jessica Elizabeth Castillo Batallas','NCJR':'Norma Celinda Jara Ruiz','MJLP':'María José López Pino'};
+const pxNames={'JPPI':'Juan Pablo Palacios Idrovo','JRCS':'Jorge Ricardo Chuchuca Serrano','MPGG':'Milton Patricio Guacho Guacho','CINC':'Christopher Israel Naranjo Cajamarca','RPLM':'Rolando Patricio Lara Moyota','JLTV':'Jose Luis Trejos Villacres','AECP':'Ana Eugenia Caiza Pérez','FMNI':'Franklin Marcelo Noboa Ibarra','MDEE':'Manuel Deifilio Encalada Espinoza','MJDL':'Marlene Josefa Diaz Lopez','AELC':'Alicia Estefania Lima Cordova','VAAJ':'Víctor Agusto Alvarez Jiménez','MPIR':'Mónica Patricia Inca Rea','MSHG':'Mary Sandra Herrera García','MBGG':'Moises Bernabe Guerrero Ganan','ARBC':'Angel Rafael Borja Cabrera','GHOA':'Gasman Humberto Ochoa Alvarez','BFPE':'Benjamín Fernando Pérez Erazo','KEBB':'Karen Elizabeth Barros Barreno','LGVC':'Luis Gustavo Vásconez Calderón','GPCB':'Gustavo Polo Cazorla Basantes','ADBV':'Alfonso Dario Bermeo Villacrés','JSPG':'Jose Salvador Pilco Guaman','SGAA':'Santiago Guillermo Arellano Arends','MCDA':'Mirian Consuelo Damian Aucancela','MBG2':'Maria Belen Goyes Guerra','CVBY':'Cristian Vinicio Bravo Yépez','LAVA':'Luis Antonio Vega Abascal','VAJB':'Verónica Alejandra Jaya Baldeón','DFEM':'Diego Fabricio Erazo Mogrovejo','F0YH':'Francisco Yépez Hidalgo','CHOG':'Carlos Henry Ochoa Gonzaga','MENV':'Monica Elizabeth Negrete Vasconez'};
 
-/* ===== TAB 2 CHARTS ===== */
-new Chart(ctx('ch20'),{type:'line',data:{labels:ML14,datasets:[lineDs('Consumo Total UCI',[...uci25,...uci26],C.r),{type:'line',label:'Promedio 2025 (100.7)',data:Array(14).fill(100.7),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100 días-paciente'}}},plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
-new Chart(ctx('ch21'),{type:'line',data:{labels:ML14,datasets:[lineDs('Consumo Total Clínica',[...mi25,...mi26],C.o),{type:'line',label:'Promedio 2025 (46.9)',data:Array(14).fill(46.9),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100 días-paciente'}}},plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+const iaData=[{c:'PAMF',n:29,a:22},{c:'PCCL',n:25,a:18},{c:'SVUC',n:24,a:18},{c:'DJAA',n:22,a:15},{c:'LFVG',n:20,a:16},{c:'MVGJ',n:19,a:16},{c:'HFOC',n:18,a:18},{c:'FVMC',n:16,a:11},{c:'JHQN',n:15,a:10},{c:'LGFC',n:14,a:10},{c:'BGPP',n:13,a:9},{c:'PABP',n:12,a:7},{c:'JLLG',n:9,a:1},{c:'MVCS',n:8,a:5},{c:'LABR',n:8,a:3},{c:'FJGP',n:8,a:3},{c:'MLGJ',n:8,a:3},{c:'JMAT',n:7,a:7},{c:'ABMG',n:7,a:3},{c:'CMLR',n:7,a:6},{c:'WHPJ',n:7,a:6},{c:'CACH',n:6,a:5},{c:'DMDM',n:6,a:5},{c:'DLPH',n:6,a:6},{c:'JSAJ',n:5,a:3},{c:'KPPC',n:5,a:3},{c:'MMMF',n:5,a:4},{c:'O0MB',n:5,a:4},{c:'MPDT',n:4,a:3},{c:'MCCR',n:4,a:3},{c:'EFFM',n:4,a:4},{c:'VNPB',n:4,a:3},{c:'MFPP',n:3,a:2},{c:'MPGG',n:3,a:2},{c:'JECB',n:3,a:2},{c:'NCJR',n:3,a:2},{c:'MJLP',n:3,a:0}];
+const iaP=69.4,iaML=['Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic','Ene26','Feb26','Mar26'];
+const iaMo=[12,18,22,28,35,38,42,48,32,38,35,30,11],iaAMo=[8,12,15,20,25,27,30,34,22,26,24,20,7];
 
-new Chart(ctx('ch22'),{type:'line',data:{labels:ML14,datasets:[
-lineDs('Penicilinas + IBL',[...penU,...penU26],C.b),
-lineDs('Carbapenémicos',[...carU,...carU26],C.r),
-lineDs('Cefalosporinas 3.ªG',[...c3U,null,null],C.t),
-lineDs('Fluoroquinolonas',[...fqU,...fqU26],C.o),
-lineDs('Glucopéptidos',[...glU,...glU26],C.lp)
-]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}},plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+const pxData=[{c:'JPPI',n:18,ok:11},{c:'JRCS',n:22,ok:14},{c:'MPGG',n:12,ok:8},{c:'CINC',n:4,ok:3},{c:'RPLM',n:14,ok:11},{c:'JLTV',n:32,ok:26},{c:'AECP',n:6,ok:5},{c:'FMNI',n:14,ok:12},{c:'MDEE',n:8,ok:7},{c:'MJDL',n:10,ok:9},{c:'AELC',n:18,ok:17},{c:'VAAJ',n:14,ok:13},{c:'MPIR',n:16,ok:15},{c:'MSHG',n:24,ok:23},{c:'MBGG',n:20,ok:19},{c:'ARBC',n:14,ok:13},{c:'GHOA',n:38,ok:38},{c:'BFPE',n:28,ok:28},{c:'KEBB',n:52,ok:52},{c:'LGVC',n:48,ok:48},{c:'GPCB',n:22,ok:22},{c:'ADBV',n:14,ok:14},{c:'JSPG',n:16,ok:16},{c:'SGAA',n:18,ok:18},{c:'MCDA',n:8,ok:8},{c:'MBG2',n:12,ok:12},{c:'CVBY',n:12,ok:12},{c:'LAVA',n:10,ok:10},{c:'VAJB',n:10,ok:10},{c:'DFEM',n:6,ok:6},{c:'F0YH',n:4,ok:4},{c:'CHOG',n:10,ok:10},{c:'MENV',n:2,ok:2}];
+const pxP=91.1;
+const ntSvc=['Cirugía','Emergencia','Clínica','UCI','Trauma','Pediatría'],ntNot=[6,29,13,8,0,1],ntNo=[3,10,2,5,2,0];
+const ntP1N=[3,19,4,3,0,0],ntP1No=[0,7,1,2,2,0],ntP2N=[3,10,9,5,0,1],ntP2No=[3,3,1,3,0,0];
 
-new Chart(ctx('ch23'),{type:'line',data:{labels:ML14,datasets:[
-lineDs('Penicilinas + IBL',[...penM,...penM26],C.b),
-lineDs('Carbapenémicos',[...carM,...carM26],C.r),
-lineDs('Cefalosporinas 3.ªG',[...c3M,null,null],C.t),
-lineDs('Fluoroquinolonas',[...fqM,...fqM26],C.o)
-]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}},plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+/* T0 */
+new Chart(ctx('ch00'),{type:'bar',data:{labels:['Consumo','MMDR','Mortalidad','IA PROA'],datasets:[{data:[6,5,12,9],backgroundColor:[C.r,C.r,C.o,C.o],borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:25}}}});
+new Chart(ctx('ch01'),{type:'bar',data:{labels:['Consumo','MMDR','Mortalidad','IA PROA'],datasets:[{data:[10,7,15,10],backgroundColor:[C.o,C.o,C.g,C.o],borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:25}}}});
+new Chart(ctx('ch02'),{type:'line',data:{labels:ML15,datasets:[lDs('UCI',idxU,C.r),{label:'Meta(51)',data:Array(15).fill(51),borderColor:C.g,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch03'),{type:'line',data:{labels:ML15,datasets:[lDs('Clínica',idxM,C.o),{label:'Meta(51)',data:Array(15).fill(51),borderColor:C.g,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100}},plugins:{legend:{position:'bottom'}}}});
 
-new Chart(ctx('ch24'),{type:'line',data:{labels:ML14,datasets:[lineDs('UCI',[...fqU,...fqU26],C.r),lineDs('Clínica',[...fqM,...fqM26],C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch25'),{type:'line',data:{labels:ML14,datasets:[lineDs('UCI',[...carU,...carU26],C.r),lineDs('Clínica',[...carM,...carM26],C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}},plugins:{legend:{position:'bottom'}}}});
+/* T1 Funnel IA */
+(function(){const p=iaP/100,pts=[];iaData.forEach(d=>{const r=d.n>0?d.a/d.n*100:0,se=Math.sqrt(p*(1-p)/d.n)*100,l2=Math.max(0,iaP-2*se),l3=Math.max(0,iaP-3*se);let co=C.b;if(r<l3)co=C.r;else if(r<l2)co=C.o;else if(r>=80)co=C.g;pts.push({x:d.n,y:Math.min(r,100),lbl:d.c,col:co,ap:d.a});});const mx=Math.max(...iaData.map(d=>d.n))+5,c2u=[],c2l=[],c3u=[],c3l=[],xP=[];for(let n=3;n<=mx;n++){const se=Math.sqrt(p*(1-p)/n)*100;xP.push(n);c2u.push(Math.min(100,iaP+2*se));c2l.push(Math.max(0,iaP-2*se));c3u.push(Math.min(100,iaP+3*se));c3l.push(Math.max(0,iaP-3*se));}
+new Chart(ctx('ch10'),{type:'scatter',data:{datasets:[{label:'Prescriptores',data:pts.map(p=>({x:p.x,y:p.y})),pointBackgroundColor:pts.map(p=>p.col),pointBorderColor:pts.map(p=>p.col),pointRadius:6,pointHoverRadius:9},{label:'Media 69.4%',data:[{x:3,y:iaP},{x:mx,y:iaP}],type:'line',borderColor:C.p,borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false},{label:'IC95%↑',data:xP.map((x,i)=>({x,y:c2u[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},{label:'IC95%↓',data:xP.map((x,i)=>({x,y:c2l[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},{label:'IC99.7%↑',data:xP.map((x,i)=>({x,y:c3u[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true},{label:'IC99.7%↓',data:xP.map((x,i)=>({x,y:c3l[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,right:15}},scales:{x:{min:0,max:mx,title:{display:true,text:'N.º solicitudes'}},y:fY},plugins:{legend:{position:'bottom',labels:{font:{size:9}}},tooltip:{callbacks:{title:it=>{const i=it[0].datasetIndex===0?it[0].dataIndex:-1;return i>=0&&pts[i]?pts[i].lbl+' — '+(iaNames[pts[i].lbl]||''):'';},label:c=>{if(c.datasetIndex!==0)return c.dataset.label;const d=pts[c.dataIndex];return d?d.lbl+': '+d.y.toFixed(1)+'% ('+d.ap+'/'+d.x+')':'';}}}}}} );})();
+(function(){const tb=document.getElementById('iaTb'),p=iaP/100;[...iaData].sort((a,b)=>(a.a/a.n)-(b.a/b.n)).forEach(d=>{const r=(d.a/d.n*100).toFixed(1),se=Math.sqrt(p*(1-p)/d.n)*100,l2=Math.max(0,iaP-2*se),l3=Math.max(0,iaP-3*se);let s='En rango',cl='tg-b';if(r<l3){s='Intervención crítica';cl='tg-no';}else if(r<l2){s='Intervención';cl='tg-w';}else if(r>=80){s='Destacado';cl='tg-ok';}tb.insertAdjacentHTML('beforeend','<tr><td><strong>'+d.c+'</strong></td><td>'+d.n+'</td><td>'+d.a+'</td><td>'+r+'%</td><td><span class="tg '+cl+'">'+s+'</span></td></tr>');});})();
+new Chart(ctx('ch11'),{type:'doughnut',data:{labels:['UCI','Emergencia','Clínica','Cirugía','Otros'],datasets:[{data:[125,98,87,52,27],backgroundColor:[C.r,C.o,C.b,C.t,C.gy]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}});
+new Chart(ctx('ch12'),{type:'line',data:{labels:iaML,datasets:[lDs('Total',iaMo,C.b),lDs('Aprobadas',iaAMo,C.g)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch13'),{type:'bar',data:{labels:['Meropenem','Piperacilina/Tazobactam','Vancomicina','Cefepime','Imipenem','Colistina','Otros'],datasets:[bDs('N',[95,72,65,48,38,22,49],C.b)]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
+new Chart(ctx('ch14'),{type:'bar',data:{labels:iaML,datasets:[bDs('Correcta',[10,15,16,22,25,23,27,30,24,28,26,18,4],C.g),bDs('Error',[2,3,6,6,10,15,15,18,8,10,9,12,7],C.r)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true}},plugins:{legend:{position:'bottom'}}}});
 
-/* ===== TAB 3 CHARTS ===== */
-new Chart(ctx('ch30'),{type:'line',data:{labels:ML14,datasets:[lineDs('Total MMDR UCI',[...mmU25,17.56,14.28],C.r),{type:'line',label:'Promedio 2025 (13.4)',data:Array(14).fill(13.4),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'/1000 días-paciente'}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch31'),{type:'line',data:{labels:ML14,datasets:[lineDs('Total MMDR Clínica',[...mmM25,11.25,14.85],C.o),{type:'line',label:'Promedio 2025 (10.7)',data:Array(14).fill(10.7),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'/1000 días-paciente'}}},plugins:{legend:{position:'bottom'}}}});
+/* T2 Consumo */
+new Chart(ctx('ch20'),{type:'line',data:{labels:ML15,datasets:[lDs('UCI',[...uci25,...uci26],C.r),{label:'Prom25',data:Array(15).fill(100.7),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch21'),{type:'line',data:{labels:ML15,datasets:[lDs('Clínica',[...mi25,...mi26],C.o),{label:'Prom25',data:Array(15).fill(46.9),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch22'),{type:'line',data:{labels:ML15,datasets:[lDs('Penicilinas con inhibidores de betalactamasas',[...penU,...penU26],C.b),lDs('Carbapenémicos',[...carU,...carU26],C.r),lDs('Cefalosporinas de 3.ª generación',[...c3U,null,10.0,1.9],C.t),lDs('Fluoroquinolonas',[...fqU,...fqU26],C.o),lDs('Glucopéptidos',[...glU,...glU26],C.lp)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+new Chart(ctx('ch23'),{type:'line',data:{labels:ML15,datasets:[lDs('Penicilinas con inhibidores de betalactamasas',[...penM,...penM26],C.b),lDs('Carbapenémicos',[...carM,...carM26],C.r),lDs('Cefalosporinas de 3.ª generación',[...c3M,null,null,1.2],C.t),lDs('Fluoroquinolonas',[...fqM,...fqM26],C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+new Chart(ctx('ch24'),{type:'line',data:{labels:ML15,datasets:[lDs('UCI',[...fqU,...fqU26],C.r),lDs('Clínica',[...fqM,...fqM26],C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch25'),{type:'line',data:{labels:ML15,datasets:[lDs('UCI',[...carU,...carU26],C.r),lDs('Clínica',[...carM,...carM26],C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
 
-new Chart(ctx('ch32'),{type:'bar',data:{labels:ML,datasets:[barDs('SAMR',samrU,C.r),barDs('BLEE',bleeU,C.o),barDs('ERC',ercU,C.lp),barDs('PA RC',parcU,C.t)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,title:{display:true,text:'/1000dp'}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch33'),{type:'bar',data:{labels:ML,datasets:[barDs('SAMR',samrM,C.r),barDs('BLEE',bleeM,C.o),barDs('ERC',ercM,C.lp)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,title:{display:true,text:'/1000dp'}}},plugins:{legend:{position:'bottom'}}}});
+/* T3 MMDR */
+new Chart(ctx('ch30'),{type:'line',data:{labels:ML15,datasets:[lDs('MMDR UCI',[...mmU25,17.56,14.28,6.49],C.r),{label:'Prom25(13.4)',data:Array(15).fill(13.4),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch31'),{type:'line',data:{labels:ML15,datasets:[lDs('MMDR Clínica',[...mmM25,11.25,14.85,6.83],C.o),{label:'Prom25(10.7)',data:Array(15).fill(10.7),borderColor:C.gy,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch32'),{type:'bar',data:{labels:ML,datasets:[bDs('SAMR',samrU,C.r),bDs('BLEE',bleeU,C.o),bDs('Enterobacterias Resistentes a Carbapenémicos',ercU,C.lp),bDs('P. aeruginosa Resistente a Carbapenémicos',parcU,C.t)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true}},plugins:{legend:{position:'bottom',labels:{font:{size:8}}}}}});
+new Chart(ctx('ch33'),{type:'bar',data:{labels:ML,datasets:[bDs('SAMR',samrM,C.r),bDs('BLEE',bleeM,C.o),bDs('Enterobacterias Resistentes a Carbapenémicos',ercM,C.lp)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true}},plugins:{legend:{position:'bottom',labels:{font:{size:8}}}}}});
+new Chart(ctx('ch34'),{type:'line',data:{labels:ML15,datasets:[lDs('Mortalidad UCI %',mortU,C.r)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:15}},plugins:{legend:{display:false}}}});
+new Chart(ctx('ch35'),{type:'line',data:{labels:ML15,datasets:[lDs('Mortalidad Clínica %',mortM,C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:5}},plugins:{legend:{display:false}}}});
 
-new Chart(ctx('ch34'),{type:'line',data:{labels:ML14,datasets:[lineDs('Mortalidad UCI %',mortU,C.r)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:15,title:{display:true,text:'%'}}},plugins:{legend:{display:false}}}});
-new Chart(ctx('ch35'),{type:'line',data:{labels:ML14,datasets:[lineDs('Mortalidad Clínica %',mortM,C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:5,title:{display:true,text:'%'}}},plugins:{legend:{display:false}}}});
+/* T4 Profilaxis */
+new Chart(ctx('ch40'),{type:'doughnut',data:{labels:['Cirugía General','Traumatología','Ginecología','Urología','Otorrinolaringología','Neurocirugía','Otros'],datasets:[{data:[142,98,68,52,38,28,24],backgroundColor:[C.b,C.r,C.pk,C.t,C.o,C.lp,C.gy]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:9}}}}}});
+new Chart(ctx('ch41'),{type:'line',data:{labels:['S1E','S2E','S3E','S4E','S1F','S2F','S3F','S4F','S1M','S2M','S3M','S4M'],datasets:[lDs('Adherencia %',[94,92,89,91,88,93,95,90,92,87,91,93],C.b),{label:'Meta 90%',data:Array(12).fill(90),borderColor:C.g,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:75,max:100}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch42'),{type:'bar',data:{labels:['Cefazolina','Ampicilina/Sulbactam','Ceftriaxona','Clindamicina','Metronidazol','Vancomicina','Imipenem','Claritromicina','Gentamicina','Otros'],datasets:[bDs('N',[365,22,15,8,18,6,5,4,3,4],C.b)]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
+(function(){const p=pxP/100,pts=[];pxData.forEach(d=>{const r=d.n>0?d.ok/d.n*100:0,se=Math.sqrt(p*(1-p)/d.n)*100,l2=Math.max(0,pxP-2*se),l3=Math.max(0,pxP-3*se);let co=C.b;if(r<l3)co=C.r;else if(r<l2)co=C.o;else if(r>=100)co=C.g;pts.push({x:d.n,y:Math.min(r,100),lbl:d.c,col:co,ok:d.ok});});const mx=Math.max(...pxData.map(d=>d.n))+5,c2u=[],c2l=[],c3u=[],c3l=[],xP=[];for(let n=2;n<=mx;n++){const se=Math.sqrt(p*(1-p)/n)*100;xP.push(n);c2u.push(Math.min(100,pxP+2*se));c2l.push(Math.max(0,pxP-2*se));c3u.push(Math.min(100,pxP+3*se));c3l.push(Math.max(0,pxP-3*se));}
+new Chart(ctx('ch43'),{type:'scatter',data:{datasets:[{label:'Prescriptores',data:pts.map(p=>({x:p.x,y:p.y})),pointBackgroundColor:pts.map(p=>p.col),pointBorderColor:pts.map(p=>p.col),pointRadius:6,pointHoverRadius:9},{label:'Media 91.1%',data:[{x:2,y:pxP},{x:mx,y:pxP}],type:'line',borderColor:C.p,borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false},{label:'IC95%↑',data:xP.map((x,i)=>({x,y:c2u[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},{label:'IC95%↓',data:xP.map((x,i)=>({x,y:c2l[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},{label:'IC99.7%↑',data:xP.map((x,i)=>({x,y:c3u[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true},{label:'IC99.7%↓',data:xP.map((x,i)=>({x,y:c3l[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,right:15}},scales:{x:{min:0,max:mx,title:{display:true,text:'N.º cirugías'}},y:fYA},plugins:{legend:{position:'bottom',labels:{font:{size:9}}},tooltip:{callbacks:{title:it=>{const i=it[0].datasetIndex===0?it[0].dataIndex:-1;return i>=0&&pts[i]?pts[i].lbl+' — '+(pxNames[pts[i].lbl]||''):'';},label:c=>{if(c.datasetIndex!==0)return c.dataset.label;const d=pts[c.dataIndex];return d?d.lbl+': '+d.y.toFixed(1)+'% ('+d.ok+'/'+d.x+')':'';}}}}}} );})();
+const naR=[['08-Ene','JPPI','Colecistectomía','Ampicilina/Sulbactam','Cefazolina','Antibiótico incorrecto'],['15-Ene','JPPI','Hernioplastia','Imipenem','Cefazolina','Antibiótico incorrecto'],['22-Ene','JRCS','Apendicectomía','Ampicilina/Sulbactam','Cefazolina+Metronidazol','Antibiótico incorrecto'],['29-Ene','JRCS','Colecistectomía','Claritromicina','Cefazolina','Antibiótico incorrecto'],['05-Feb','JPPI','Hernioplastia','Ampicilina/Sulbactam','Cefazolina','Antibiótico incorrecto'],['05-Feb','MPGG','Artoplastia','Vancomicina','Cefazolina','Sin criterios'],['12-Feb','JRCS','Tiroidectomía','Ampicilina/Sulbactam','Cefazolina','Antibiótico incorrecto'],['12-Feb','JPPI','Colecistectomía','Imipenem','Cefazolina','Antibiótico incorrecto'],['19-Feb','MPGG','Osteosíntesis','Vancomicina','Cefazolina','Sin criterios'],['19-Feb','JRCS','Hernioplastia','Claritromicina','Cefazolina','Antibiótico incorrecto'],['26-Feb','JPPI','Mastectomía','Ampicilina/Sulbactam','Cefazolina','Antibiótico incorrecto'],['26-Feb','JRCS','Colecistectomía','Ampicilina/Sulbactam','Cefazolina','Antibiótico incorrecto'],['05-Mar','MPGG','Artoplastia','Vancomicina','Cefazolina','Sin criterios'],['05-Mar','JPPI','Hernioplastia','Imipenem','Cefazolina','Antibiótico incorrecto'],['05-Mar','JRCS','Apendicectomía','Ampicilina/Sulbactam','Cefazolina+Metronidazol','Antibiótico incorrecto'],['12-Mar','RPLM','Colecistectomía','Ceftriaxona','Cefazolina','Antibiótico incorrecto'],['12-Mar','JRCS','Tiroidectomía','Claritromicina','Cefazolina','Antibiótico incorrecto'],['12-Mar','JPPI','Colecistectomía','Ampicilina/Sulbactam','Cefazolina','Antibiótico incorrecto'],['19-Mar','MPGG','Osteosíntesis','Vancomicina','Cefazolina','Sin criterios'],['19-Mar','JRCS','Hernioplastia','Ampicilina/Sulbactam','Cefazolina','Antibiótico incorrecto'],['19-Mar','CINC','Apendicectomía','Clindamicina','Cefazolina+Metronidazol','Antibiótico incorrecto'],['26-Mar','JLTV','Osteosíntesis','Ceftriaxona','Cefazolina','Antibiótico incorrecto'],['26-Mar','JLTV','Artoplastia','Ceftriaxona','Cefazolina','Antibiótico incorrecto'],['26-Mar','RPLM','Hernioplastia','Clindamicina','Cefazolina','Antibiótico incorrecto'],['26-Mar','JLTV','Osteosíntesis','Gentamicina','Cefazolina','Antibiótico incorrecto'],['26-Mar','JLTV','Reducción Fx','Ceftriaxona','Cefazolina','Antibiótico incorrecto'],['26-Mar','RPLM','Colecistectomía','Ceftriaxona','Cefazolina','Antibiótico incorrecto'],['26-Mar','JLTV','Osteosíntesis','Ceftriaxona','Cefazolina','Antibiótico incorrecto'],['26-Mar','JLTV','Artoplastia','Gentamicina','Cefazolina','Antibiótico incorrecto']];
+(function(){const tb=document.querySelector('#naT tbody');naR.forEach(r=>{tb.insertAdjacentHTML('beforeend','<tr><td>'+r[0]+'</td><td><b>'+r[1]+'</b></td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td></tr>');});})();
+new Chart(ctx('ch44'),{type:'bar',data:{labels:['<15','15-29','30-60','61-90','>90'],datasets:[bDs('N',[12,45,310,58,25],C.b)]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+new Chart(ctx('ch45'),{type:'bar',data:{labels:['Colecistectomía','Apendicectomía','Hernioplastia','Cesárea','Osteosíntesis','Histerectomía','Artoplastia','Tiroidectomía','RTU','Craneotomía'],datasets:[bDs('N',[82,65,58,48,42,35,28,22,18,12],C.t)]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
 
-/* ===== TAB 4 CHARTS ===== */
-new Chart(ctx('ch40'),{type:'doughnut',data:{labels:pxSpc,datasets:[{data:pxSpcV,backgroundColor:[C.b,C.r,C.pk,C.t,C.o,C.lp,C.gy]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:10}}}}}});
-new Chart(ctx('ch41'),{type:'line',data:{labels:pxAdhLbl,datasets:[lineDs('Adherencia %',pxAdh,C.b),{type:'line',label:'Meta 90%',data:Array(12).fill(90),borderColor:C.g,borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:75,max:100,title:{display:true,text:'% adherencia'}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch42'),{type:'bar',data:{labels:pxAtb,datasets:[barDs('Casos',pxAtbV,C.b)]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'N.º prescripciones'}}}}});
+/* T5 Notificaciones */
+new Chart(ctx('ch50'),{type:'bar',data:{labels:ntSvc,datasets:[bDs('Notificados',ntNot,C.g),bDs('No notificados',ntNo,C.r)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch51'),{type:'bar',data:{labels:ntSvc,datasets:[bDs('% Notificación',ntSvc.map((_,i)=>{const t=ntNot[i]+ntNo[i];return t>0?(ntNot[i]/t*100).toFixed(1):0;}),C.b),{label:'Meta 90%',data:Array(6).fill(90),borderColor:C.g,borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false,type:'line'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch52'),{type:'bar',data:{labels:ntSvc,datasets:[bDs('Ene-26',ntSvc.map((_,i)=>{const t=ntP1N[i]+ntP1No[i];return t>0?(ntP1No[i]/t*100).toFixed(1):0;}),C.o),bDs('Feb-26',ntSvc.map((_,i)=>{const t=ntP2N[i]+ntP2No[i];return t>0?(ntP2No[i]/t*100).toFixed(1):0;}),C.r)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,title:{display:true,text:'% brecha'}}},plugins:{legend:{position:'bottom'}}}});
 
-/* Funnel Plot Profilaxis */
-(function(){
-const p=pxP/100,pts=[];
-pxData.forEach(d=>{
-const rate=d.n>0?d.ok/d.n*100:0;
-const se=Math.sqrt(p*(1-p)/d.n)*100;
-const lo2=Math.max(0,pxP-2*se);
-const lo3=Math.max(0,pxP-3*se);
-let col=C.b;
-if(rate<lo3)col=C.r;else if(rate<lo2)col=C.o;else if(rate>=100)col=C.g;
-pts.push({x:d.n,y:Math.min(rate,100),lbl:d.c,col:col,ok:d.ok});
-});
-const maxN=Math.max(...pxData.map(d=>d.n))+5;
-const ci2u=[],ci2l=[],ci3u=[],ci3l=[],xPts=[];
-for(let n=2;n<=maxN;n++){
-const se=Math.sqrt(p*(1-p)/n)*100;
-xPts.push(n);
-ci2u.push(Math.min(100,pxP+2*se));ci2l.push(Math.max(0,pxP-2*se));
-ci3u.push(Math.min(100,pxP+3*se));ci3l.push(Math.max(0,pxP-3*se));
-}
-new Chart(ctx('ch43'),{type:'scatter',data:{datasets:[
-{label:'Prescriptores',data:pts.map(p=>({x:p.x,y:p.y})),pointBackgroundColor:pts.map(p=>p.col),pointBorderColor:pts.map(p=>p.col),pointRadius:6,pointHoverRadius:9},
-{label:'Media 91.1%',data:[{x:2,y:pxP},{x:maxN,y:pxP}],type:'line',borderColor:C.p,borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false},
-{label:'IC 95% sup',data:xPts.map((x,i)=>({x:x,y:ci2u[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},
-{label:'IC 95% inf',data:xPts.map((x,i)=>({x:x,y:ci2l[i]})),type:'line',borderColor:C.a,borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,showLine:true},
-{label:'IC 99.7% sup',data:xPts.map((x,i)=>({x:x,y:ci3u[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true},
-{label:'IC 99.7% inf',data:xPts.map((x,i)=>({x:x,y:ci3l[i]})),type:'line',borderColor:C.gy,borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,showLine:true}
-]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,right:15,bottom:10,left:10}},scales:{x:{title:{display:true,text:'N.º cirugías'},min:0,max:maxN},y:funnelYAxisAdh},plugins:{legend:{position:'bottom',labels:{font:{size:9}}},tooltip:{callbacks:{title:function(items){const i=items[0].datasetIndex===0?items[0].dataIndex:-1;return i>=0&&pts[i]?pts[i].lbl:'';},label:function(c){if(c.datasetIndex!==0)return c.dataset.label;const i=c.dataIndex;const d=pts[i];if(!d)return'';return d.lbl+': '+d.y.toFixed(1)+'% ('+d.ok+'/'+d.x+' cirugías)';}}}}}});
-})();
+/* T6 Correlación */
+new Chart(ctx('ch60'),{type:'line',data:{labels:ML15,datasets:[{label:'Consumo UCI',data:[...uci25,...uci26],borderColor:C.b,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y',fill:false},{label:'MMDR UCI',data:[...mmU25,17.56,14.28,6.49],borderColor:C.r,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y1',fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',beginAtZero:true},y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false}}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch61'),{type:'line',data:{labels:ML15,datasets:[{label:'Consumo Clínica',data:[...mi25,...mi26],borderColor:C.b,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y',fill:false},{label:'MMDR Clínica',data:[...mmM25,11.25,14.85,6.83],borderColor:C.r,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y1',fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',beginAtZero:true},y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false}}},plugins:{legend:{position:'bottom'}}}});
+new Chart(ctx('ch62'),{type:'line',data:{labels:ML15,datasets:[{label:'Carbapenémicos',data:[...carU,...carU26],borderColor:C.b,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y',fill:false},{label:'Enterobacterias Resistentes a Carbapenémicos',data:[...ercU,11.76,7.14,0],borderColor:C.r,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y1',fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',beginAtZero:true},y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false}}},plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
+new Chart(ctx('ch63'),{type:'line',data:{labels:['Oct25','Nov25','Dic25','Ene26','Feb26','Mar26'],datasets:[lDs('Penicilinas con inhibidores de betalactamasas',[28.3,29.9,47.7,26.6,18.6,7.7],C.b),lDs('Carbapenémicos',[24.4,20.9,14.5,13.5,24.3,25.0],C.r),lDs('Cefalosporinas de 4.ª generación',[6.7,null,null,34.1,1.6,17.9],C.t),lDs('Fluoroquinolonas',[14.4,3.7,0.9,23.5,19.1,5.4],C.o)]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom',labels:{font:{size:8}}}}}});
 
-/* tabla no-adherencias */
-(function(){
-const tb=document.querySelector('#naT tbody');
-naRows.forEach(r=>{
-const tr=document.createElement('tr');
-tr.innerHTML='<td>'+r[0]+'</td><td><strong>'+r[1]+'</strong></td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td>';
-tb.appendChild(tr);
-});
-})();
+/* T7 Antibiograma */
+const abg={
+uci:{t:'UCI',gn:[
+{n:'E. coli (n=11, BLEE 27%)',d:{AMC:40,AMP:72,SAM:27,CZO:27,FEP:27,FOX:27,CRO:27,CAZ:27,FQ:45,GEN:18,AMK:0,SXT:63,TZP:9,MEM:0,ETP:0,NIT:0}},
+{n:'K. pneumoniae (n=10, BLEE 40%)',d:{AMC:50,AMP:null,SAM:55,CZO:60,FEP:60,FOX:60,CRO:60,CAZ:60,FQ:20,GEN:10,AMK:0,SXT:40,TZP:40,MEM:40,ETP:40,NIT:null}},
+{n:'K. oxytoca (n=8, BLEE 50%)',d:{AMC:60,AMP:null,SAM:87,CZO:87,FEP:87,FOX:75,CRO:87,CAZ:87,FQ:50,GEN:37,AMK:0,SXT:75,TZP:50,MEM:50,ETP:100,NIT:null}},
+{n:'Enterobacter (n=4)',d:{AMC:null,AMP:null,SAM:25,CZO:null,FEP:25,FOX:null,CRO:null,CAZ:null,FQ:25,GEN:0,AMK:0,SXT:25,TZP:25,MEM:25,ETP:null,NIT:null}}],
+gp:[{n:'S. aureus (n=15, SAMR 23%)',d:{OXA:23,PEN:69,CLI:25,ERY:46,SXT:7,VAN:0,LNZ:0,RIF:0,GEN:7,LEV:7,DAP:0}}]},
+mi:{t:'Medicina Interna',gn:[
+{n:'E. coli (n=136, BLEE 42%)',d:{AMC:11,AMP:82,SAM:51,CZO:68,FEP:51,FOX:25,CRO:68,CAZ:66,FQ:50,GEN:18,AMK:2,SXT:54,TZP:5,MEM:3,ETP:8,NIT:6}},
+{n:'K. pneumoniae (n=38, BLEE 68%)',d:{AMC:16,AMP:null,SAM:57,CZO:71,FEP:56,FOX:43,CRO:73,CAZ:72,FQ:42,GEN:39,AMK:5,SXT:65,TZP:31,MEM:23,ETP:31,NIT:58}},
+{n:'K. oxytoca (n=18, BLEE 61%)',d:{AMC:25,AMP:null,SAM:50,CZO:83,FEP:66,FOX:25,CRO:68,CAZ:100,FQ:16,GEN:12,AMK:0,SXT:44,TZP:44,MEM:22,ETP:35,NIT:20}},
+{n:'Enterobacter (n=16)',d:{AMC:null,AMP:null,SAM:13,CZO:null,FEP:6,FOX:null,CRO:42,CAZ:40,FQ:6,GEN:0,AMK:0,SXT:50,TZP:25,MEM:13,ETP:13,NIT:100}},
+{n:'P. aeruginosa (n=15)',d:{AMC:null,AMP:null,SAM:null,CZO:null,FEP:42,FOX:null,CRO:null,CAZ:60,FQ:20,GEN:27,AMK:6,SXT:null,TZP:21,MEM:26,ETP:null,NIT:null}}],
+gp:[{n:'S. aureus (n=45, SAMR 36%)',d:{OXA:36,PEN:90,CLI:20,ERY:64,SXT:17,VAN:0,LNZ:0,RIF:0,GEN:0,LEV:36,DAP:0}}]},
+er:{t:'Emergencia',gn:[
+{n:'E. coli (n=394, BLEE 22%)',d:{AMC:14,AMP:69,SAM:31,CZO:50,FEP:31,FOX:0,CRO:47,CAZ:46,FQ:34,GEN:12,AMK:0,SXT:51,TZP:1,MEM:2,ETP:5,NIT:3}},
+{n:'K. pneumoniae (n=26, BLEE 30%)',d:{AMC:8,AMP:null,SAM:89,CZO:46,FEP:42,FOX:20,CRO:47,CAZ:47,FQ:30,GEN:0,AMK:0,SXT:61,TZP:0,MEM:0,ETP:3,NIT:33}},
+{n:'Enterobacter (n=20)',d:{AMC:null,AMP:null,SAM:5,CZO:null,FEP:42,FOX:null,CRO:null,CAZ:null,FQ:25,GEN:0,AMK:0,SXT:35,TZP:5,MEM:0,ETP:10,NIT:11}}],
+gp:[{n:'S. aureus (n=21, SAMR 38%)',d:{OXA:38,PEN:90,CLI:19,ERY:52,SXT:4,VAN:0,LNZ:0,RIF:0,GEN:0,LEV:38,DAP:0}}]},
+ce:{t:'Consulta Externa',gn:[
+{n:'E. coli (n=430, BLEE 21%)',d:{AMC:2,AMP:64,SAM:29,CZO:34,FEP:29,FOX:0,CRO:30,CAZ:30,FQ:45,GEN:10,AMK:0,SXT:49,TZP:0,MEM:1,ETP:5,NIT:6}},
+{n:'Proteus (n=31)',d:{AMC:3,AMP:51,SAM:22,CZO:25,FEP:19,FOX:0,CRO:22,CAZ:22,FQ:22,GEN:0,AMK:0,SXT:54,TZP:0,MEM:0,ETP:6,NIT:28}},
+{n:'K. pneumoniae (n=29, BLEE 20%)',d:{AMC:7,AMP:null,SAM:48,CZO:13,FEP:19,FOX:0,CRO:22,CAZ:48,FQ:27,GEN:16,AMK:0,SXT:0,TZP:3,MEM:0,ETP:0,NIT:66}}],
+gp:[{n:'S. aureus (n=83, SAMR 22%)',d:{OXA:22,PEN:91,CLI:13,ERY:71,SXT:3,VAN:0,LNZ:0,RIF:0,GEN:1,LEV:22,DAP:0}}]},
+ped:{t:'Pediatría',gn:[
+{n:'E. coli (n=16, BLEE 18%)',d:{AMC:10,AMP:75,SAM:43,CZO:66,FEP:37,FOX:37,CRO:50,CAZ:60,FQ:31,GEN:12,AMK:0,SXT:50,TZP:0,MEM:0,ETP:0,NIT:0}},
+{n:'K. pneumoniae (n=9, BLEE 44%)',d:{AMC:0,AMP:null,SAM:33,CZO:77,FEP:66,FOX:33,CRO:80,CAZ:62,FQ:33,GEN:0,AMK:0,SXT:55,TZP:33,MEM:22,ETP:22,NIT:25}},
+{n:'K. oxytoca (n=8, BLEE 62%)',d:{AMC:0,AMP:null,SAM:62,CZO:62,FEP:75,FOX:62,CRO:100,CAZ:62,FQ:12,GEN:37,AMK:0,SXT:75,TZP:0,MEM:0,ETP:6,NIT:20}}],
+gp:[{n:'S. aureus (n=8, SAMR 12%)',d:{OXA:12,PEN:12,CLI:12,ERY:87,SXT:12,VAN:0,LNZ:0,RIF:null,GEN:12,LEV:12,DAP:0}}]},
+all:{t:'Consolidado General',gn:[
+{n:'E. coli OUT (n=536, BLEE 23%)',d:{AMC:6,AMP:70,SAM:33,CZO:32,FEP:32,FOX:0,CRO:31,CAZ:31,FQ:41,GEN:14,AMK:0,SXT:53,TZP:2,MEM:1,ETP:4,NIT:4}},
+{n:'E. coli IN (n=387, BLEE 20%)',d:{AMC:2,AMP:62,SAM:29,CZO:33,FEP:29,FOX:27,CRO:28,CAZ:28,FQ:45,GEN:10,AMK:0,SXT:47,TZP:0,MEM:1,ETP:5,NIT:5}},
+{n:'K. pneumoniae (n=48, BLEE 48%)',d:{AMC:4,AMP:null,SAM:56,CZO:54,FEP:56,FOX:56,CRO:59,CAZ:45,FQ:32,GEN:6,AMK:0,SXT:31,TZP:6,MEM:7,ETP:28,NIT:40}}],
+gp:[{n:'S. aureus OUT (n=18)',d:{OXA:44,PEN:88,CLI:11,ERY:77,SXT:5,VAN:0,LNZ:0,RIF:0,GEN:0,LEV:22,DAP:null}},{n:'S. aureus IN (n=28)',d:{OXA:34,PEN:92,CLI:32,ERY:75,SXT:0,VAN:0,LNZ:0,RIF:7,GEN:22,LEV:0,DAP:null}}]}
+};
+const aN={AMC:'Amoxicilina/Ácido clavulánico',AMP:'Ampicilina',SAM:'Ampicilina/Sulbactam',CZO:'Cefazolina',FEP:'Cefepime',FOX:'Cefoxitina',CRO:'Ceftriaxona',CAZ:'Ceftazidima',FQ:'Fluoroquinolonas',GEN:'Gentamicina',AMK:'Amikacina',SXT:'Trimetoprima/Sulfametoxazol',TZP:'Piperacilina/Tazobactam',MEM:'Meropenem',ETP:'Ertapenem',NIT:'Nitrofurantoína',OXA:'Oxacilina',PEN:'Penicilina',CLI:'Clindamicina',ERY:'Eritromicina',VAN:'Vancomicina',LNZ:'Linezolid',RIF:'Rifampicina',LEV:'Levofloxacina',DAP:'Daptomicina'};
+const gnK=['AMC','AMP','SAM','CZO','FEP','FOX','CRO','CAZ','FQ','GEN','AMK','SXT','TZP','MEM','ETP','NIT'];
+const gpK=['OXA','PEN','CLI','ERY','SXT','VAN','LNZ','RIF','GEN','LEV','DAP'];
+function cc(v){if(v===null||v===undefined)return'na';return v<=30?'s':v<=70?'i':'r';}
+function ct(v){return v===null||v===undefined?'—':v+'%';}
+function mkT(orgs,keys){let h='<table class="abg"><thead><tr><th class="rn">Organismo</th>';keys.forEach(k=>h+='<th>'+aN[k]+'</th>');h+='</tr></thead><tbody>';orgs.forEach(o=>{h+='<tr><td class="rn">'+o.n+'</td>';keys.forEach(k=>{const v=o.d[k];h+='<td class="'+cc(v)+'">'+ct(v)+'</td>';});h+='</tr>';});return h+'</tbody></table>';}
+function showAbg(s,el){document.querySelectorAll('.svc-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');const d=abg[s];if(!d)return;let h='<div class="c" style="margin-top:12px"><h3>'+d.t+' — Ene-Dic 2025 (% Resistencia)</h3>';if(d.gn.length){h+='<div class="st" style="font-size:.9em;margin-top:8px">Gram-negativos</div><div class="abg-wrap">'+mkT(d.gn,gnK)+'</div>';}if(d.gp.length){h+='<div class="st" style="font-size:.9em;margin-top:14px">Gram-positivos</div><div class="abg-wrap">'+mkT(d.gp,gpK)+'</div>';}h+='<div class="leg" style="margin-top:8px">Verde ≤30% = sensible (1ª línea empírica). Amarillo 31-70% = precaución. Rojo >70% = NO usar empíricamente. Confirmar siempre con antibiograma individual.</div></div>';document.getElementById('abgBox').innerHTML=h;}
+showAbg('uci',document.querySelector('.svc-btn'));
 
-new Chart(ctx('ch44'),{type:'bar',data:{labels:tmLbl,datasets:[barDs('Casos',tmV,C.b)]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'N.º casos'}}}}});
-new Chart(ctx('ch45'),{type:'bar',data:{labels:topCx,datasets:[barDs('Procedimientos',topCxV,C.t)]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'N.º procedimientos'}}}}});
-
-/* ===== TAB 5 CHARTS ===== */
-new Chart(ctx('ch50'),{type:'bar',data:{labels:ntSvc,datasets:[barDs('Notificados',ntNot,C.g),barDs('No notificados',ntNo,C.r)]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,title:{display:true,text:'N.º prescripciones'}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch51'),{type:'bar',data:{labels:ntSvc,datasets:[barDs('% Notificación',ntSvc.map((s,i)=>{const t=ntNot[i]+ntNo[i];return t>0?(ntNot[i]/t*100).toFixed(1):0;}),C.b),{type:'line',label:'Meta 90%',data:Array(6).fill(90),borderColor:C.g,borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,title:{display:true,text:'%'}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch52'),{type:'bar',data:{labels:ntSvc,datasets:[
-barDs('Brecha Ene-26 (%)',ntSvc.map((s,i)=>{const t=ntP1N[i]+ntP1No[i];return t>0?(ntP1No[i]/t*100).toFixed(1):0;}),C.o),
-barDs('Brecha Feb-26 (%)',ntSvc.map((s,i)=>{const t=ntP2N[i]+ntP2No[i];return t>0?(ntP2No[i]/t*100).toFixed(1):0;}),C.r)
-]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,title:{display:true,text:'% No notificado (brecha)'}}},plugins:{legend:{position:'bottom'}}}});
-
-/* ===== TAB 6 CHARTS ===== */
-new Chart(ctx('ch60'),{type:'line',data:{labels:ML14,datasets:[
-{label:'Consumo UCI (DDD/100dp)',data:[...uci25,...uci26],borderColor:C.b,backgroundColor:C.b+'22',tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y',fill:false},
-{label:'MMDR UCI (/1000dp)',data:[...mmU25,17.56,14.28],borderColor:C.r,backgroundColor:C.r+'22',tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y1',fill:false}
-]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',title:{display:true,text:'DDD/100dp'},beginAtZero:true},y1:{position:'right',title:{display:true,text:'/1000dp'},beginAtZero:true,grid:{drawOnChartArea:false}}},plugins:{legend:{position:'bottom'}}}});
-new Chart(ctx('ch61'),{type:'line',data:{labels:ML14,datasets:[
-{label:'Consumo Clínica (DDD/100dp)',data:[...mi25,...mi26],borderColor:C.b,backgroundColor:C.b+'22',tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y',fill:false},
-{label:'MMDR Clínica (/1000dp)',data:[...mmM25,11.25,14.85],borderColor:C.r,backgroundColor:C.r+'22',tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y1',fill:false}
-]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',title:{display:true,text:'DDD/100dp'},beginAtZero:true},y1:{position:'right',title:{display:true,text:'/1000dp'},beginAtZero:true,grid:{drawOnChartArea:false}}},plugins:{legend:{position:'bottom'}}}});
-
-new Chart(ctx('ch62'),{type:'line',data:{labels:ML14,datasets:[
-{label:'Carbapenémicos (DDD/100dp)',data:[...carU,...carU26],borderColor:C.b,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y',fill:false},
-{label:'ERC (/1000dp)',data:[...ercU,11.76,7.14],borderColor:C.r,tension:.3,borderWidth:2,pointRadius:3,yAxisID:'y1',fill:false}
-]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',title:{display:true,text:'DDD/100dp'},beginAtZero:true},y1:{position:'right',title:{display:true,text:'/1000dp'},beginAtZero:true,grid:{drawOnChartArea:false}}},plugins:{legend:{position:'bottom'}}}});
-
-const casLabels=['Oct 25','Nov 25','Dic 25','Ene 26','Feb 26'];
-new Chart(ctx('ch63'),{type:'line',data:{labels:casLabels,datasets:[
-lineDs('Penicilinas + IBL',[27.4,28.9,47.7,26.6,18.6],C.b),
-lineDs('Carbapenémicos',[19.3,21.4,14.5,13.5,24.3],C.r),
-lineDs('Cefalosporinas 4.ªG',[0,0,0,34.1,1.6],C.t),
-lineDs('Fluoroquinolonas',[4.2,3.8,5.9,23.5,19.1],C.o)
-]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'DDD/100dp'}}},plugins:{legend:{position:'bottom',labels:{font:{size:9}}}}}});
-
-/* ===== TAB 9 TABLAS DINÁMICAS ===== */
-(function(){
-const tb=document.getElementById('pxTb');
-const sorted=[...pxData].sort((a,b)=>(a.ok/a.n)-(b.ok/b.n));
-sorted.forEach(d=>{
-const pct=(d.ok/d.n*100).toFixed(1);
-const nok=d.n-d.ok;
-const tr=document.createElement('tr');
-tr.innerHTML='<td><strong>'+d.c+'</strong></td><td>'+d.n+'</td><td>'+d.ok+'</td><td>'+nok+'</td><td>'+pct+' %</td>';
-tb.appendChild(tr);
-});
-})();
-
-(function(){
-const tb=document.getElementById('rkTb');
-const all=[...iaData,
-{c:'JSAJ2',n:2,a:1},{c:'WHPJ2',n:2,a:1},{c:'DFEM',n:2,a:2},{c:'RVXX',n:1,a:0},
-{c:'CYXX',n:1,a:1},{c:'MTXX',n:2,a:2},{c:'TVXX',n:1,a:1},{c:'HGXX',n:1,a:1},{c:'JCXX',n:1,a:0}
-];
-all.sort((a,b)=>(b.a/b.n)-(a.a/a.n)||(b.n-a.n));
-all.forEach(d=>{
-const rate=(d.a/d.n*100).toFixed(1);
-const tr=document.createElement('tr');
-tr.innerHTML='<td><strong>'+d.c+'</strong></td><td>'+d.n+'</td><td>'+d.a+'</td><td>'+rate+' %</td>';
-tb.appendChild(tr);
-});
-})();
+/* T10 Tables */
+(function(){const tb=document.getElementById('pxTb');[...pxData].sort((a,b)=>(a.ok/a.n)-(b.ok/b.n)).forEach(d=>{const nm=pxNames[d.c]||'';tb.insertAdjacentHTML('beforeend','<tr><td><b>'+d.c+'</b></td><td>'+nm+'</td><td>'+d.n+'</td><td>'+d.ok+'</td><td>'+(d.n-d.ok)+'</td><td>'+(d.ok/d.n*100).toFixed(1)+'%</td></tr>');});})();
+(function(){const tb=document.getElementById('rkTb');[...iaData].sort((a,b)=>(b.a/b.n)-(a.a/a.n)||(b.n-a.n)).forEach(d=>{const nm=iaNames[d.c]||'';tb.insertAdjacentHTML('beforeend','<tr><td><b>'+d.c+'</b></td><td>'+nm+'</td><td>'+d.n+'</td><td>'+d.a+'</td><td>'+(d.a/d.n*100).toFixed(1)+'%</td></tr>');});})();
 </script>
 </body>
 </html>
